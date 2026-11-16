@@ -42,10 +42,10 @@ body::after { opacity: 0.03; } /* grain très léger */
 .cursor-dot { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; width: 0; height: 0; }
 .cursor-dot::before { content: ""; position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; background: rgb(var(--accent-hi)); transform: scale(1); transition: transform 0.4s var(--ease), opacity 0.3s; box-shadow: 0 0 0 1px rgb(28 28 28 / 0.5); }
 .cursor-dot.big::before { transform: scale(2.4); opacity: 0.6; }
-.cursor-dot.word::before { transform: scale(7.2); opacity: 1; }
+.cursor-dot.word::before { transform: scale(1.4); opacity: 1; }
 .cursor-dot.hide { opacity: 0 !important; }
-.cursor-dot span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #1C1C1C; white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
-.cursor-dot.word span { opacity: 1; }
+.cursor-dot span { position: absolute; left: 14px; top: 12px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; background: rgb(var(--accent)); padding: 4px 9px; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity 0.3s var(--ease), transform 0.4s var(--ease); clip-path: polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px); }
+.cursor-dot.word span { opacity: 1; transform: none; }
 
 /* Fond « atelier lumineux » : plans biseautés sur 3 profondeurs, une seule source de lumière (souris + scroll) */
 .atelier { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
@@ -86,3 +86,19 @@ h2, h3 { transition: font-stretch 0.5s var(--ease); }
   .frame-draw::before, .frame-draw::after { opacity: 0.9; transform: none; transition: none; }
   .cursor-dot { display: none; }
 }
+
+/* ================================================================== Réalisations : mode bureau */
+.desk { background: #EFEFED; box-shadow: inset 0 2px 24px rgb(28 28 28 / 0.08); clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px); }
+.desk::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgb(28 28 28 / 0.035) 1px, transparent 1px), linear-gradient(90deg, rgb(28 28 28 / 0.035) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.desk-win { box-shadow: 0 40px 60px -30px rgb(28 28 28 / 0.55); filter: drop-shadow(0 10px 14px rgb(28 28 28 / 0.2)); }
+.desk-win:focus-visible { outline: none; }
+.desk-scroll { animation: deskScroll var(--dur, 14s) cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; will-change: transform; }
+.desk-screen:hover .desk-scroll { animation-play-state: paused; }
+@keyframes deskScroll { from { transform: translateY(0); } to { transform: translateY(var(--dist, 0px)); } }
+.ghost-cursor { position: absolute; left: 20%; top: 18%; z-index: 3; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35)); animation: ghostMove 9s var(--ease) infinite; }
+.ghost-click { position: absolute; left: 20%; top: 18%; z-index: 2; width: 34px; height: 34px; margin: -8px 0 0 -8px; border: 2px solid rgb(var(--accent)); border-radius: 50%; opacity: 0; pointer-events: none; animation: ghostClick 9s var(--ease) infinite; }
+@keyframes ghostMove { 0% { left: 20%; top: 18%; } 22% { left: 62%; top: 30%; } 40% { left: 62%; top: 30%; } 62% { left: 35%; top: 62%; } 80% { left: 35%; top: 62%; } 100% { left: 20%; top: 18%; } }
+@keyframes ghostClick { 0%, 24%, 44%, 64%, 100% { opacity: 0; transform: scale(0.3); } 22%, 62% { left: inherit; } 28% { opacity: 0.9; transform: scale(0.6); } 36% { opacity: 0; transform: scale(1.6); } }
+.desk-step { opacity: 0; animation: stepIn 0.6s var(--ease) forwards; }
+@keyframes stepIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .desk-scroll, .ghost-cursor, .ghost-click { animation: none !important; } .ghost-cursor, .ghost-click { display: none; } .desk-step { animation: none; opacity: 1; } }

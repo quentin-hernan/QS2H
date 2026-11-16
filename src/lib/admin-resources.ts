@@ -49,6 +49,8 @@ export const resources: Resource[] = [
       { name: "authorized", label: "J'ai l'autorisation du client de présenter ce projet (obligatoire pour publier un projet client)", type: "boolean" },
       { name: "authorizedNote", label: "Note interne sur l'autorisation (date, moyen, interlocuteur)", type: "text" },
       { name: "year", label: "Année", type: "number", half: true },
+      { name: "duration", label: "Durée réelle du projet (du brief à la mise en ligne)", type: "text", half: true, hint: "Ex. « 5 semaines ». Laissez vide si inconnue." },
+      { name: "beforeImage", label: "Capture AVANT refonte (affiche le curseur Avant / Après)", type: "image" },
       { name: "services", label: "Services concernés", type: "multiselect", options: "services" },
       { name: "summary", label: "Description courte", type: "textarea", required: true, rows: 3, max: 300 },
       { name: "challenge", label: "Contexte et objectifs", type: "textarea", rows: 4 },

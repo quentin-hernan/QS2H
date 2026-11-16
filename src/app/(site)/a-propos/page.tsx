@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Tilt } from "@/components/BlogList";
 import { Reveal } from "@/components/Reveal";
 import { getPage, getTeam } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
@@ -42,7 +43,7 @@ export default async function About() {
           <ul className="grid gap-8 sm:grid-cols-2 lg:col-span-8">
             {team.map((m, i) => (
               <Reveal as="li" key={m.id} delay={i * 0.08}>
-                <div className="relative mb-5 aspect-[4/5] overflow-hidden chamfer bg-ivory-200">{m.photo ? <Image src={m.photo} alt={`Portrait de ${m.name}`} fill sizes="(min-width:640px) 30vw, 90vw" className="object-cover" /> : <div className="flex h-full items-center justify-center font-serif text-7xl muted">{m.name.replace(/[\[\]]/g, "").slice(0, 1)}</div>}</div>
+                <Tilt><div className="relative mb-5 aspect-[4/5] overflow-hidden chamfer bg-ivory-200 shadow-[0_30px_40px_-30px_rgba(28,28,28,.5)]">{m.photo ? <Image src={m.photo} alt={`Portrait de ${m.name}`} fill sizes="(min-width:640px) 30vw, 90vw" className="object-cover" /> : <div className="flex h-full items-center justify-center font-serif text-7xl muted">{m.name.replace(/[\[\]]/g, "").slice(0, 1)}</div>}</div></Tilt>
                 <h3 className="text-h3 font-medium">{m.name}</h3><p className="acc text-[0.9rem]">{m.role}</p><p className="muted mt-3 leading-relaxed">{m.bio}</p>
               </Reveal>
             ))}

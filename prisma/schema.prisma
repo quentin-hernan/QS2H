@@ -105,6 +105,8 @@ model Project {
   status         String   @default("draft") // draft | published
   isExample      Boolean  @default(false) // = "Projet concept" (réalisé par QS2H sans client)
   year           Int      @default(0)
+  duration       String   @default("") // durée réelle du projet, du brief à la mise en ligne (ex. « 5 semaines »)
+  beforeImage    String   @default("") // capture AVANT refonte (curseur avant / après)
   planes         String   @default("[]") // JSON {id,name,kind,image,caption,depth}[] : vue éclatée
   meta           String   @default("{}") // JSON : capture (title, description, h1, hn, tech, lighthouse mesuré, date)
   authorized     Boolean  @default(false) // autorisation du client de présenter ce projet

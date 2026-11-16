@@ -51,6 +51,13 @@ _prototype/              première maquette HTML (archive, ignorée par le build
 - Aucune donnée inventée : scores et technologies viennent de la capture ; un projet client ne se publie qu'avec la case « J'ai l'autorisation du client » ; les projets réalisés sans client portent le badge « Projet concept ».
 - Mode ZIP de site statique avec aperçu iframe isolé (`apercu.qs2h.fr`) : **non implémenté** (optionnel au cahier des charges).
 
+### Identité et animation
+- Palette : noir encre `#1C1C1C`, bleu QS2H `#2A5587` (survol `#1E4068`), bleu clair `#7FA9D9` pour les fonds sombres, fond `#F8F8F7`. Tout passe par des variables CSS (`--accent`, `--accent-hi`, `--accent-hover`) pilotées par Paramètres > Apparence ; `npx tsx --env-file=.env scripts/migrate-accent.ts` convertit un ancien accent bordeaux enregistré en base.
+- Logo : `public/logo.png` (noir + bleu) et `logo-light.png` (ivoire + bleu clair) sont générés depuis `public/logo-original.png` par `npm run assets` (le bordeaux d'origine est recoloré en bleu). Pour utiliser le fichier officiel, remplacez `logo-original.png` puis relancez la commande.
+- Typographie : Archivo (titres, graisses 700-800, axe de largeur) + Inter (texte), auto-hébergées via `next/font`. Aucune serif ni italique de titre.
+- Animation (`src/components/Motion.tsx`, `src/app/motion.css`, `scenes.css`) : préchargeur à la première visite, transition de page (View Transitions API, repli en fondu), curseur contextuel, barre de progression, fond « atelier lumineux », cadres d'angle, texte vivant. Uniquement transform / opacité, 0,4 à 0,9 s, easing `cubic-bezier(0.22, 1, 0.36, 1)`, tout est réduit avec `prefers-reduced-motion`.
+- Scènes par page (CSS 3D) : `Scenes.tsx` (services, tarifs, méthode, contact, blog, espace client) ; mode bureau des réalisations : `ProjectsDesk.tsx`.
+
 ### Scène 3D
 - `components/HomeStage.tsx` : hero + section épinglée « vue éclatée » (GSAP ScrollTrigger).
 - `components/scene/StageCanvas.tsx` : portable modélisé en code (aucun fichier .glb à charger), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables.

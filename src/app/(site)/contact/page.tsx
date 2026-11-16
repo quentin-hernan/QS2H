@@ -1,5 +1,6 @@
 import { QuoteForm } from "@/components/QuoteForm";
 import { MapEmbed } from "@/components/MapEmbed";
+import { ContactLaptop } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getSettings } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
@@ -29,6 +30,7 @@ export default async function Contact({ searchParams }: { searchParams: Promise<
             <div><dt className="label">Zone d&apos;intervention</dt><dd className="max-w-sm leading-relaxed">{c.area}</dd></div>
             {s.integrations.calendlyUrl && <div><dt className="label">Rendez-vous</dt><dd><a className="btn btn-ghost mt-1" href={s.integrations.calendlyUrl} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a></dd></div>}
           </dl>
+          <ContactLaptop />
           <div className="light-section mt-12 chamfer"><MapEmbed city={c.city} /></div>
         </div>
         <div className="min-w-0 lg:col-span-7"><QuoteForm presetPlan={formule} /></div>

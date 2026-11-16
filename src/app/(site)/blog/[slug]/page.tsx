@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { TocNav } from "@/components/TocNav";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import sanitizeHtml from "sanitize-html";
@@ -57,7 +58,7 @@ export default async function PostPage({ params }: P) {
         <div className="light-section py-16 md:py-24">
           <div className="container grid gap-12 lg:grid-cols-12">
             {toc.length > 1 && (
-              <aside className="lg:col-span-3"><nav aria-label="Sommaire" className="lg:sticky lg:top-32"><p className="eyebrow mb-5">Sommaire</p><ol className="space-y-3 text-[0.95rem]">{toc.map((t) => (<li key={t.id}><a className="link-u muted hover:text-ink-900" href={`#${t.id}`}>{t.text}</a></li>))}</ol></nav></aside>
+              <aside className="lg:col-span-3"><TocNav toc={toc} /></aside>
             )}
             <div className={toc.length > 1 ? "lg:col-span-8 lg:col-start-5" : "lg:col-span-8 lg:col-start-3"}>
               {post.cover && <div className="relative mb-12 aspect-[3/2] overflow-hidden chamfer"><Image src={post.cover} alt="" fill priority sizes="(min-width:1024px) 60vw, 100vw" className="object-cover" /></div>}

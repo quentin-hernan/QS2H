@@ -171,8 +171,8 @@ export function ScrollWords({ text, className = "" }: { text: string; className?
     return () => { tw.scrollTrigger?.kill(); tw.kill(); };
   }, []);
   return (
-    <p ref={ref} className={className} aria-label={text}>
-      {text.split(" ").map((w, i) => (<span key={i} aria-hidden="true" style={{ display: "inline-block", marginRight: "0.28em" }}>{w}</span>))}
+    <p ref={ref} className={className}>
+      {text.split(" ").map((w, i) => (<span key={i} style={{ display: "inline-block", marginRight: "0.28em" }}>{w}</span>))}
     </p>
   );
 }

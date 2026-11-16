@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireClient } from "@/lib/client-auth";
+import { ProjectObject } from "@/components/Scenes";
 import { formatDate, parseJson } from "@/lib/utils";
 
 export const metadata = { title: "Mon espace client" };
@@ -25,6 +26,7 @@ export default async function Page() {
           return (
             <article key={p.id} className="mb-10">
               <h3 className="mb-5 text-h3">{p.title}</h3>
+              <ProjectObject done={steps.filter((x) => x.status === "termine").length} total={Math.max(1, steps.length)} current={steps.find((x) => x.status === "en-cours")?.name} />
               <ol className="border-l hair">
                 {steps.map((s, i) => (
                   <li key={i} className="relative pb-6 pl-6">

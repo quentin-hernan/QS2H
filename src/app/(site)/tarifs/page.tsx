@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PlanDevices } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/Reveal";
@@ -25,10 +26,11 @@ export default async function Tarifs() {
 
       <section className="light-section py-20 md:py-28">
         <div className="container">
+          <PlanDevices names={plans.map((p) => p.name)} />
           <div className="grid gap-5 lg:grid-cols-3">
             {plans.map((p, i) => (
               <Reveal key={p.id} delay={i * 0.08}>
-                <article className={`flex h-full flex-col chamfer border p-8 md:p-10 ${p.highlighted ? "dark-section border-transparent shadow-[0_40px_80px_-40px_rgba(12,14,17,.7)]" : "hair"}`}>
+                <article data-plan={i} className={`flex h-full flex-col chamfer border p-8 md:p-10 ${p.highlighted ? "dark-section border-transparent shadow-[0_40px_80px_-40px_rgba(12,14,17,.7)]" : "hair"}`}>
                   <p className="acc mb-3 min-h-[1.2em] text-[0.75rem] font-medium uppercase tracking-[0.16em]">{p.highlighted ? "Le plus demandé" : ""}</p>
                   <h2 className="text-h3 font-medium">{p.name}</h2>
                   <p className="muted mt-2 min-h-[3em] text-[0.95rem] leading-snug">{p.description}</p>
