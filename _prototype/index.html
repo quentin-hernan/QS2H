@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atelier Nord — Création de sites web pour entreprises</title>
+<meta name="description" content="Atelier Nord conçoit des sites web sur mesure pour les entreprises : design, développement, référencement.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080b;--ink:#f2f0ea;--mut:#8b8f99;--line:rgba(255,255,255,.1);--acc:#ff5a1f;--glass:rgba(16,17,22,.62)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.vig{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(7,8,11,.75) 100%)}
+header,main,footer{position:relative;z-index:2}
+#bar{position:fixed;top:0;left:0;height:2px;width:0;background:var(--acc);z-index:50}
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:22px 4.5vw;mix-blend-mode:normal}
+.logo{font-family:"Instrument Serif",Georgia,serif;font-size:1.7rem;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.logo b{color:var(--acc);font-weight:400}
+nav{display:flex;gap:6px;align-items:center;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:6px;border-radius:60px}
+nav a{color:var(--ink);text-decoration:none;font-size:.88rem;padding:9px 18px;border-radius:40px;opacity:.75;transition:.25s}
+nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
+nav a.cta{background:var(--ink);color:#000;opacity:1;font-weight:500}nav a.cta:hover{background:var(--acc);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border-radius:60px;background:var(--acc);color:#fff;text-decoration:none;font-weight:500;font-size:.95rem;border:0;cursor:pointer;font-family:inherit;transition:background .3s,box-shadow .3s;will-change:transform;box-shadow:0 10px 40px -10px rgba(255,90,31,.7)}
+.btn:hover{box-shadow:0 14px 50px -6px rgba(255,90,31,.9)}
+.btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(10px)}.btn.ghost:hover{background:rgba(255,255,255,.14)}
+section{position:relative;padding:130px 4.5vw}
+.hero{min-height:112vh;display:flex;flex-direction:column;justify-content:center;padding-top:140px}
+.hero .txt{max-width:640px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:28px}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--acc)}
+h1,h2,h3{font-weight:500;letter-spacing:-.035em;line-height:1.02}
+h1{font-size:clamp(3rem,7.2vw,7rem)}
+h1 em,h2 em{font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;color:var(--acc);letter-spacing:-.02em}
+.ln{display:block;overflow:hidden;padding-bottom:.08em}.ln>span{display:block;transform:translateY(115%);transition:transform 1.2s cubic-bezier(.2,.9,.2,1)}
+.in .ln>span,.ln.in>span{transform:none}
+.ln:nth-child(2)>span{transition-delay:.12s}.ln:nth-child(3)>span{transition-delay:.24s}
+.lead{font-size:1.15rem;color:#b4b7c0;max-width:470px;margin:30px 0 40px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.facts{display:flex;gap:46px;margin-top:70px;flex-wrap:wrap}
+.facts b{display:block;font-weight:500;font-size:1.05rem}.facts span{font-size:.82rem;color:var(--mut)}
+.hint{position:absolute;left:4.5vw;bottom:32px;display:flex;gap:12px;align-items:center;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.hint i{width:1px;height:46px;background:linear-gradient(var(--acc),transparent);animation:dr 2s infinite}
+@keyframes dr{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.marq{overflow:hidden;border-block:1px solid var(--line);background:rgba(7,8,11,.7);backdrop-filter:blur(12px);padding:22px 0;position:relative;z-index:2}
+.marq div{display:flex;gap:60px;white-space:nowrap;width:max-content;animation:mq 38s linear infinite;font-family:"Instrument Serif",serif;font-size:2.2rem;color:#c9c7bf}
+.marq span::after{content:"✦";color:var(--acc);margin-left:60px;font-size:1.2rem}
+@keyframes mq{to{transform:translateX(-50%)}}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;align-items:start}
+h2{font-size:clamp(2.2rem,4.6vw,4.4rem);margin-bottom:22px}
+.sub{color:#a9acb6;max-width:520px;font-size:1.05rem;margin-bottom:40px}
+.panel{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-radius:26px}
+.svc{display:grid;grid-template-columns:50px 1fr 30px;gap:18px;align-items:center;padding:26px 30px;border-bottom:1px solid var(--line);transition:background .35s,padding .35s;cursor:default;position:relative}
+.svc:last-child{border-bottom:0}
+.svc:hover{background:rgba(255,90,31,.08);padding-left:42px}
+.svc .n{font-size:.8rem;color:var(--acc);letter-spacing:.1em}
+.svc h3{font-size:1.45rem;margin-bottom:4px}.svc p{color:var(--mut);font-size:.93rem}
+.svc .ar{font-size:1.3rem;transition:transform .35s;color:var(--mut)}.svc:hover .ar{transform:translateX(6px) rotate(-45deg);color:var(--acc)}
+.stp{padding:34px 36px;margin-bottom:22px;opacity:.38;transform:scale(.97);transition:.6s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}
+.stp.on{opacity:1;transform:none;border-color:rgba(255,90,31,.5)}
+.stp::after{content:"";position:absolute;left:0;top:0;height:2px;width:0;background:var(--acc);transition:width 1.2s}.stp.on::after{width:100%}
+.stp .k{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+.stp h3{font-size:2rem;margin-bottom:10px}.stp p{color:#aeb1ba}
+.stpwrap{min-height:130vh;padding-top:20vh}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;margin-top:20px}
+.plan{padding:40px 34px;display:flex;flex-direction:column;transition:transform .15s,border-color .3s;transform-style:preserve-3d;will-change:transform;position:relative;overflow:hidden}
+.plan::before,.tilt::before{content:"";position:absolute;inset:0;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.1),transparent 60%);opacity:0;transition:.3s;pointer-events:none}
+.plan:hover::before{opacity:1}
+.plan.hl{border-color:rgba(255,90,31,.7);box-shadow:0 0 80px -20px rgba(255,90,31,.55)}
+.plan .tg{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);min-height:1.2em;margin-bottom:10px}
+.plan h3{font-size:1.7rem}.plan .amt{font-size:3.6rem;letter-spacing:-.045em;margin:18px 0 4px;font-weight:500}.plan .amt small{font-size:.9rem;color:var(--mut);letter-spacing:0;font-weight:400}
+.plan ul{list-style:none;margin:24px 0 32px;flex:1}.plan li{padding:12px 0;border-top:1px solid var(--line);font-size:.94rem;color:#b4b7c0}
+form{display:grid;gap:14px;padding:38px}
+label{font-size:.78rem;color:var(--mut);display:grid;gap:7px;letter-spacing:.04em}
+input,textarea,select{width:100%;padding:15px 16px;border:1px solid var(--line);background:rgba(255,255,255,.04);font:inherit;color:var(--ink);border-radius:12px;outline:none;transition:border-color .25s,background .25s}
+input:focus,textarea:focus,select:focus{border-color:var(--acc);background:rgba(255,255,255,.07)}
+select option{color:#000}
+.info p{color:#b4b7c0;margin-bottom:10px}.info b{color:var(--ink);font-weight:500}
+footer{padding:34px 4.5vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.84rem;color:var(--mut);border-top:1px solid var(--line);background:rgba(7,8,11,.85);backdrop-filter:blur(12px)}
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
+#cur,#dot{position:fixed;left:0;top:0;pointer-events:none;z-index:99;border-radius:50%}
+#cur{width:44px;height:44px;border:1px solid rgba(255,255,255,.55);margin:-22px 0 0 -22px;transition:width .3s,height .3s,margin .3s,background .3s,border-color .3s}
+#cur.big{width:84px;height:84px;margin:-42px 0 0 -42px;background:rgba(255,90,31,.18);border-color:var(--acc)}
+#dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:var(--acc)}
+#load{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;transition:opacity .9s,visibility .9s}
+#load.off{opacity:0;visibility:hidden}
+#load .lg{font-family:"Instrument Serif",serif;font-size:2.6rem}#load .lg b{color:var(--acc);font-weight:400}
+#load .ln2{width:220px;height:1px;background:var(--line);position:relative}#load .ln2 i{position:absolute;inset:0;background:var(--acc);transform-origin:left;transform:scaleX(0);transition:transform .3s}
+#load small{font-size:.75rem;letter-spacing:.2em;color:var(--mut)}
+@media(hover:none){#cur,#dot{display:none}}
+@media(max-width:900px){
+  nav a:not(.cta){display:none}
+  .split{grid-template-columns:1fr}
+  .hero{justify-content:flex-start;padding-top:120px;min-height:130vh}
+  .hero .txt{background:linear-gradient(rgba(7,8,11,.55),transparent);padding-bottom:20px}
+  .spacer{display:none}
+  .stpwrap{min-height:auto;padding-top:0}
+  section{padding:90px 5vw}
+}
+</style>
+</head>
+<body>
+<div id="load"><div class="lg">Atelier <b>Nord</b></div><div class="ln2"><i id="lb"></i></div><small id="lp">0 %</small></div>
+<div id="bar"></div><div id="cur"></div><div id="dot"></div>
+<canvas id="gl"></canvas><div class="vig"></div>
+
+<header>
+  <a class="logo" href="#top">Atelier <b>Nord</b></a>
+  <nav><a href="#services">Services</a><a href="#methode">Méthode</a><a href="#tarifs">Tarifs</a><a class="cta mag" href="#contact">Devis gratuit</a></nav>
+</header>
+
+<main>
+  <section class="hero" id="top">
+    <div class="txt">
+      <div class="eyebrow rv">Création de sites web pour entreprises</div>
+      <h1 id="h1"><span class="ln"><span>Des sites web</span></span><span class="ln"><span>qui font</span></span><span class="ln"><span><em>la différence.</em></span></span></h1>
+      <p class="lead rv">Design sur mesure, développement soigné, référencement local. Un seul interlocuteur, un prix fixe, une livraison en quelques semaines.</p>
+      <div class="row rv"><a class="btn mag" href="#contact">Demander un devis <span>→</span></a><a class="btn ghost mag" href="#methode">Voir notre méthode</a></div>
+      <div class="facts rv"><div><b>Prix fixe</b><span>Devis signé d'avance</span></div><div><b>3 à 4 semaines</b><span>Délai moyen</span></div><div><b>100 % à vous</b><span>Le site vous appartient</span></div></div>
+    </div>
+    <div class="hint"><i></i>Défiler · bougez la souris · cliquez l'ordinateur</div>
+  </section>
+
+  <div class="marq"><div><span>Site vitrine</span><span>Boutique en ligne</span><span>Refonte</span><span>Référencement local</span><span>Animations 3D</span><span>Maintenance</span><span>Site vitrine</span><span>Boutique en ligne</span><span>Refonte</span><span>Référencement local</span><span>Animations 3D</span><span>Maintenance</span></div></div>
+
+  <section id="services">
+    <div class="split"><div class="spacer"></div>
+      <div>
+        <div class="eyebrow rv">Services</div>
+        <h2 class="rv">Tout ce qu'il faut pour <em>être trouvé</em> et choisi.</h2>
+        <div class="panel rv">
+          <div class="svc"><span class="n">01</span><div><h3>Site vitrine</h3><p>Votre activité, vos références, vos coordonnées. Rapide et adapté au mobile.</p></div><span class="ar">→</span></div>
+          <div class="svc"><span class="n">02</span><div><h3>Boutique en ligne</h3><p>Catalogue, paiement sécurisé, commandes et stocks.</p></div><span class="ar">→</span></div>
+          <div class="svc"><span class="n">03</span><div><h3>Refonte de site</h3><p>Design, vitesse, structure : on modernise l'existant.</p></div><span class="ar">→</span></div>
+          <div class="svc"><span class="n">04</span><div><h3>Référencement local</h3><p>Apparaître sur Google auprès des clients de votre zone.</p></div><span class="ar">→</span></div>
+          <div class="svc"><span class="n">05</span><div><h3>Animations &amp; 3D</h3><p>Interactions et visuels 3D quand ils servent votre message.</p></div><span class="ar">→</span></div>
+          <div class="svc"><span class="n">06</span><div><h3>Maintenance</h3><p>Hébergement, sauvegardes, sécurité, modifications.</p></div><span class="ar">→</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="methode" class="stpwrap">
+    <div class="split">
+      <div>
+        <div class="eyebrow rv">Méthode</div>
+        <h2 class="rv">Quatre étapes, <em>zéro surprise.</em></h2>
+        <div class="panel stp"  data-p="0"><div class="k">Étape 1</div><h3>On vous écoute</h3><p>Activité, clients, objectifs, budget. Nous définissons ensemble l'arborescence puis la maquette, que vous validez avant tout développement.</p></div>
+        <div class="panel stp"  data-p="1"><div class="k">Étape 2</div><h3>On construit</h3><p>Développement propre et rapide, testé sur tous les écrans. Vous suivez l'avancement sur une version de test.</p></div>
+        <div class="panel stp"  data-p="2"><div class="k">Étape 3</div><h3>On optimise</h3><p>Vitesse, balises, fiche Google, structure des pages : les fondations pour apparaître dans les recherches de votre secteur.</p></div>
+        <div class="panel stp"  data-p="3"><div class="k">Étape 4</div><h3>On lance</h3><p>Mise en ligne, formation à la modification du contenu, suivi après lancement. Tous les accès vous sont remis.</p></div>
+      </div>
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <section id="tarifs">
+    <div class="eyebrow rv">Tarifs</div>
+    <h2 class="rv">Des prix <em>clairs.</em></h2>
+    <p class="sub rv">Hors taxes, sans abonnement caché. Règlement en deux fois : à la commande, puis à la livraison.</p>
+    <div class="plans">
+      <div class="panel plan rv"><div class="tg"></div><h3>Essentiel</h3><div class="amt">990 €<small> HT</small></div><ul><li>Jusqu'à 3 pages</li><li>Design sur mesure</li><li>Adapté mobile</li><li>Formulaire de contact</li></ul><a class="btn ghost mag" href="#contact">Demander ce devis</a></div>
+      <div class="panel plan hl rv"><div class="tg">Le plus demandé</div><h3>Professionnel</h3><div class="amt">2 490 €<small> HT</small></div><ul><li>Jusqu'à 8 pages</li><li>Animations et éléments 3D</li><li>Référencement local</li><li>Statistiques de visites</li><li>3 mois de maintenance</li></ul><a class="btn mag" href="#contact">Demander ce devis →</a></div>
+      <div class="panel plan rv"><div class="tg"></div><h3>Sur mesure</h3><div class="amt">Sur devis</div><ul><li>Boutique en ligne</li><li>Espace client, outils métier</li><li>Intégrations spécifiques</li><li>Accompagnement dédié</li></ul><a class="btn ghost mag" href="#contact">Nous contacter</a></div>
+    </div>
+  </section>
+
+  <section id="contact" style="padding-bottom:160px">
+    <div class="split">
+      <div class="spacer"></div>
+      <div>
+        <div class="eyebrow rv">Contact</div>
+        <h2 class="rv">Parlons de <em>votre projet.</em></h2>
+        <p class="sub rv">Réponse sous 24 heures ouvrées, avec une première estimation gratuite et sans engagement.</p>
+        <form class="panel rv" id="f">
+          <label>Nom<input name="nom" required></label>
+          <label>Email professionnel<input name="email" type="email" required></label>
+          <label>Entreprise<input name="ent"></label>
+          <label>Offre souhaitée<select name="offre"><option>Essentiel</option><option selected>Professionnel</option><option>Sur mesure</option></select></label>
+          <label>Votre projet<textarea name="msg" rows="4"></textarea></label>
+          <button class="btn mag" type="submit" style="justify-content:center">Envoyer la demande →</button>
+          <small id="ok" style="color:var(--acc)"></small>
+        </form>
+        <div class="info" style="margin-top:28px"><p><b>Email</b> — contact@votre-domaine.fr</p><p><b>Téléphone</b> — 00 00 00 00 00</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><span>© 2026 Atelier Nord</span><span>Mentions légales · Politique de confidentialité</span></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const CONTACT_EMAIL="contact@votre-domaine.fr"; // à remplacer
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)), lerp=(a,b,t)=>a+(b-a)*t;
+const smoother=t=>t*t*t*(t*(t*6-15)+10);
+const isMob=()=>innerWidth<900;
+
+/* ================= RENDERER ================= */
+const canvas=$('#gl');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,isMob()?1.5:2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x07080b);
+scene.fog=new THREE.Fog(0x07080b,11,32);
+const camera=new THREE.PerspectiveCamera(32,1,.1,80);
+
+/* ---- environnement (reflets réalistes sur le métal) ---- */
+(function(){
+  const env=new THREE.Scene();env.background=new THREE.Color(0x030305);
+  const P=(w,h,x,y,z,rx,ry,c,k)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(k),side:2}));m.position.set(x,y,z);m.rotation.set(rx,ry,0);env.add(m)};
+  P(14,8,0,9,0,Math.PI/2,0,0xffffff,5);          // grand softbox haut
+  P(2.5,12,-9,2,2,0,Math.PI/2,0xff7a3d,5);        // bande chaude gauche
+  P(2.5,12,9,2,-2,0,Math.PI/2,0xa8c4ff,4);        // bande froide droite
+  P(16,3,0,3,-10,0,0,0xffffff,2.5);               // rim arrière
+  P(10,2,0,0.5,10,0,0,0xffffff,1.2);              // fill avant
+  const pm=new THREE.PMREMGenerator(renderer);
+  scene.environment=pm.fromScene(env,.03).texture;pm.dispose();
+})();
+
+/* ---- lumières ---- */
+const key=new THREE.SpotLight(0xffe3cf,2.6,40,.55,.7,1);key.position.set(3.5,8,5);key.target.position.set(0,0,0);
+key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-.0004;key.shadow.radius=6;scene.add(key,key.target);
+const rim=new THREE.DirectionalLight(0x9db8ff,1.1);rim.position.set(-6,4,-6);scene.add(rim);
+const warm=new THREE.PointLight(0xff5a1f,2.4,12,2);warm.position.set(-3,1.4,2);scene.add(warm);
+scene.add(new THREE.HemisphereLight(0x8892b0,0x0a0a0f,.25));
+
+/* ---- sol ---- */
+const floor=new THREE.Mesh(new THREE.CircleGeometry(60,80),new THREE.MeshStandardMaterial({color:0x0d0e13,metalness:.55,roughness:.5,envMapIntensity:.4}));
+floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+(function(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  const r=g.createRadialGradient(128,128,0,128,128,128);r.addColorStop(0,'rgba(255,90,31,.55)');r.addColorStop(.4,'rgba(255,90,31,.14)');r.addColorStop(1,'rgba(255,90,31,0)');g.fillStyle=r;g.fillRect(0,0,256,256);
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(11,11),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));
+  m.rotation.x=-Math.PI/2;m.position.y=.01;scene.add(m);
+  // anneaux de repère au sol
+  [3.2,4.6,6.2].forEach((r,i)=>{const t=new THREE.Mesh(new THREE.RingGeometry(r,r+.012,128),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.07-i*.015,side:2}));t.rotation.x=-Math.PI/2;t.position.y=.012;scene.add(t)});
+})();
+
+/* ================= HELPERS GÉOMÉTRIE ================= */
+function rbox(w,h,d,r,b=.012){
+  const s=new THREE.Shape(),x=-w/2,y=-h/2;
+  s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const g=new THREE.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelThickness:b,bevelSize:b,bevelSegments:4,curveSegments:10});
+  g.translate(0,0,-(d-2*b)/2);return g;
+}
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+const mkTex=c=>{const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t};
+
+/* ================= CONTENU DES ÉCRANS (site animé) ================= */
+function drawSite(g,H,t,off,sc){
+  g.save();g.scale(sc,sc);
+  g.fillStyle='#0d0e12';g.fillRect(0,0,1280,H/sc);
+  g.translate(0,-off);
+  let gr=g.createRadialGradient(1000,300,10,1000,300,560);gr.addColorStop(0,'rgba(255,90,31,.38)');gr.addColorStop(1,'rgba(255,90,31,0)');g.fillStyle=gr;g.fillRect(0,0,1280,900);
+  // nav
+  g.fillStyle='#f2f0ea';g.beginPath();g.arc(86,46,13,0,7);g.fill();g.fillStyle='#ff5a1f';g.beginPath();g.arc(86,46,6,0,7);g.fill();
+  g.font='600 22px Helvetica,Arial';g.fillStyle='#f2f0ea';g.fillText('Votre Marque',110,53);
+  g.font='18px Helvetica,Arial';g.fillStyle='#8b8f99';['Services','Réalisations','À propos'].forEach((s,i)=>g.fillText(s,700+i*140,52));
+  rr(g,1070,24,140,44,22);g.fillStyle='#f2f0ea';g.fill();g.fillStyle='#000';g.font='600 17px Helvetica,Arial';g.fillText('Contact',1109,52);
+  // hero
+  rr(g,70,130,230,36,18);g.strokeStyle='#2a2d36';g.lineWidth=1.5;g.stroke();g.fillStyle='#8b8f99';g.font='16px Helvetica,Arial';g.fillText('● Disponible cette semaine',90,154);
+  g.fillStyle='#f2f0ea';g.font='600 80px Helvetica Neue,Helvetica,Arial';g.fillText('Votre activité,',70,270);
+  g.fillStyle='#ff5a1f';g.font='italic 84px Georgia,serif';g.fillText('en pleine lumière.',70,360);
+  g.fillStyle='#3a3d47';g.fillRect(70,410,420,12);g.fillRect(70,438,340,12);
+  rr(g,70,490,200,60,30);g.fillStyle='#ff5a1f';g.fill();g.fillStyle='#fff';g.font='600 19px Helvetica,Arial';g.fillText('Démarrer →',112,527);
+  rr(g,290,490,190,60,30);g.strokeStyle='#3a3d47';g.stroke();g.fillStyle='#f2f0ea';g.fillText('Nos projets',334,527);
+  // cartes empilées (droite)
+  for(let k=2;k>=0;k--){const ox=720+k*34,oy=150+k*46+Math.sin(t*1.2+k)*7;
+    rr(g,ox,oy,440,290,24);const lg=g.createLinearGradient(ox,oy,ox+440,oy+290);
+    lg.addColorStop(0,['#ff5a1f','#23252d','#1a1c22'][k]);lg.addColorStop(1,['#ff9a5a','#14151a','#101115'][k]);g.fillStyle=lg;g.fill();
+    g.strokeStyle='rgba(255,255,255,.12)';g.lineWidth=1.5;g.stroke();
+    if(k==0){g.fillStyle='rgba(0,0,0,.35)';g.fillRect(ox+34,oy+36,150,16);g.fillRect(ox+34,oy+64,230,12);g.font='600 64px Helvetica,Arial';g.fillStyle='#fff';g.fillText('+128 %',ox+34,oy+200);g.font='18px Helvetica,Arial';g.fillText('de demandes entrantes',ox+36,oy+236)}}
+  // services
+  g.fillStyle='#f2f0ea';g.font='600 46px Helvetica,Arial';g.fillText('Ce que nous faisons',70,700);
+  for(let i=0;i<3;i++){rr(g,70+i*385,740,360,250,22);g.fillStyle='#15171c';g.fill();g.strokeStyle='#262932';g.lineWidth=1.5;g.stroke();
+    g.beginPath();g.arc(120+i*385,800,26,0,7);g.fillStyle=i==1?'#ff5a1f':'#2a2d36';g.fill();
+    g.fillStyle='#f2f0ea';g.fillRect(100+i*385,860,180,16);g.fillStyle='#3a3d47';g.fillRect(100+i*385,894,290,10);g.fillRect(100+i*385,916,240,10);g.fillRect(100+i*385,938,260,10)}
+  // bannière
+  rr(g,70,1060,1140,260,30);const bg=g.createLinearGradient(70,1060,1210,1320);bg.addColorStop(0,'#ff5a1f');bg.addColorStop(1,'#c2370f');g.fillStyle=bg;g.fill();
+  g.fillStyle='#fff';g.font='600 58px Helvetica,Arial';g.fillText('Parlons de votre projet.',120,1180);g.font='22px Helvetica,Arial';g.fillText('Réponse sous 24 heures ouvrées.',122,1230);
+  rr(g,930,1150,220,64,32);g.fillStyle='#fff';g.fill();g.fillStyle='#000';g.font='600 20px Helvetica,Arial';g.fillText('Nous écrire →',968,1190);
+  g.restore();
+}
+function drawPhone(g,t,off){
+  g.fillStyle='#0d0e12';g.fillRect(0,0,512,1024);g.save();g.translate(0,-off);
+  let gr=g.createRadialGradient(400,260,5,400,260,320);gr.addColorStop(0,'rgba(255,90,31,.45)');gr.addColorStop(1,'rgba(255,90,31,0)');g.fillStyle=gr;g.fillRect(0,0,512,800);
+  g.fillStyle='#f2f0ea';g.beginPath();g.arc(52,110,12,0,7);g.fill();g.fillStyle='#ff5a1f';g.beginPath();g.arc(52,110,5,0,7);g.fill();
+  g.font='600 22px Helvetica,Arial';g.fillStyle='#f2f0ea';g.fillText('Votre Marque',74,118);
+  g.fillRect(430,102,32,3);g.fillRect(430,114,32,3);
+  g.font='600 62px Helvetica,Arial';g.fillText('Votre activité,',40,260);g.font='italic 66px Georgia,serif';g.fillStyle='#ff5a1f';g.fillText('en pleine',40,332);g.fillText('lumière.',40,400);
+  g.fillStyle='#3a3d47';g.fillRect(40,440,360,10);g.fillRect(40,462,300,10);
+  rr(g,40,510,200,60,30);g.fillStyle='#ff5a1f';g.fill();g.fillStyle='#fff';g.font='600 20px Helvetica,Arial';g.fillText('Démarrer →',72,547);
+  for(let i=0;i<3;i++){rr(g,40,640+i*200,432,170,22);g.fillStyle='#15171c';g.fill();g.strokeStyle='#262932';g.lineWidth=1.5;g.stroke();
+    g.beginPath();g.arc(92,700+i*200,26,0,7);g.fillStyle=i==1?'#ff5a1f':'#2a2d36';g.fill();g.fillStyle='#f2f0ea';g.fillRect(140,690+i*200,200,14);g.fillStyle='#3a3d47';g.fillRect(70,760+i*200,340,9);g.fillRect(70,780+i*200,280,9)}
+  g.restore();
+}
+
+/* ================= MODÈLES 3D ================= */
+const alu=new THREE.MeshStandardMaterial({color:0xc6c9cf,metalness:1,roughness:.28,envMapIntensity:1.3});
+const darkMetal=new THREE.MeshStandardMaterial({color:0x2a2c32,metalness:1,roughness:.32,envMapIntensity:1.2});
+const keyMat=new THREE.MeshStandardMaterial({color:0x0f1014,metalness:.4,roughness:.5});
+const black=new THREE.MeshStandardMaterial({color:0x020203,metalness:.2,roughness:.25});
+const devices=new THREE.Group();scene.add(devices);
+
+/* ---- ORDINATEUR PORTABLE ---- */
+const lap=new THREE.Group();devices.add(lap);
+const baseG=rbox(3.2,2.2,.09,.12);baseG.rotateX(-Math.PI/2);
+const base=new THREE.Mesh(baseG,alu);base.position.y=.045;base.castShadow=base.receiveShadow=true;lap.add(base);
+const well=new THREE.Mesh(new THREE.PlaneGeometry(2.86,1.14),black);well.rotation.x=-Math.PI/2;well.position.set(0,.0915,-.38);lap.add(well);
+const keys=new THREE.InstancedMesh(new THREE.BoxGeometry(.165,.03,.15),keyMat,6*14);
+const mt=new THREE.Matrix4();let ki=0;
+for(let r=0;r<6;r++)for(let c=0;c<14;c++){mt.setPosition((c-6.5)*.196,.104,-.82+r*.18);keys.setMatrixAt(ki++,mt)}
+keys.castShadow=true;lap.add(keys);
+const padG=rbox(1.15,.68,.012,.05,.004);padG.rotateX(-Math.PI/2);const pad=new THREE.Mesh(padG,new THREE.MeshStandardMaterial({color:0xaeb1b8,metalness:1,roughness:.18,envMapIntensity:1.4}));pad.position.set(0,.093,.62);lap.add(pad);
+// charnière
+const hinge=new THREE.Group();hinge.position.set(0,.09,-1.08);lap.add(hinge);
+const lid=new THREE.Mesh(rbox(3.2,2.1,.06,.1,.012),alu);lid.position.set(0,1.05,-.035);lid.castShadow=true;hinge.add(lid);
+const bezel=new THREE.Mesh(new THREE.PlaneGeometry(3.08,1.98),black);bezel.position.z=.0305;lid.add(bezel);
+const screenCv=document.createElement('canvas');screenCv.width=1280;screenCv.height=800;const sg=screenCv.getContext('2d');
+const screenTex=mkTex(screenCv);
+const screen=new THREE.Mesh(new THREE.PlaneGeometry(2.96,1.85),new THREE.MeshBasicMaterial({map:screenTex,toneMapped:false}));screen.position.z=.0312;lid.add(screen);
+// reflet vitre
+const glare=new THREE.Mesh(new THREE.PlaneGeometry(2.96,1.85),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.04,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));glare.position.z=.032;lid.add(glare);
+// halo d'écran
+const sl=new THREE.PointLight(0xffa070,0,6,2);sl.position.set(0,.9,1.1);lap.add(sl);
+let lidA=Math.PI/2-.02,lidT=-.2;
+
+/* ---- TÉLÉPHONE ---- */
+const phone=new THREE.Group();devices.add(phone);
+const pBody=new THREE.Mesh(rbox(.92,1.92,.1,.15,.014),darkMetal);pBody.castShadow=true;phone.add(pBody);
+const phoneCv=document.createElement('canvas');phoneCv.width=512;phoneCv.height=1024;const pg=phoneCv.getContext('2d');const phoneTex=mkTex(phoneCv);
+const pScreen=new THREE.Mesh(new THREE.PlaneGeometry(.84,1.84),new THREE.MeshBasicMaterial({map:phoneTex,toneMapped:false}));pScreen.position.z=.0512;phone.add(pScreen);
+const isl=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.16,12),black);isl.rotation.z=Math.PI/2;isl.position.set(0,.84,.0522);phone.add(isl);
+const cam1=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.03,24),darkMetal);cam1.rotation.x=Math.PI/2;
+[[-.22,.7],[.04,.7],[-.09,.46]].forEach(p=>{const c=cam1.clone();c.position.set(p[0],p[1],-.065);phone.add(c);const l=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.032,20),black);l.rotation.x=Math.PI/2;l.position.set(p[0],p[1],-.072);phone.add(l)});
+phone.position.set(2.3,1.05,1.0);phone.rotation.set(-.08,-.45,.06);
+
+/* ---- TABLETTE ---- */
+const tab=new THREE.Group();devices.add(tab);
+const tBody=new THREE.Mesh(rbox(2.1,1.5,.085,.13,.012),darkMetal);tBody.castShadow=true;tab.add(tBody);
+const tabCv=document.createElement('canvas');tabCv.width=1024;tabCv.height=724;const tg=tabCv.getContext('2d');const tabTex=mkTex(tabCv);
+const tScreen=new THREE.Mesh(new THREE.PlaneGeometry(1.96,1.38),new THREE.MeshBasicMaterial({map:tabTex,toneMapped:false}));tScreen.position.z=.0435;tab.add(tScreen);
+tab.position.set(-2.8,1.0,.5);tab.rotation.set(-.05,.5,-.05);
+
+/* ---- pastilles flottantes (verre) ---- */
+const chips=[];
+function chipTex(label,sub){
+  const c=document.createElement('canvas');c.width=640;c.height=220;const g=c.getContext('2d');
+  rr(g,6,6,628,208,50);g.fillStyle='rgba(18,19,25,.82)';g.fill();g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=3;g.stroke();
+  g.beginPath();g.arc(110,110,46,0,7);g.fillStyle='#ff5a1f';g.fill();
+  g.strokeStyle='#fff';g.lineWidth=9;g.lineCap='round';g.lineJoin='round';g.beginPath();g.moveTo(88,112);g.lineTo(105,130);g.lineTo(136,90);g.stroke();
+  g.fillStyle='#f2f0ea';g.font='600 52px Helvetica,Arial';g.fillText(label,185,112);g.fillStyle='#8b8f99';g.font='32px Helvetica,Arial';g.fillText(sub,187,158);
+  return mkTex(c);
+}
+[['Rapide','chargement optimisé',[-2.1,2.6,1.8]],['Mobile','adapté à tous les écrans',[2.9,2.9,-.4]],['Référencé','visible sur Google',[-3.4,.5,2.8]],['Sécurisé','HTTPS &amp; sauvegardes'.replace('&amp;','&'),[3.4,.6,2.6]],['Sur mesure','jamais de modèle générique',[0.6,3.5,-1.6]]].forEach((d,i)=>{
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(1.5,.516),new THREE.MeshBasicMaterial({map:chipTex(d[0],d[1]),transparent:true,depthWrite:false,toneMapped:false}));
+  m.userData={p:new THREE.Vector3(...d[2]),ph:i*1.7,s:0};m.position.copy(m.userData.p);scene.add(m);chips.push(m);
+});
+
+/* ================= CAMÉRA : TRAJET LIÉ AU SCROLL ================= */
+const KF=[
+ {c:[.7,1.75,6.6],l:[-1.5,.75,0],ry:-.38,lid:-.2,ph:[2.3,1.05,1.0],tb:[-2.8,1.0,.5]},          // hero
+ {c:[2.4,1.55,5.0],l:[3.7,.95,.6],ry:-.15,lid:-.12,ph:[2.2,1.1,1.1],tb:[-2.6,.9,.8]},           // services
+ {c:[-.2,3.6,4.4],l:[-1.7,.2,.2],ry:.12,lid:-.55,ph:[3.2,.9,.4],tb:[-3.2,.9,-.6]},               // méthode
+ {c:[0,1.9,10.5],l:[0,.9,0],ry:0,lid:-.2,ph:[2.6,1.1,1.2],tb:[-3.0,1.0,.6]},                     // tarifs
+ {c:[1.1,1.35,3.7],l:[2.0,.95,0],ry:.38,lid:-.18,ph:[2.9,1.2,1.4],tb:[-3.1,.8,1.4]}              // contact
+];
+const secIds=['top','services','methode','tarifs','contact'];
+let tops=[];function measure(){tops=secIds.map(id=>document.getElementById(id).offsetTop)}
+let sidx=0;
+function kfAt(u){
+  const i=clamp(Math.floor(u),0,KF.length-2),f=smoother(clamp(u-i));
+  const a=KF[i],b=KF[i+1];const v=(k)=>a[k].map((x,j)=>lerp(x,b[k][j],f));
+  return {c:v('c'),l:v('l'),ry:lerp(a.ry,b.ry,f),lid:lerp(a.lid,b.lid,f),ph:v('ph'),tb:v('tb')};
+}
+function targetIndex(){
+  const y=scrollY+innerHeight*.5;let i=0;
+  for(let k=0;k<tops.length;k++)if(y>=tops[k])i=k;
+  if(i>=tops.length-1)return tops.length-1;
+  const frac=(y-tops[i])/(tops[i+1]-tops[i]);
+  return i+smoother(clamp((frac-.4)/.6));
+}
+
+/* ================= INTERACTION ================= */
+let mx=0,my=0,smx=0,smy=0;const mouse=new THREE.Vector2(9,9);
+addEventListener('pointermove',e=>{mx=e.clientX/innerWidth*2-1;my=e.clientY/innerHeight*2-1;mouse.set(mx,-my);curT.x=e.clientX;curT.y=e.clientY});
+const cur=$('#cur'),dot=$('#dot');const curT={x:-100,y:-100},curP={x:-100,y:-100};
+const ray=new THREE.Raycaster();let hovered=null,hoverAmt=0;const bump=new Map();
+addEventListener('click',()=>{
+  if(!hovered)return;bump.set(hovered,1);
+  if(hovered===lap){lidT=lidT>0?KF[0].lid:Math.PI/2-.02}
+});
+const targets=[];[[lap,[base,lid,screen]],[phone,[pBody,pScreen]],[tab,[tBody,tScreen]]].forEach(([g,ms])=>ms.forEach(m=>{m.userData.owner=g;targets.push(m)}));
+
+function layout(){
+  const mob=isMob();
+  renderer.setPixelRatio(Math.min(devicePixelRatio,mob?1.5:2));
+  renderer.setSize(innerWidth,innerHeight,false);
+  camera.aspect=innerWidth/innerHeight;camera.fov=mob?48:32;camera.updateProjectionMatrix();
+  measure();
+}
+addEventListener('resize',layout);
+
+/* ================= BOUCLE ================= */
+const clock=new THREE.Clock();let frame=0,intro=0,scrollBoost=0,lastY=scrollY;
+const camPos=new THREE.Vector3(.7,1.75,9),camLook=new THREE.Vector3(-1.5,.75,0);
+function tick(){
+  const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;frame++;
+  intro=Math.min(1,intro+dt*.5);
+  // scroll
+  sidx+=(targetIndex()-sidx)*(1-Math.pow(.0009,dt));
+  const k=kfAt(sidx);
+  const mob=isMob();
+  scrollBoost+=((Math.abs(scrollY-lastY))-scrollBoost)*.1;lastY=scrollY;
+  smx+=(mx-smx)*.05;smy+=(my-smy)*.05;
+  // caméra
+  const cz=mob?1.9:0,lx=mob?0:1,ly=mob?1.15:0;
+  const introZ=(1-smoother(intro))*3.2;
+  camPos.set(k.c[0]*(mob?.3:1)+smx*.55,k.c[1]-smy*.28+Math.sin(t*.35)*.04,k.c[2]+cz+introZ);
+  camLook.set(k.l[0]*lx,k.l[1]+ly,k.l[2]);
+  camera.position.copy(camPos);camera.lookAt(camLook);
+  camera.rotation.z+=Math.sin(t*.3)*.002;
+  // modèles
+  lap.rotation.y+=((k.ry+smx*.22)-lap.rotation.y)*.07;
+  lap.rotation.x=Math.sin(t*.5)*.008;
+  if(lidT<1)lidT=k.lid;                   // ouvert : suit le trajet ; fermé par clic : on respecte
+  const opening=intro>.15?1:0;
+  lidA+=((opening?lidT:Math.PI/2-.02)-lidA)*(1-Math.pow(.02,dt));
+  hinge.rotation.x=lidA;
+  const open=1-clamp((lidA-(-.2))/(Math.PI/2+.2));
+  sl.intensity=open*1.6;
+  lap.position.y=Math.sin(t*.6)*.02;
+  phone.position.set(...k.ph.map((x,j)=>x));phone.position.y+=Math.sin(t*.9)*.09;
+  phone.rotation.y=-.45+smx*.2+Math.sin(t*.5)*.05;phone.rotation.x=-.08+smy*.06;
+  tab.position.set(...k.tb);tab.position.y+=Math.sin(t*.8+1)*.08;
+  tab.rotation.y=.5+smx*.15+Math.cos(t*.45)*.05;tab.rotation.x=-.05+smy*.05;
+  // pastilles
+  chips.forEach((c,i)=>{
+    const u=c.userData;c.position.set(u.p.x+Math.sin(t*.6+u.ph)*.12,u.p.y+Math.sin(t*.8+u.ph)*.15,u.p.z);
+    c.position.x+=smx*(.25+i*.05);c.quaternion.copy(camera.quaternion);
+    const vis=clamp(intro*2-.8-i*.1);u.s+=(vis-u.s)*.08;c.scale.setScalar(Math.max(.001,u.s*(1+(stepPulse>0?stepPulse*.12:0))));
+  });stepPulse*=.94;
+  // lumières
+  warm.position.x=-3+Math.sin(t*.5)*1.6;warm.position.z=2+Math.cos(t*.4)*1.2;
+  // survol
+  ray.setFromCamera(mouse,camera);
+  const hit=!mob?ray.intersectObjects(targets)[0]:null;
+  hovered=hit?hit.object.userData.owner:null;hoverAmt+=((hovered?1:0)-hoverAmt)*.12;
+  cur.classList.toggle('big',!!hovered||curBig);
+  // anim bump
+  [[lap],[phone],[tab]].forEach(([g])=>{let b=bump.get(g)||0;b*=.9;bump.set(g,b);const s=1+Math.sin(b*Math.PI)*.07;g.scale.setScalar(s*(1+(hovered===g?.025:0)))});
+  // écrans (texte animé)
+  const off=(.5-.5*Math.cos(t*.45))*560+scrollBoost*18+(hovered===lap?Math.sin(t*2)*0:0);
+  if(frame%2===0){drawSite(sg,800,t,off,1);screenTex.needsUpdate=true}
+  if(frame%3===0){drawPhone(pg,t,(.5-.5*Math.cos(t*.5+1))*420);phoneTex.needsUpdate=true;
+    tg.save();drawSite(tg,724,t+2,(.5-.5*Math.cos(t*.4+2))*520,.8);tg.restore();tabTex.needsUpdate=true}
+  // curseur
+  curP.x+=(curT.x-curP.x)*.18;curP.y+=(curT.y-curP.y)*.18;
+  cur.style.transform=`translate(${curP.x}px,${curP.y}px)`;dot.style.transform=`translate(${curT.x}px,${curT.y}px)`;
+  // barre progression
+  $('#bar').style.width=(scrollY/(document.documentElement.scrollHeight-innerHeight)*100)+'%';
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+
+/* ================= UI ================= */
+let curBig=false,stepPulse=0;
+$$('a,button,input,textarea,select,.svc,.plan').forEach(el=>{el.addEventListener('pointerenter',()=>curBig=true);el.addEventListener('pointerleave',()=>curBig=false)});
+// boutons magnétiques
+$$('.mag').forEach(b=>{
+  b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.25}px,${(e.clientY-r.top-r.height/2)*.35}px)`});
+  b.addEventListener('pointerleave',()=>{b.style.transform='';});
+});
+// tilt cartes
+$$('.plan').forEach(c=>{
+  c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    c.style.transform=`perspective(900px) rotateY(${(x-.5)*10}deg) rotateX(${(.5-y)*10}deg) translateY(-6px)`;c.style.setProperty('--mx',x*100+'%');c.style.setProperty('--my',y*100+'%')});
+  c.addEventListener('pointerleave',()=>c.style.transform='');
+});
+// révélations
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+$$('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%4)*.07+'s';io.observe(el)});
+// étapes
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){$$('.stp').forEach(s=>s.classList.toggle('on',s===e.target));stepPulse=1}}),{rootMargin:'-40% 0px -40% 0px'});
+$$('.stp').forEach(s=>so.observe(s));
+// ancres fluides
+$$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const id=a.getAttribute('href');const el=document.querySelector(id);if(!el)return;e.preventDefault();
+  const y=id==='#top'?0:el.offsetTop-60;const y0=scrollY,d=y-y0,T=1300,s=performance.now();
+  (function st(n){const p=clamp((n-s)/T);scrollTo(0,y0+d*smoother(p));if(p<1)requestAnimationFrame(st)})(s)}));
+// formulaire
+$('#f').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));
+  const body=`Nom : ${d.nom}\nEmail : ${d.email}\nEntreprise : ${d.ent}\nOffre : ${d.offre}\n\n${d.msg}`;
+  location.href=`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Demande de devis — '+d.nom)}&body=${encodeURIComponent(body)}`;
+  $('#ok').textContent="Votre messagerie s'ouvre pour envoyer la demande."});
+
+/* ================= DÉMARRAGE ================= */
+layout();
+let p=0;const lt=setInterval(()=>{p=Math.min(100,p+Math.random()*22);$('#lb').style.transform=`scaleX(${p/100})`;$('#lp').textContent=Math.round(p)+' %';
+  if(p>=100){clearInterval(lt);setTimeout(()=>{$('#load').classList.add('off');$('#h1').classList.add('in');$$('.hero .rv').forEach(e=>e.classList.add('in'))},350)}},120);
+tick();
+</script>
+</body>
+</html>

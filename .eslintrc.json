@@ -1,0 +1,10 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "ignorePatterns": ["_prototype/**"],
+  "overrides": [
+    {
+      "files": ["src/app/admin/**", "src/components/admin/**"],
+      "rules": { "@next/next/no-html-link-for-pages": "off", "@next/next/no-img-element": "off" }
+    }
+  ]
+}

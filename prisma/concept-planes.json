@@ -1,0 +1,272 @@
+{
+ "atelier-bois": {
+  "planes": [
+   {
+    "id": "atelier-bois-1",
+    "name": "Navigation",
+    "kind": "nav",
+    "image": "/seed/atelier-bois/01.webp",
+    "caption": "",
+    "depth": 0
+   },
+   {
+    "id": "atelier-bois-2",
+    "name": "Agencements en bois, dessinés et fabriqués sur mesure",
+    "kind": "hero",
+    "image": "/seed/atelier-bois/02.webp",
+    "caption": "",
+    "depth": 1
+   },
+   {
+    "id": "atelier-bois-3",
+    "name": "Ce que nous faisons",
+    "kind": "section",
+    "image": "/seed/atelier-bois/03.webp",
+    "caption": "",
+    "depth": 2
+   },
+   {
+    "id": "atelier-bois-4",
+    "name": "Du croquis à la pose",
+    "kind": "section",
+    "image": "/seed/atelier-bois/04.webp",
+    "caption": "",
+    "depth": 3
+   },
+   {
+    "id": "atelier-bois-5",
+    "name": "Parlons de votre projet",
+    "kind": "section",
+    "image": "/seed/atelier-bois/05.webp",
+    "caption": "",
+    "depth": 4
+   },
+   {
+    "id": "atelier-bois-6",
+    "name": "Pied de page",
+    "kind": "footer",
+    "image": "/seed/atelier-bois/06.webp",
+    "caption": "",
+    "depth": 5
+   },
+   {
+    "id": "atelier-bois-7",
+    "name": "Version tablette",
+    "kind": "tablet",
+    "image": "/seed/atelier-bois/07.webp",
+    "caption": "",
+    "depth": 6
+   },
+   {
+    "id": "atelier-bois-8",
+    "name": "Version mobile",
+    "kind": "mobile",
+    "image": "/seed/atelier-bois/08.webp",
+    "caption": "",
+    "depth": 7
+   }
+  ],
+  "meta": {
+   "capturedAt": "2026-11-16T20:45:54.431Z",
+   "url": "",
+   "title": "Atelier Bois — Agencements en bois, dessinés et fabriqu",
+   "description": "Escaliers, bibliothèques, cuisines : un atelier, un interlocuteur.",
+   "h1": [
+    "Agencements en bois, dessinés et fabriqués sur mesure"
+   ],
+   "headings": {
+    "h1": 1,
+    "h2": 3,
+    "h3": 3,
+    "h4": 0,
+    "h5": 0,
+    "h6": 0
+   },
+   "lang": "fr",
+   "technologies": [
+    "Next.js"
+   ],
+   "lighthouse": null
+  }
+ },
+ "table-du-quai": {
+  "planes": [
+   {
+    "id": "table-du-quai-1",
+    "name": "Navigation",
+    "kind": "nav",
+    "image": "/seed/table-du-quai/01.webp",
+    "caption": "",
+    "depth": 0
+   },
+   {
+    "id": "table-du-quai-2",
+    "name": "Une brasserie de bord d'eau, une carte qui change avec les saisons",
+    "kind": "hero",
+    "image": "/seed/table-du-quai/02.webp",
+    "caption": "",
+    "depth": 1
+   },
+   {
+    "id": "table-du-quai-3",
+    "name": "Ce que nous faisons",
+    "kind": "section",
+    "image": "/seed/table-du-quai/03.webp",
+    "caption": "",
+    "depth": 2
+   },
+   {
+    "id": "table-du-quai-4",
+    "name": "La carte, mise à jour en deux minutes",
+    "kind": "section",
+    "image": "/seed/table-du-quai/04.webp",
+    "caption": "",
+    "depth": 3
+   },
+   {
+    "id": "table-du-quai-5",
+    "name": "Parlons de votre projet",
+    "kind": "section",
+    "image": "/seed/table-du-quai/05.webp",
+    "caption": "",
+    "depth": 4
+   },
+   {
+    "id": "table-du-quai-6",
+    "name": "Pied de page",
+    "kind": "footer",
+    "image": "/seed/table-du-quai/06.webp",
+    "caption": "",
+    "depth": 5
+   },
+   {
+    "id": "table-du-quai-7",
+    "name": "Version tablette",
+    "kind": "tablet",
+    "image": "/seed/table-du-quai/07.webp",
+    "caption": "",
+    "depth": 6
+   },
+   {
+    "id": "table-du-quai-8",
+    "name": "Version mobile",
+    "kind": "mobile",
+    "image": "/seed/table-du-quai/08.webp",
+    "caption": "",
+    "depth": 7
+   }
+  ],
+  "meta": {
+   "capturedAt": "2026-11-16T20:46:00.579Z",
+   "url": "",
+   "title": "La Table du Quai — Une brasserie de bord d'eau, une carte q",
+   "description": "Cuisine de produits locaux, service midi et soir.",
+   "h1": [
+    "Une brasserie de bord d'eau, une carte qui change avec les saisons"
+   ],
+   "headings": {
+    "h1": 1,
+    "h2": 3,
+    "h3": 3,
+    "h4": 0,
+    "h5": 0,
+    "h6": 0
+   },
+   "lang": "fr",
+   "technologies": [
+    "Next.js"
+   ],
+   "lighthouse": null
+  }
+ },
+ "cabinet-conseil": {
+  "planes": [
+   {
+    "id": "cabinet-conseil-1",
+    "name": "Navigation",
+    "kind": "nav",
+    "image": "/seed/cabinet-conseil/01.webp",
+    "caption": "",
+    "depth": 0
+   },
+   {
+    "id": "cabinet-conseil-2",
+    "name": "Conseil juridique pour dirigeants de PME",
+    "kind": "hero",
+    "image": "/seed/cabinet-conseil/02.webp",
+    "caption": "",
+    "depth": 1
+   },
+   {
+    "id": "cabinet-conseil-3",
+    "name": "Ce que nous faisons",
+    "kind": "section",
+    "image": "/seed/cabinet-conseil/03.webp",
+    "caption": "",
+    "depth": 2
+   },
+   {
+    "id": "cabinet-conseil-4",
+    "name": "Des honoraires annoncés avant de commencer",
+    "kind": "section",
+    "image": "/seed/cabinet-conseil/04.webp",
+    "caption": "",
+    "depth": 3
+   },
+   {
+    "id": "cabinet-conseil-5",
+    "name": "Parlons de votre projet",
+    "kind": "section",
+    "image": "/seed/cabinet-conseil/05.webp",
+    "caption": "",
+    "depth": 4
+   },
+   {
+    "id": "cabinet-conseil-6",
+    "name": "Pied de page",
+    "kind": "footer",
+    "image": "/seed/cabinet-conseil/06.webp",
+    "caption": "",
+    "depth": 5
+   },
+   {
+    "id": "cabinet-conseil-7",
+    "name": "Version tablette",
+    "kind": "tablet",
+    "image": "/seed/cabinet-conseil/07.webp",
+    "caption": "",
+    "depth": 6
+   },
+   {
+    "id": "cabinet-conseil-8",
+    "name": "Version mobile",
+    "kind": "mobile",
+    "image": "/seed/cabinet-conseil/08.webp",
+    "caption": "",
+    "depth": 7
+   }
+  ],
+  "meta": {
+   "capturedAt": "2026-11-16T20:46:06.700Z",
+   "url": "",
+   "title": "Cabinet Conseil — Conseil juridique pour dirigeants de PME",
+   "description": "Droit des sociétés, contrats commerciaux, relations sociales.",
+   "h1": [
+    "Conseil juridique pour dirigeants de PME"
+   ],
+   "headings": {
+    "h1": 1,
+    "h2": 3,
+    "h3": 3,
+    "h4": 0,
+    "h5": 0,
+    "h6": 0
+   },
+   "lang": "fr",
+   "technologies": [
+    "Next.js"
+   ],
+   "lighthouse": null
+  }
+ }
+}

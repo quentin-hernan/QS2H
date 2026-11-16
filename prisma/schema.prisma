@@ -1,0 +1,324 @@
+// SQLite en local. Pour la production, remplacer le provider par "postgresql"
+// et DATABASE_URL par l'URL Postgres (Neon, Supabase…). Les listes/objets sont stockés en JSON texte
+// pour rester portables entre les deux.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  name               String
+  passwordHash       String
+  role               String   @default("editor") // owner | editor
+  mustChangePassword Boolean  @default(false)
+  totpSecret         String?
+  totpEnabled        Boolean  @default(false)
+  inviteToken        String?  @unique
+  inviteExpires      DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model LoginLog {
+  id        String   @id @default(cuid())
+  email     String
+  ip        String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ip, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userEmail String
+  action    String
+  entity    String
+  entityId  String?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  key       String   @id
+  value     String // JSON
+  updatedAt DateTime @updatedAt
+}
+
+model PageContent {
+  key       String   @id
+  body      String // JSON
+  updatedAt DateTime @updatedAt
+}
+
+model PageVersion {
+  id        String   @id @default(cuid())
+  key       String
+  body      String
+  author    String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
+model Service {
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  title          String
+  tagline        String
+  problem        String
+  solution       String
+  deliverables   String  @default("[]") // JSON string[]
+  duration       String  @default("")
+  priceFrom      Int     @default(0)
+  priceUnit      String  @default("€ HT")
+  faq            String  @default("[]") // JSON {q,a}[]
+  seoTitle       String  @default("")
+  seoDescription String  @default("")
+  order          Int     @default(0)
+  published      Boolean @default(true)
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  client         String
+  sector         String
+  services       String   @default("[]") // JSON slugs
+  summary        String
+  challenge      String   @default("")
+  solution       String   @default("")
+  results        String   @default("[]") // JSON {label,value}[]
+  technologies   String   @default("[]") // JSON string[]
+  url            String   @default("")
+  cover          String   @default("")
+  images         String   @default("[]") // JSON string[]
+  testimonial    String   @default("")
+  testimonialBy  String   @default("")
+  status         String   @default("draft") // draft | published
+  isExample      Boolean  @default(false) // = "Projet concept" (réalisé par QS2H sans client)
+  year           Int      @default(0)
+  planes         String   @default("[]") // JSON {id,name,kind,image,caption,depth}[] : vue éclatée
+  meta           String   @default("{}") // JSON : capture (title, description, h1, hn, tech, lighthouse mesuré, date)
+  authorized     Boolean  @default(false) // autorisation du client de présenter ce projet
+  authorizedAt   DateTime?
+  authorizedNote String   @default("")
+  seoTitle       String   @default("")
+  seoDescription String   @default("")
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Plan {
+  id          String  @id @default(cuid())
+  name        String
+  price       String
+  priceNote   String  @default("HT")
+  description String  @default("")
+  features    String  @default("[]") // JSON string[]
+  highlighted Boolean @default(false)
+  cta         String  @default("Demander ce devis")
+  order       Int     @default(0)
+}
+
+model PlanOption {
+  id          String @id @default(cuid())
+  name        String
+  price       String
+  description String @default("")
+  order       Int    @default(0)
+}
+
+model Faq {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+  order    Int    @default(0)
+}
+
+model Review {
+  id        String  @id @default(cuid())
+  author    String
+  role      String  @default("")
+  company   String  @default("")
+  rating    Int     @default(5)
+  text      String
+  visible   Boolean @default(true)
+  isExample Boolean @default(false)
+  order     Int     @default(0)
+}
+
+model Post {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  excerpt        String
+  content        String // HTML assaini
+  category       String    @default("Conseils")
+  author         String    @default("QS2H")
+  cover          String    @default("")
+  status         String    @default("draft") // draft | published
+  publishedAt    DateTime?
+  seoTitle       String    @default("")
+  seoDescription String    @default("")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model TeamMember {
+  id    String @id @default(cuid())
+  name  String
+  role  String
+  bio   String @default("")
+  photo String @default("")
+  order Int    @default(0)
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  name        String
+  email       String
+  phone       String   @default("")
+  company     String   @default("")
+  projectType String   @default("")
+  budget      String   @default("")
+  deadline    String   @default("")
+  message     String   @default("")
+  status      String   @default("nouveau") // nouveau | contacté | devis envoyé | gagné | perdu
+  notes       String   @default("")
+  source      String   @default("site")
+  consent     Boolean  @default(false)
+  clientId    String?
+
+  @@index([status, createdAt])
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  alt       String
+  width     Int      @default(0)
+  height    Int      @default(0)
+  size      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Redirect {
+  id        String  @id @default(cuid())
+  from      String  @unique
+  to        String
+  permanent Boolean @default(true)
+}
+
+/* ---------------------------------------------------------------- Espace client */
+model Client {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  firstName        String
+  lastName         String
+  company          String    @default("")
+  passwordHash     String
+  emailVerifiedAt  DateTime?
+  verifyTokenHash  String?   @unique
+  verifyExpires    DateTime?
+  resetTokenHash   String?   @unique
+  resetExpires     DateTime?
+  deleteTokenHash  String?   @unique
+  deleteExpires    DateTime?
+  sessionVersion   Int       @default(0)
+  newsletter       Boolean   @default(false) // double opt-in confirmé
+  newsletterTokenHash String? @unique
+  unsubToken       String    @unique @default(cuid())
+  inactivityWarnedAt DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime  @default(now())
+  consents         Consent[]
+  logins           ClientLogin[]
+  projects         ClientProject[]
+  documents        ClientDocument[]
+  messages         ClientMessage[]
+}
+
+model Consent {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  kind       String // cgu | confidentialite | newsletter | majorite
+  docVersion Int      @default(0)
+  ipTruncated String  @default("")
+  givenAt    DateTime @default(now())
+  withdrawnAt DateTime?
+}
+
+model ClientLogin {
+  id        String   @id @default(cuid())
+  clientId  String?
+  email     String
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  ipTruncated String @default("")
+  agent     String   @default("")
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
+
+model ClientProject {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title     String
+  steps     String   @default("[]") // JSON {name, status: "a-venir"|"en-cours"|"termine", note}[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  documents ClientDocument[]
+}
+
+model ClientDocument {
+  id           String         @id @default(cuid())
+  clientId     String?
+  client       Client?        @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  projectId    String?
+  project      ClientProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  kind         String // devis | facture | livrable | maquette | autre
+  title        String
+  file         String // nom du fichier dans storage/documents (jamais public)
+  mime         String @default("application/pdf")
+  status       String @default("") // maquette : "" | "validée" | "modifications demandées"
+  retainedUntil DateTime? // factures conservées 10 ans après suppression du compte
+  createdAt    DateTime @default(now())
+}
+
+model ClientMessage {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  fromClient Boolean @default(true)
+  body      String
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+/* ---------------------------------------------------------------- Textes légaux versionnés */
+model LegalVersion {
+  id        String   @id @default(cuid())
+  doc       String // mentions | confidentialite | cgu | cgv | cookies
+  version   Int
+  html      String
+  major     Boolean  @default(false)
+  author    String   @default("")
+  note      String   @default("")
+  createdAt DateTime @default(now())
+
+  @@unique([doc, version])
+}
