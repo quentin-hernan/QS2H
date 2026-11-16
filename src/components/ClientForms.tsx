@@ -18,7 +18,7 @@ function F({ id, label, type = "text", autoComplete, required = true, defaultVal
 }
 const Btn = ({ pending, children }: { pending: boolean; children: React.ReactNode }) => <button className="btn btn-primary" disabled={pending}>{pending ? "Veuillez patienter…" : children}</button>;
 const Check = ({ name, children, required }: { name: string; children: React.ReactNode; required?: boolean }) => (
-  <label className="flex cursor-pointer items-start gap-3 text-[0.95rem]"><input type="checkbox" name={name} required={required} className="mt-1 h-5 w-5 shrink-0 accent-[rgb(122,0,32)]" /><span>{children}</span></label>
+  <label className="flex cursor-pointer items-start gap-3 text-[0.95rem]"><input type="checkbox" name={name} required={required} className="mt-1 h-5 w-5 shrink-0 accent-[rgb(42,85,135)]" /><span>{children}</span></label>
 );
 
 export function RegisterForm() {

@@ -80,7 +80,7 @@ export default async function ServicePage({ params }: P) {
         <div className="container">
           <p className="eyebrow mb-8">Voir aussi</p>
           <ul className="grid gap-4 md:grid-cols-3">
-            {others.map((o) => (<li key={o.slug}><Link href={`/services/${o.slug}`} className="hair group block chamfer border p-6 transition-colors hover:bg-ivory" data-cursor><span className="text-h3 font-medium">{o.title}</span><span className="acc float-right transition-transform group-hover:translate-x-1" aria-hidden="true">→</span></Link></li>))}
+            {others.map((o) => (<li key={o.slug}><Link href={`/services/${o.slug}`} className="hair group block chamfer border p-6 transition-colors hover:bg-ivory" data-cursor="Voir"><span className="text-h3 font-medium">{o.title}</span><span className="acc float-right transition-transform group-hover:translate-x-1" aria-hidden="true">→</span></Link></li>))}
           </ul>
         </div>
       </section>

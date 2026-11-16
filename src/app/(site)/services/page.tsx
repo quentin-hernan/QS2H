@@ -24,7 +24,7 @@ export default async function Services() {
           <ul className="grid gap-px border hair bg-[rgb(12_14_17/0.14)] md:grid-cols-2">
             {services.map((s, i) => (
               <Reveal as="li" key={s.slug} delay={(i % 2) * 0.08} className="bg-ivory">
-                <Link href={`/services/${s.slug}`} className="group flex h-full min-h-[22rem] flex-col justify-between p-8 transition-colors duration-500 hover:bg-ivory-200 md:p-12" data-cursor>
+                <Link href={`/services/${s.slug}`} className="group flex h-full min-h-[22rem] flex-col justify-between p-8 transition-colors duration-500 hover:bg-ivory-200 md:p-12" data-cursor="Voir">
                   <div>
                     <p className="muted text-[0.85rem] tabular-nums">0{i + 1}</p>
                     <h2 className="mt-10 text-h2 font-medium group-hover:acc transition-colors">{s.title}</h2>

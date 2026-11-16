@@ -112,7 +112,7 @@ function Stack({ planes, explode, selected, onSelect, hover, setHover }: { plane
               <meshBasicMaterial map={it.tex} toneMapped={false} />
             </mesh>
             <mesh geometry={bodyGeom(W, it.h)}>
-              <meshStandardMaterial color={sel ? "#7A0020" : "#16181c"} roughness={0.5} metalness={0.2} />
+              <meshStandardMaterial color={sel ? "#2A5587" : "#1C1C1C"} roughness={0.5} metalness={0.2} />
             </mesh>
           </group>
         );

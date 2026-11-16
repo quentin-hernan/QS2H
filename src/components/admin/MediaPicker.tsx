@@ -32,7 +32,7 @@ export function MediaPicker({ open, onClose, onPick }: { open: boolean; onClose:
   }
 
   return (
-    <dialog ref={ref} onClose={onClose} onClick={(e) => e.target === ref.current && onClose()} aria-label="Choisir une image" className="dark-section m-auto w-[min(920px,94vw)] rounded-2xl border p-0 backdrop:bg-black/70" style={{ borderColor: "rgb(242 239 233 / .16)", background: "#14171C", color: "#F2EFE9" }}>
+    <dialog ref={ref} onClose={onClose} onClick={(e) => e.target === ref.current && onClose()} aria-label="Choisir une image" className="dark-section m-auto w-[min(920px,94vw)] rounded-2xl border p-0 backdrop:bg-black/70" style={{ borderColor: "rgb(242 239 233 / .16)", background: "#242424", color: "#F8F8F7" }}>
       <div className="p-6">
         <div className="mb-5 flex items-center justify-between">
           <div className="flex gap-2" role="tablist">

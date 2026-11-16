@@ -2,7 +2,7 @@ import sharp from "sharp";
 import path from "node:path";
 
 async function main() {
-  const cover = await sharp(path.join("public", "seed", "menuiserie-duval.webp")).resize(940, 588).png().toBuffer();
+  const cover = await sharp(path.join("public", "seed", "atelier-bois.webp")).resize(940, 588).png().toBuffer();
   const b64 = cover.toString("base64");
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
   <defs>

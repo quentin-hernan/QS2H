@@ -46,13 +46,14 @@ export function euro(n: number) {
 
 export function hexToRgbTriplet(hex: string): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
-  const v = m ? m[1] : "7A0020";
+  const v = m ? m[1] : "2A5587";
   return `${parseInt(v.slice(0, 2), 16)} ${parseInt(v.slice(2, 4), 16)} ${parseInt(v.slice(4, 6), 16)}`;
 }
 
 /** Éclaircit une couleur pour l'utiliser comme accent sur fond sombre. */
-export function lighten(hex: string, amount = 0.38): string {
+export function lighten(hex: string, amount = 0.45): string {
+  if (hex.toLowerCase() === "#2a5587") return amount < 0 ? "30 64 104" : "127 169 217"; // bleu clair validé pour fonds sombres
   const [r, g, b] = hexToRgbTriplet(hex).split(" ").map(Number);
-  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  const mix = (c: number) => Math.round(amount < 0 ? c * (1 + amount) : c + (255 - c) * amount); // amount < 0 : assombrit (survol)
   return `${mix(r)} ${mix(g)} ${mix(b)}`;
 }

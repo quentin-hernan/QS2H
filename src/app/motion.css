@@ -1,0 +1,88 @@
+/* ================================================================== Système d'animation
+   Durées 0,4 à 0,9 s, easing de référence cubic-bezier(0.22, 1, 0.36, 1), uniquement transform et opacité. */
+:root { --ease: cubic-bezier(0.22, 1, 0.36, 1); --mx: 0; --my: 0; --sy: 0; }
+.reveal { transition: opacity 0.8s var(--ease), transform 0.9s var(--ease); transition-delay: var(--d, 0s); }
+.ln > span { transition: transform 0.9s var(--ease); transition-delay: var(--d, 0s); }
+.hero-ln > span { animation-duration: 0.9s; animation-timing-function: var(--ease); }
+body::after { opacity: 0.03; } /* grain très léger */
+
+/* Préchargeur (première visite) : les cadres d'angle se dessinent autour du logo */
+.preloader { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; background: #1C1C1C; animation: plOut 0.4s var(--ease) 0.8s forwards; }
+.pl-skip .preloader { display: none; }
+.preloader-box { position: relative; padding: 28px 40px; }
+.pl-logo { width: min(260px, 60vw); height: auto; opacity: 0; animation: plFade 0.5s var(--ease) 0.35s forwards; }
+.pl-c { position: absolute; width: 56px; height: 56px; border: 0 solid #7FA9D9; }
+.pl-tl { left: 0; top: 0; border-width: 3px 0 0 3px; animation: plTl 0.6s var(--ease) both; }
+.pl-br { right: 0; bottom: 0; border-width: 0 3px 3px 0; animation: plBr 0.6s var(--ease) 0.1s both; }
+@keyframes plTl { from { transform: translate(14px, 14px) scale(0.2); opacity: 0; transform-origin: 0 0; } to { transform: none; opacity: 1; } }
+@keyframes plBr { from { transform: translate(-14px, -14px) scale(0.2); opacity: 0; transform-origin: 100% 100%; } to { transform: none; opacity: 1; } }
+@keyframes plFade { to { opacity: 1; } }
+@keyframes plOut { to { opacity: 0; visibility: hidden; } }
+
+/* Transition de page : volet biseauté (View Transitions API) ; repli = fondu */
+::view-transition-group(root) { animation-duration: 0.8s; animation-timing-function: var(--ease); }
+::view-transition-old(root) { animation: vtOld 0.8s var(--ease) both; }
+::view-transition-new(root) { animation: vtNew 0.8s var(--ease) both; }
+@keyframes vtNew { from { clip-path: polygon(0 0, 0 0, -18% 100%, -18% 100%); } to { clip-path: polygon(0 0, 122% 0, 104% 100%, -18% 100%); } }
+@keyframes vtOld { to { opacity: 0.4; transform: translateY(-10px); } }
+.route-out { opacity: 0; transition: opacity 0.25s var(--ease); }
+.route-in { animation: routeIn 0.45s var(--ease) both; }
+@keyframes routeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Barre de progression et indicateur de section */
+.scroll-bar { position: fixed; left: 0; right: 0; top: 0; z-index: 60; height: 2px; pointer-events: none; }
+.scroll-bar-fill { height: 100%; background: rgb(var(--accent)); transform: scaleX(0); transform-origin: 0 50%; will-change: transform; }
+.sec-dots { position: fixed; right: 14px; top: 50%; z-index: 40; display: none; flex-direction: column; gap: 4px; transform: translateY(-50%); mix-blend-mode: difference; }
+@media (min-width: 1100px) { .sec-dots { display: flex; } }
+.sec-dot { display: grid; place-items: center; width: 24px; height: 24px; }
+.sec-dot span { width: 6px; height: 6px; background: #fff; opacity: 0.4; transition: transform 0.4s var(--ease), opacity 0.4s var(--ease); }
+.sec-dot[aria-current="true"] span { opacity: 1; transform: scale(1.8); }
+
+/* Curseur contextuel */
+.cursor-dot { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; width: 0; height: 0; }
+.cursor-dot::before { content: ""; position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; background: rgb(var(--accent-hi)); transform: scale(1); transition: transform 0.4s var(--ease), opacity 0.3s; box-shadow: 0 0 0 1px rgb(28 28 28 / 0.5); }
+.cursor-dot.big::before { transform: scale(2.4); opacity: 0.6; }
+.cursor-dot.word::before { transform: scale(7.2); opacity: 1; }
+.cursor-dot.hide { opacity: 0 !important; }
+.cursor-dot span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #1C1C1C; white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
+.cursor-dot.word span { opacity: 1; }
+
+/* Fond « atelier lumineux » : plans biseautés sur 3 profondeurs, une seule source de lumière (souris + scroll) */
+.atelier { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.atelier-plane { position: absolute; transform: translate3d(calc(var(--mx) * var(--d) * 26px), calc(var(--my) * var(--d) * 14px + var(--sy) * var(--d) * -90px), 0); will-change: transform; }
+.atelier-face, .atelier-shadow { position: absolute; inset: 0; clip-path: polygon(8% 0, 100% 0, 100% 92%, 92% 100%, 0 100%, 0 8%); }
+.atelier-shadow { filter: blur(22px); transform: translate3d(calc(var(--mx) * -22px + 16px), calc(var(--my) * -14px + 24px), 0); }
+.atelier-dark .atelier-face { background: rgb(248 248 247 / calc(0.025 + var(--d) * 0.03)); }
+.atelier-dark .atelier-shadow { background: rgb(0 0 0 / 0.5); }
+.atelier-light .atelier-face { background: rgb(28 28 28 / calc(0.02 + var(--d) * 0.02)); }
+.atelier-light .atelier-shadow { background: rgb(28 28 28 / 0.16); }
+/* Reflet de lumière qui balaie lentement les sections sombres */
+.sweep { position: relative; overflow: hidden; }
+.sweep::after { content: ""; position: absolute; top: -10%; bottom: -10%; left: -30%; width: 22%; pointer-events: none; background: rgb(248 248 247 / 0.045); transform: translateX(0) skewX(-18deg); animation: sweep 14s linear infinite; z-index: 0; }
+@keyframes sweep { from { transform: translateX(0) skewX(-18deg); } to { transform: translateX(760%) skewX(-18deg); } }
+.sweep > .container { position: relative; z-index: 1; }
+
+/* Lignes d'angle bleues dessinées à l'entrée de section */
+.frame-draw { position: relative; }
+.frame-draw::before, .frame-draw::after { content: ""; position: absolute; width: min(120px, 14vw); height: min(120px, 14vw); border: 0 solid rgb(var(--acc-ctx)); opacity: 0; transition: opacity 0.4s var(--ease), transform 0.9s var(--ease); pointer-events: none; }
+.frame-draw::before { left: 0; top: -24px; border-width: 2px 0 0 2px; transform: translate(18px, 18px) scale(0.3); transform-origin: 0 0; }
+.frame-draw::after { right: 0; bottom: -24px; border-width: 0 2px 2px 0; transform: translate(-18px, -18px) scale(0.3); transform-origin: 100% 100%; }
+.frame-draw.in::before, .frame-draw.in::after { opacity: 0.9; transform: none; }
+
+/* Texte vivant : un seul mot-clé par titre flotte très légèrement (4 px, 7 s) */
+h1 .serif-it, h2 .serif-it { display: inline-block; animation: floatWord 7s ease-in-out infinite; }
+@keyframes floatWord { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+a:hover h2, a:hover h3, a:focus-visible h3 { font-stretch: 126%; }
+h2, h3 { transition: font-stretch 0.5s var(--ease); }
+/* Bandeau de mots-clés dans une bande biseautée */
+.band { clip-path: polygon(24px 0, 100% 0, calc(100% - 24px) 100%, 0 100%); background: rgb(var(--accent)); color: #fff; overflow: hidden; }
+.band-track { display: flex; width: max-content; gap: 3rem; padding: 1rem 0; animation: mq 60s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader, .sweep::after, h1 .serif-it, h2 .serif-it, .band-track { animation: none !important; }
+  .preloader { display: none; }
+  .atelier-plane, .atelier-shadow { transform: none !important; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .frame-draw::before, .frame-draw::after { opacity: 0.9; transform: none; transition: none; }
+  .cursor-dot { display: none; }
+}

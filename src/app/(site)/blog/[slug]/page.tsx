@@ -68,7 +68,7 @@ export default async function PostPage({ params }: P) {
       </article>
       {related.length > 0 && (
         <section className="bg-ivory-200 py-20 text-ink-900"><div className="container"><p className="eyebrow mb-8">À lire aussi</p>
-          <ul className="grid gap-6 md:grid-cols-2">{related.map((r) => (<li key={r.id}><Link href={`/blog/${r.slug}`} className="hair group block chamfer border p-8 transition-colors hover:bg-ivory" data-cursor><p className="muted text-[0.8rem] uppercase tracking-wider">{r.category}</p><h2 className="mt-3 text-h3 font-medium group-hover:acc">{r.title}</h2></Link></li>))}</ul>
+          <ul className="grid gap-6 md:grid-cols-2">{related.map((r) => (<li key={r.id}><Link href={`/blog/${r.slug}`} className="hair group block chamfer border p-8 transition-colors hover:bg-ivory" data-cursor="Lire"><p className="muted text-[0.8rem] uppercase tracking-wider">{r.category}</p><h2 className="mt-3 text-h3 font-medium group-hover:acc">{r.title}</h2></Link></li>))}</ul>
         </div></section>
       )}
       <CtaBand title="Un projet de site ?" text="Parlez-nous de votre activité. Devis gratuit sous 24 heures ouvrées." />

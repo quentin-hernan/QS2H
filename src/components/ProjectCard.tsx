@@ -9,7 +9,7 @@ export function ProjectCard({ p, priority = false, level = 3 }: { p: P; priority
   const H = level === 2 ? "h2" : "h3";
   const v = useViewer();
   return (
-    <Link href={`/realisations/${p.slug}`} className="group block" data-cursor onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; if (v.open(p.slug)) e.preventDefault(); }}>
+    <Link href={`/realisations/${p.slug}`} className="group block" data-cursor="Ouvrir" onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; if (v.open(p.slug)) e.preventDefault(); }}>
       <div className="chamfer relative aspect-[8/5] overflow-hidden border hair bg-ivory-200">
         {p.cover ? (
           <Image src={p.cover} alt={`Aperçu du site ${p.title}`} fill sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" priority={priority} className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.045]" />

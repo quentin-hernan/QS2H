@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { roundedBox, roundedPlane } from "./geometry";
-import { makeLayerTexture } from "./layerTextures";
+import { displayFont, makeLayerTexture } from "./layerTextures";
 import { smooth, stage } from "./store";
 
 const D = THREE.MathUtils;
@@ -31,14 +31,14 @@ function useScreenTexture(accent: string) {
     };
     const placeholder = () => {
       const gr = g.createLinearGradient(0, 0, 1280, 800);
-      gr.addColorStop(0, "#14171C");
-      gr.addColorStop(1, "#0C0E11");
+      gr.addColorStop(0, "#242424");
+      gr.addColorStop(1, "#1C1C1C");
       g.fillStyle = gr;
       g.fillRect(0, 0, 1280, 800);
       g.fillStyle = accent;
       g.fillRect(80, 360, 120, 6);
-      g.fillStyle = "#F2EFE9";
-      g.font = "italic 90px Georgia, serif";
+      g.fillStyle = "#F8F8F7";
+      g.font = `800 84px ${displayFont()}`;
       g.fillText("Votre site ici.", 80, 330);
     };
     const load = (urls: string[]) => {
@@ -64,7 +64,7 @@ function useScreenTexture(accent: string) {
       const cur = imgs[cycle % n];
       if (n > 1 && local < trans && cycle > 0) {
         const k = D.smootherstep(local / trans, 0, 1);
-        g.fillStyle = "#0C0E11";
+        g.fillStyle = "#1C1C1C";
         g.fillRect(0, 0, 1280, 800);
         cover(imgs[(cycle - 1) % n], 1 - 0.07 * k, 1 - k);
         cover(cur, 1.09 - 0.09 * k, k);
@@ -154,9 +154,20 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
 
     // placement du rig
     // hero : portable à droite (texte à gauche) ; vue éclatée : décalée à droite du panneau de texte
-    const tx = portrait ? 0 : D.lerp(D.lerp(0.55, 0.2, ho), 1.75, e);
-    const ty = portrait ? D.lerp(D.lerp(1.95, 0.35, ho), 1.3, e) : 0;
-    const ts = (portrait ? D.lerp(0.54, 0.62, ho) : D.lerp(0.86, 0.9, ho)) * D.lerp(1, portrait ? 0.82 : 0.72, e);
+    // Zone de l'objet : colonne de droite, texte limité à 46 % du conteneur, 80 px de respiration minimum.
+    const W = size.width;
+    const pad = W >= 1280 ? 64 : W >= 768 ? 40 : 20;
+    const cw = Math.min(W, 1440) - 2 * pad;
+    const left = (W - Math.min(W, 1440)) / 2 + pad;
+    const regionL = left + cw * 0.46 + 80, regionR = left + cw;
+    const dist = camera.position.length();
+    const pxu = size.height / (2 * dist * Math.tan(THREE.MathUtils.degToRad(30 / 2))); // pixels par unité monde au niveau de l'objet
+    const BASE_W = 3.9; // largeur apparente du portable à l'échelle 1 (lacet inclus)
+    const heroS = THREE.MathUtils.clamp((regionR - regionL) / (BASE_W * pxu), 0.42, 0.7); // 0,7 = ~19 % de moins qu'avant
+    const heroX = ((regionL + regionR) / 2 - W / 2) / pxu;
+    const tx = portrait ? 0 : D.lerp(D.lerp(heroX, heroX * 0.4, ho), 1.75, e);
+    const ty = portrait ? D.lerp(D.lerp(2.1, 0.35, ho), 1.3, e) : 0;
+    const ts = (portrait ? D.lerp(0.4, 0.55, ho) : D.lerp(heroS, heroS + 0.04, ho)) * D.lerp(1, portrait ? 0.82 : 0.78, e);
     rig.current.position.x = D.damp(rig.current.position.x, tx, 3, dt);
     rig.current.position.y = D.damp(rig.current.position.y, ty + Math.sin(t * 0.7) * 0.03, 3, dt);
     rig.current.scale.setScalar(D.damp(rig.current.scale.x, ts, 3, dt));
@@ -185,7 +196,7 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     // caméra
     camera.position.x = D.damp(camera.position.x, stage.mx * 0.5 * (1 - e), 3, dt);
     camera.position.y = D.damp(camera.position.y, D.lerp(1.55, 1.95, e) - stage.my * 0.2, 3, dt);
-    camera.position.z = D.damp(camera.position.z, D.lerp(7.2, 7.9, e) + (portrait ? 2.2 : 0) - ho * 0.5, 3, dt);
+    camera.position.z = D.damp(camera.position.z, D.lerp(8.2, 8.8, e) + (portrait ? 2.2 : 0) - ho * 0.5, 3, dt);
     camera.lookAt(0, D.lerp(1.0, 1.5, e), 0);
   });
 

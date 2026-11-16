@@ -1,7 +1,23 @@
 import Link from "next/link";
 import { Reveal, Lines } from "./Reveal";
 import { CountUp } from "./CountUp";
+import { AtelierBg, FrameDraw } from "./Motion";
 import { euro } from "@/lib/utils";
+
+/** Bandeau de mots-clés (services) qui défile lentement dans une bande biseautée. Rôle : montrer l'étendue de l'offre d'un coup d'œil. */
+export function KeywordBand({ words }: { words: string[] }) {
+  const row = [...words, ...words];
+  return (
+    <div className="light-section py-6" aria-label="Nos services en un coup d'œil" role="group">
+      <div className="band" aria-hidden="true">
+        <div className="band-track text-[0.9rem] font-semibold uppercase tracking-[0.22em]">
+          {[...row, ...row].map((w, i) => (<span key={i} className="flex items-center gap-12">{w}<span className="inline-block h-1.5 w-1.5 bg-white/70" /></span>))}
+        </div>
+      </div>
+      <ul className="sr-only">{words.map((w) => (<li key={w}>{w}</li>))}</ul>
+    </div>
+  );
+}
 
 export function TrustBar({ items }: { items: { value: string; label: string }[] }) {
   return (
@@ -34,7 +50,7 @@ export function ServicesList({ services, title, lead, theme = "light" }: { servi
         <ol className="lg:col-span-8">
           {services.map((s, i) => (
             <li key={s.slug} className="border-t hair last:border-b">
-              <Link href={`/services/${s.slug}`} className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-6 gap-y-2 py-8 transition-[padding] duration-500 ease-out hover:pl-4 md:gap-x-10" data-cursor>
+              <Link href={`/services/${s.slug}`} className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-6 gap-y-2 py-8 transition-[padding] duration-500 ease-out hover:pl-4 md:gap-x-10" data-cursor="Voir">
                 <span className="muted w-8 text-[0.85rem] tabular-nums">0{i + 1}</span>
                 <div>
                   <h3 id={i === 0 ? "services-h-first" : undefined} className="text-h3 font-medium transition-colors group-hover:acc">{s.title}</h3>
@@ -101,27 +117,29 @@ function Stars({ n }: { n: number }) {
 
 export function CtaBand({ title, text }: { title: string; text: string }) {
   return (
-    <section className="dark-section relative overflow-hidden py-28 md:py-44" aria-labelledby="cta-h">
-      <div className="container">
+    <section className="dark-section sweep relative overflow-hidden py-28 md:py-44" aria-labelledby="cta-h">
+      <AtelierBg tone="dark" />
+      <FrameDraw className="container">
         <Lines as="h2" lines={[title]} className="text-display max-w-[14ch] font-medium [&_.ln]:pb-3" />
         <div className="mt-10 grid items-end gap-8 md:grid-cols-2">
           <Reveal delay={0.2}><p className="muted max-w-md text-[1.15rem] leading-relaxed">{text}</p></Reveal>
           <Reveal delay={0.3}><div className="flex flex-wrap gap-3 md:justify-end"><Link href="/contact" className="btn btn-primary">Demander un devis gratuit <span aria-hidden="true">→</span></Link><Link href="/tarifs" className="btn btn-ghost">Voir les tarifs</Link></div></Reveal>
         </div>
-      </div>
+      </FrameDraw>
     </section>
   );
 }
 
 export function PageHero({ eyebrow, title, lead, children }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode }) {
   return (
-    <section className="dark-section relative pb-20 pt-40 md:pb-28 md:pt-52">
-      <div className="container">
+    <section className="dark-section sweep relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
+      <AtelierBg tone="dark" />
+      <FrameDraw className="container">
         {children}
         <p className="eyebrow mb-7">{eyebrow}</p>
         <h1 className="max-w-[18ch] text-h1 font-medium">{title}</h1>
         {lead && <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{lead}</p>}
-      </div>
+      </FrameDraw>
     </section>
   );
 }

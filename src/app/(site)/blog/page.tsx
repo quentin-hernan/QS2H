@@ -32,7 +32,7 @@ export default async function Blog({ searchParams }: { searchParams: Promise<{ c
           <ul className="grid gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
             {posts.map((p, i) => (
               <Reveal as="li" key={p.id} delay={(i % 3) * 0.08}>
-                <Link href={`/blog/${p.slug}`} className="group block" data-cursor>
+                <Link href={`/blog/${p.slug}`} className="group block" data-cursor="Lire">
                   <div className="relative aspect-[3/2] overflow-hidden chamfer border hair bg-ink-900">
                     {p.cover ? <Image src={p.cover} alt="" fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" /> : <div className="flex h-full items-end p-6"><span className="font-serif text-4xl italic text-ivory/80">{p.category}</span></div>}
                   </div>

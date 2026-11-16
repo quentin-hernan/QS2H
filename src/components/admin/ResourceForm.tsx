@@ -133,7 +133,7 @@ function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all
     case "number":
       return <div>{Label}<input id={id} type="number" min={0} className="field" value={value} onChange={(e) => onChange(Number(e.target.value))} {...aria} />{Hint}{Err}</div>;
     case "boolean":
-      return <label className="flex cursor-pointer items-center gap-3 py-2"><input type="checkbox" className="h-5 w-5 accent-[rgb(217,108,130)]" checked={!!value} onChange={(e) => onChange(e.target.checked)} /><span>{f.label}</span></label>;
+      return <label className="flex cursor-pointer items-center gap-3 py-2"><input type="checkbox" className="h-5 w-5 accent-[rgb(127,169,217)]" checked={!!value} onChange={(e) => onChange(e.target.checked)} /><span>{f.label}</span></label>;
     case "select":
       return <div>{Label}<select id={id} className="field" value={value} onChange={(e) => onChange(e.target.value)} {...aria}>{(f.options as { value: string; label: string }[]).map((o) => (<option key={o.value} value={o.value} className="text-black">{o.label}</option>))}</select>{Err}</div>;
     case "datetime":

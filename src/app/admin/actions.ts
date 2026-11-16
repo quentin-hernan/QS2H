@@ -110,7 +110,7 @@ export async function inviteUser(_: { error?: string; ok?: string } | undefined,
   const token = crypto.randomBytes(24).toString("hex");
   await db.user.create({ data: { email, name, role, passwordHash: await hashPassword(crypto.randomBytes(24).toString("hex")), inviteToken: token, inviteExpires: new Date(Date.now() + 7 * 864e5), mustChangePassword: false } });
   const link = `${SITE_URL}/admin/invitation/${token}`;
-  await sendMail({ to: email, subject: "Invitation à l'administration QS2H", html: layout("Vous êtes invité(e)", `<p style="line-height:1.6">Bonjour ${esc(name)}, vous avez été invité(e) à gérer le site QS2H.</p><p><a href="${link}" style="display:inline-block;background:#7A0020;color:#fff;padding:12px 22px;border-radius:30px;text-decoration:none">Créer mon mot de passe</a></p><p style="font-size:13px;color:#5C5C56">Ce lien est valable 7 jours.</p>`) });
+  await sendMail({ to: email, subject: "Invitation à l'administration QS2H", html: layout("Vous êtes invité(e)", `<p style="line-height:1.6">Bonjour ${esc(name)}, vous avez été invité(e) à gérer le site QS2H.</p><p><a href="${link}" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;border-radius:30px;text-decoration:none">Créer mon mot de passe</a></p><p style="font-size:13px;color:#5A5F66">Ce lien est valable 7 jours.</p>`) });
   await audit(s.email, "invitation utilisateur", "user", email);
   return { ok: `Invitation créée. Lien (si l'email n'est pas configuré) : ${link}` };
 }
@@ -307,7 +307,7 @@ const settingSchemas: Record<string, z.ZodTypeAny> = {
     address: str(), zip: str(20), city: str(80).min(1), phone: str(40), email: z.string().trim().email("Email invalide."), hours: str(), area: str(500),
     director: str(), hostName: str(), hostAddress: str(500), mediator: str(500), dpoEmail: z.string().trim().email("Email DPO invalide."),
   }),
-  theme: z.object({ accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur hexadécimale attendue (#7A0020).") }),
+  theme: z.object({ accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur hexadécimale attendue (#2A5587).") }),
   social: z.object({ linkedin: url, instagram: url, facebook: url }),
   integrations: z.object({ calendlyUrl: url, plausibleDomain: str(100), searchConsoleToken: str(200) }),
   footerText: str(500),
@@ -446,7 +446,7 @@ export async function replyToClient(clientId: string, body: string): Promise<Res
   const c = await db.client.findUnique({ where: { id: clientId } });
   if (!c) return { ok: false, error: "Client introuvable." };
   await db.clientMessage.create({ data: { clientId, body: b.slice(0, 4000), fromClient: false } });
-  await sendMail({ to: c.email, subject: "Nouveau message de QS2H", html: layout("Vous avez un nouveau message", `<p style="line-height:1.6">Bonjour ${esc(c.firstName)}, QS2H vous a écrit dans votre espace client.</p><p><a href="${SITE_URL}/compte/messages" style="display:inline-block;background:#7A0020;color:#fff;padding:12px 22px;text-decoration:none">Lire le message</a></p>`) });
+  await sendMail({ to: c.email, subject: "Nouveau message de QS2H", html: layout("Vous avez un nouveau message", `<p style="line-height:1.6">Bonjour ${esc(c.firstName)}, QS2H vous a écrit dans votre espace client.</p><p><a href="${SITE_URL}/compte/messages" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;text-decoration:none">Lire le message</a></p>`) });
   await audit(s.email, "réponse client", "client", clientId);
   revalidatePath(`/admin/clients/${clientId}`);
   return { ok: true };

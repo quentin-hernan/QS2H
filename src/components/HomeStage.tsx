@@ -89,7 +89,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
       <div className="pointer-events-none sticky top-0 z-[1] -mb-[100svh] h-[100svh] w-full" style={{ opacity: pinned ? 1 - Math.min(1, Math.max(0, (prog - 0.93) / 0.07)) : 1 }} aria-hidden="true">
         {/* repli statique : affiché pendant le chargement, sans WebGL, ou sur appareil faible */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero-fallback.webp" alt="" width={1600} height={1000} fetchPriority="high" className={`absolute inset-y-0 right-[-8%] my-auto h-auto w-[78%] max-w-[1100px] object-contain transition-opacity duration-700 max-md:inset-x-0 max-md:bottom-[-4%] max-md:top-auto max-md:right-auto max-md:mx-auto max-md:my-0 max-md:w-[135%] ${ready ? "opacity-0" : "opacity-100"}`} />
+        <img src="/hero-fallback.webp" alt="" width={1600} height={1000} fetchPriority="high" className={`absolute inset-y-0 right-[3%] my-auto h-auto w-[44%] max-w-[760px] object-contain transition-opacity duration-700 max-md:inset-x-0 max-md:bottom-[-4%] max-md:top-auto max-md:right-auto max-md:mx-auto max-md:my-0 max-md:w-[135%] ${ready ? "opacity-0" : "opacity-100"}`} />
         {mode === "3d" && (
           <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}>
             <StageCanvas layers={layers} accent={accent} lowPower={lowPower.current} running={running} onReady={() => setReady(true)} />

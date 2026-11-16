@@ -26,7 +26,7 @@ export const defaultSettings = {
     mediator: "[Nom et coordonnées du médiateur de la consommation]",
     dpoEmail: "contact@qs2h.fr",
   },
-  theme: { accent: "#7A0020" },
+  theme: { accent: "#2A5587" },
   social: { linkedin: "", instagram: "", facebook: "" },
   integrations: { calendlyUrl: "", plausibleDomain: "", searchConsoleToken: "" },
   footerText: "Sites web sur mesure pour les entreprises. Conçus à Bordeaux, livrés partout en France.",

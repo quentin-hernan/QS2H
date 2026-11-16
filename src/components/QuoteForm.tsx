@@ -109,7 +109,7 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
         <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Ne pas remplir<input tabIndex={-1} autoComplete="off" {...register("website")} /></label></div>
         <div className="sm:col-span-2">
           <label className="flex cursor-pointer items-start gap-3 text-[0.9rem] leading-snug muted">
-            <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-[rgb(217,108,130)]" {...register("consent")} {...aria("consent")} />
+            <input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-[rgb(127,169,217)]" {...register("consent")} {...aria("consent")} />
             <span>J&apos;accepte que QS2H utilise ces informations pour répondre à ma demande. Elles sont conservées 3 ans maximum et ne sont jamais revendues. <a className="link-u acc" href="/politique-de-confidentialite" target="_blank">En savoir plus</a>.</span>
           </label><Err k="consent" />
         </div>

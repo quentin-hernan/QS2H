@@ -41,7 +41,7 @@ export function ProjectsGallery({ items, accent, level = 3 }: { items: P[]; acce
   }
   return (
     <div>
-      <section ref={ref} tabIndex={0} aria-roledescription="carrousel" aria-label="Carrousel des réalisations. Flèches gauche et droite pour naviguer." className="relative h-[62svh] min-h-[420px] w-full cursor-grab select-none outline-offset-4 active:cursor-grabbing" style={{ touchAction: "pan-y" }}>
+      <section ref={ref} data-cursor="Glisser" tabIndex={0} aria-roledescription="carrousel" aria-label="Carrousel des réalisations. Flèches gauche et droite pour naviguer." className="relative h-[62svh] min-h-[420px] w-full cursor-grab select-none outline-offset-4 active:cursor-grabbing" style={{ touchAction: "pan-y" }}>
         <GalleryCanvas items={withCover} accent={accent} running={running} host={host} apiRef={api} onOpen={(slug) => viewer.open(slug)} lowPower={typeof window !== "undefined" && window.innerWidth < 900} />
       </section>
       <div className="mt-6 flex items-center justify-between gap-4">

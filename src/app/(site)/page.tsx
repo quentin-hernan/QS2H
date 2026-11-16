@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HomeStage } from "@/components/HomeStage";
-import { TrustBar, ServicesList, Reviews, CtaBand } from "@/components/Blocks";
+import { TrustBar, ServicesList, Reviews, CtaBand, KeywordBand } from "@/components/Blocks";
+import { ScrollWords } from "@/components/Motion";
 import { ProjectsGallery } from "@/components/ProjectsGallery";
 import { Timeline } from "@/components/Timeline";
 import { Faq } from "@/components/Faq";
@@ -27,6 +28,7 @@ export default async function Home() {
       <HomeStage hero={{ kicker: page.kicker, line1: page.line1, line2: page.line2, line3: page.line3, lead: page.lead, ctaPrimary: page.ctaPrimary, ctaSecondary: page.ctaSecondary }} layers={page.layers} covers={covers} accent={accent} />
 
       <TrustBar items={s.trust} />
+      <KeywordBand words={services.map((x) => x.title)} />
 
       <ServicesList services={services} title={page.servicesTitle} lead={page.servicesLead} />
 
@@ -52,7 +54,7 @@ export default async function Home() {
             <div className="lg:sticky lg:top-32">
               <p className="eyebrow mb-6">Méthode</p>
               <Lines as="h2" lines={["Du premier échange", "à la mise en ligne."]} className="text-h2 font-medium" />
-              <Reveal delay={0.2}><p className="muted mt-6 max-w-sm leading-relaxed">{method.intro}</p></Reveal>
+              <ScrollWords text={method.intro} className="mt-6 max-w-sm leading-relaxed" />
               <Reveal delay={0.3}><Link href="/methode" className="btn btn-ghost mt-8">Détail de la méthode</Link></Reveal>
             </div>
           </div>

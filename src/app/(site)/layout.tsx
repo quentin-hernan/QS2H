@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { CookieBanner } from "@/components/CookieBanner";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Cursor } from "@/components/Cursor";
+import { LightDriver, PageTransitions, Preloader, ScrollUI } from "@/components/Motion";
 import { JsonLd } from "@/components/JsonLd";
 import { getProjects, getReviews, getSettings } from "@/lib/content";
 import { ViewerProvider } from "@/components/ProjectViewer";
@@ -20,6 +21,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <JsonLd data={[orgJsonLd(s, rating), websiteJsonLd()]} />
       <SmoothScroll />
       <Cursor />
+      <Preloader />
+      <PageTransitions />
+      <LightDriver />
+      <ScrollUI />
       <Header />
       <ViewerProvider projects={vp}>
         <main id="contenu">{children}</main>

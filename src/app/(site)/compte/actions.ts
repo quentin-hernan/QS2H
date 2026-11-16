@@ -12,7 +12,7 @@ import { SITE_URL } from "@/lib/utils";
 import { eraseClient } from "@/lib/client-data";
 
 export type S = { error?: string; ok?: string } | undefined;
-const btn = (href: string, label: string) => `<p><a href="${href}" style="display:inline-block;background:#7A0020;color:#fff;padding:12px 22px;text-decoration:none">${esc(label)}</a></p><p style="font-size:13px;color:#5F5F5F;word-break:break-all">${esc(href)}</p>`;
+const btn = (href: string, label: string) => `<p><a href="${href}" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;text-decoration:none">${esc(label)}</a></p><p style="font-size:13px;color:#5F5F5F;word-break:break-all">${esc(href)}</p>`;
 const GENERIC_LOGIN = "Identifiants incorrects, ou adresse email pas encore vérifiée.";
 
 /* ------------------------------------------------------------------ Inscription */

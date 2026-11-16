@@ -115,7 +115,7 @@ export function SettingsSection({ section, title, children, initial, fields }: {
           <div key={f.name} className={f.type === "textarea" ? "md:col-span-2" : ""}>
             <label className="label" htmlFor={`${section}-${f.name}`}>{f.label}</label>
             {f.type === "textarea" ? <textarea id={`${section}-${f.name}`} rows={3} className="field" value={v[f.name] ?? ""} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} />
-              : f.type === "color" ? (<div className="flex gap-3"><input id={`${section}-${f.name}`} type="color" className="h-12 w-16 cursor-pointer rounded-lg border bg-transparent p-1" style={ring} value={v[f.name] || "#7A0A22"} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} /><input aria-label={f.label} className="field" value={v[f.name] ?? ""} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} /></div>)
+              : f.type === "color" ? (<div className="flex gap-3"><input id={`${section}-${f.name}`} type="color" className="h-12 w-16 cursor-pointer rounded-lg border bg-transparent p-1" style={ring} value={v[f.name] || "#2A5587"} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} /><input aria-label={f.label} className="field" value={v[f.name] ?? ""} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} /></div>)
               : <input id={`${section}-${f.name}`} className="field" value={v[f.name] ?? ""} onChange={(e) => setV({ ...v, [f.name]: e.target.value })} />}
             {f.hint && <p className="muted mt-1.5 text-xs">{f.hint}</p>}
           </div>

@@ -16,11 +16,12 @@ async function main() {
     const al = a / 255;
     const un = (c: number) => (al > 0.01 ? Math.max(0, Math.min(255, Math.round((c - 255 * (1 - al)) / al))) : 0);
     const R = un(r), G = un(g), B = un(b);
-    dark[i] = R; dark[i + 1] = G; dark[i + 2] = B; dark[i + 3] = a;
-    // version claire : noir -> ivoire, bordeaux -> rouge éclairci
-    const isRed = R > G + 40 && R > B + 30;
-    if (isRed) { light[i] = 214; light[i + 1] = 70; light[i + 2] = 96; }
-    else { light[i] = 242; light[i + 1] = 239; light[i + 2] = 233; }
+    // "redness" : 0 (noir) -> 1 (accent d'origine). Les pixels d'accent sont recolorés en bleu QS2H ; les lettres noires restent noires / deviennent ivoire.
+    const t = Math.max(0, Math.min(1, (R - Math.max(G, B)) / 110));
+    const mix = (a0: number, b0: number) => Math.round(a0 + (b0 - a0) * t);
+    // version sombre (logo.png) : noir + bleu #2A5587 ; version claire : ivoire + bleu clair #7FA9D9
+    dark[i] = mix(28, 42); dark[i + 1] = mix(28, 85); dark[i + 2] = mix(28, 135); dark[i + 3] = a;
+    light[i] = mix(248, 127); light[i + 1] = mix(248, 169); light[i + 2] = mix(248, 217);
     light[i + 3] = a;
   }
   const mk = (buf: Buffer) => sharp(buf, { raw: { width, height, channels: 4 } });
@@ -29,7 +30,7 @@ async function main() {
   const m = await sharp(path.join(out, "logo.png")).metadata();
   console.log("logo.png", m.width, m.height);
   // icône carrée (monogramme Q) pour favicon / app icon
-  await sharp(path.join(out, "logo.png")).resize(512, 512, { fit: "contain", background: { r: 242, g: 239, b: 233, alpha: 1 } }).png().toFile(path.join(out, "icon-512.png"));
-  await sharp(path.join(out, "logo.png")).resize(180, 180, { fit: "contain", background: { r: 242, g: 239, b: 233, alpha: 1 } }).png().toFile(path.join(out, "apple-touch-icon.png"));
+  await sharp(path.join(out, "logo.png")).resize(512, 512, { fit: "contain", background: { r: 248, g: 248, b: 247, alpha: 1 } }).png().toFile(path.join(out, "icon-512.png"));
+  await sharp(path.join(out, "logo.png")).resize(180, 180, { fit: "contain", background: { r: 248, g: 248, b: 247, alpha: 1 } }).png().toFile(path.join(out, "apple-touch-icon.png"));
 }
 main();

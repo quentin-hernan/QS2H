@@ -106,7 +106,7 @@ function Viewer({ p, onClose, onNext }: { p: VProject; onClose: () => void; onNe
               <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-x-6 gap-y-3 bg-gradient-to-t from-ivory-200 via-ivory-200/90 to-transparent px-6 pb-5 pt-10">
                 <label className="flex min-w-[160px] flex-1 items-center gap-3 text-[0.82rem] font-medium uppercase tracking-[0.12em]">
                   <span className="hidden sm:inline">Assembler</span>
-                  <input type="range" min={0} max={1} step={0.01} value={slider} onChange={(e) => { const v = Number(e.target.value); setSlider(v); explode.current = v; }} aria-label="Assembler ou éclater la vue" className="h-11 flex-1 accent-[rgb(122,10,34)]" />
+                  <input type="range" min={0} max={1} step={0.01} value={slider} onChange={(e) => { const v = Number(e.target.value); setSlider(v); explode.current = v; }} aria-label="Assembler ou éclater la vue" className="h-11 flex-1 accent-[rgb(42,85,135)]" />
                   <span className="hidden sm:inline">Éclater</span>
                 </label>
                 <div className="flex flex-wrap gap-2" role="group" aria-label="Contrôles de la vue">
