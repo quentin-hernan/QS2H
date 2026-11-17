@@ -99,7 +99,7 @@ function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
   const origin = new THREE.Vector3((bb.min.x + bb.max.x) / 2, bb.min.y, (bb.min.z + bb.max.z) / 2);
 
   // matières : aluminium brossé, touches sombres, écran = texture temps réel
-  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); // devant la vitre coplanaire (évite le z-fighting)
+  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex, transparent: true, side: THREE.DoubleSide, depthTest: false, depthWrite: false, toneMapped: false }); // dessiné par-dessus la vitre coplanaire du modèle (évite le z-fighting) ; fondu piloté par l'opacité
   const tune = (m: THREE.MeshPhongMaterial): THREE.Material => {
     if (m.name === "Material.008") return screenMat;
     const alu = m.name === "Material.003";
@@ -177,8 +177,10 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     const open = smooth(0.3, 2.1, t - born.current);
     lap.hinge.rotation.x = D.lerp(Math.PI / 2 + lap.tilt, 0, open);
     const opened = open > 0.995;
-    lap.screenMat.visible = !opened;
-    lg.current.visible = opened;
+    // écran réel du portable tant que les couches ne sont pas déployées ; les couches apparaissent / disparaissent en fondu
+    const lf = smooth(0.1, 0.4, e);
+    lap.screenMat.opacity = opened ? 1 - lf : 1; // fondu entre l'écran réel et les couches
+    lg.current.visible = opened && lf > 0.01;
 
     // placement du rig
     // hero : portable à droite (texte à gauche) ; vue éclatée : décalée à droite du panneau de texte
@@ -217,11 +219,11 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
       lm.lift = D.damp(lm.lift, act ? 0.42 : 0, 5, dt);
       // les pages devant la couche active s'effacent progressivement pour ne pas la cacher ; celles derrière restent en retrait
       const target = stage.active === -1 || e < 0.5 || act ? 1 : i < stage.active ? 0 : 0.3;
-      lm.op = D.damp(lm.op, target, 3, dt);
+      lm.op = D.damp(lm.op, target, 10, dt);
       it.position.z = -i * gap + 2 * gap * e + lm.lift;
-      if (lm.face) lm.face.opacity = lm.op;
-      lm.slab.opacity = lm.op;
-      it.visible = lm.op > 0.02;
+      if (lm.face) lm.face.opacity = lm.op * lf;
+      lm.slab.opacity = lm.op * lf;
+      it.visible = lm.op * lf > 0.02;
     });
 
     // caméra
