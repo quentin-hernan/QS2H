@@ -3,7 +3,6 @@ import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getServices } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
-import { euro } from "@/lib/utils";
 
 export const metadata = buildMetadata({
   title: "Services : création de site, refonte, e-commerce, SEO",

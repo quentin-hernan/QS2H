@@ -1,8 +1,9 @@
 "use client";
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { roundedBox, roundedPlane } from "./geometry";
 import { displayFont, makeLayerTexture } from "./layerTextures";
 import { smooth, stage } from "./store";
@@ -79,39 +80,73 @@ function useScreenTexture(accent: string) {
   }, [accent]);
 }
 
+
+/** MacBook fourni (public/models/macbook.fbx) : normalisé (écran de 2,9 unités de large, base posée sur y = 0),
+ *  capot détaché sur une charnière, matière de l'écran remplacée par la texture temps réel. */
+function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
+  src.updateMatrixWorld(true);
+  const lid = src.getObjectByName("Cube016") as THREE.Mesh;
+  const base = src.getObjectByName("Cylinder") as THREE.Mesh;
+  const screenIdx = (lid.material as THREE.Material[]).findIndex((m) => m.name === "Material.008");
+  // boîte englobante de l'écran (groupe de matière 008) en coordonnées monde du modèle
+  const sb = new THREE.Box3(), v = new THREE.Vector3();
+  const pos = lid.geometry.attributes.position, idx = lid.geometry.index;
+  for (const gr of lid.geometry.groups) if (gr.materialIndex === screenIdx) for (let i = gr.start; i < gr.start + gr.count; i++) { v.fromBufferAttribute(pos, idx ? idx.getX(i) : i).applyMatrix4(lid.matrixWorld); sb.expandByPoint(v); }
+  const sc = sb.getCenter(new THREE.Vector3());
+  const k = 2.9 / sb.getSize(new THREE.Vector3()).x;
+  const bb = new THREE.Box3().setFromObject(base);
+  const lb = new THREE.Box3().setFromObject(lid);
+  const origin = new THREE.Vector3((bb.min.x + bb.max.x) / 2, bb.min.y, (bb.min.z + bb.max.z) / 2);
+
+  // matières : aluminium brossé, touches sombres, écran = texture temps réel
+  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); // devant la vitre coplanaire (évite le z-fighting)
+  const tune = (m: THREE.MeshPhongMaterial): THREE.Material => {
+    if (m.name === "Material.008") return screenMat;
+    const alu = m.name === "Material.003";
+    const behind = m.name === "Material.005" || m.name === "Material.006" || m.name === "Material.007"; // vitre et cadre du capot, derrière l'écran
+    return new THREE.MeshStandardMaterial({ name: m.name, color: behind ? 0x050506 : alu ? 0xc9ccd2 : m.color, metalness: alu ? 1 : 0.25, roughness: alu ? 0.32 : 0.5, envMapIntensity: alu ? 1.25 : 0.8, polygonOffset: behind, polygonOffsetFactor: behind ? 3 : 0, polygonOffsetUnits: behind ? 3 : 0 });
+  };
+  src.traverse((o) => { const me = o as THREE.Mesh; if (me.isMesh) me.material = Array.isArray(me.material) ? me.material.map((m) => tune(m as THREE.MeshPhongMaterial)) : tune(me.material as THREE.MeshPhongMaterial); });
+
+  // charnière : bord bas-arrière du capot
+  const pivot = new THREE.Vector3((lb.min.x + lb.max.x) / 2, lb.min.y, lb.max.z);
+  const hinge = new THREE.Group();
+  hinge.position.copy(pivot);
+  src.add(hinge);
+  hinge.attach(lid);
+  const root = new THREE.Group();
+  const wrap = new THREE.Group();
+  wrap.scale.setScalar(k);
+  wrap.position.set(-origin.x * k, -origin.y * k, -origin.z * k);
+  wrap.add(src);
+  root.add(wrap);
+  // centre de l'écran et inclinaison du capot ouvert (repère du rig)
+  const screenCenter = sc.clone().sub(origin).multiplyScalar(k);
+  const tilt = Math.atan2(lb.max.z - lb.min.z, lb.max.y - lb.min.y) * 0.9;
+  const hingeRig = pivot.clone().sub(origin).multiplyScalar(k);
+  return { root, hinge, screenMat, screenCenter, tilt, hingeRig, wrap };
+}
+
 function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
   const rig = useRef<THREE.Group>(null!);
   const body = useRef<THREE.Group>(null!);
-  const hinge = useRef<THREE.Group>(null!);
   const lg = useRef<THREE.Group>(null!);
-  const lidScreen = useRef<THREE.Mesh>(null!);
-  const keys = useRef<THREE.InstancedMesh>(null!);
   const items = useRef<(THREE.Group | null)[]>([]);
   const frames = useRef(0);
   const camera = useThree((s) => s.camera);
   const size = useThree((s) => s.size);
   const screen = useScreenTexture(accent);
+  const fbx = useLoader(FBXLoader, "/models/macbook.fbx");
+  const lap = useMemo(() => buildLaptop(fbx.clone(true) as THREE.Group, screen.tex), [fbx, screen]);
 
   const g = useMemo(
     () => ({
-      base: roundedBox(3.2, 2.2, 0.09, 0.12, 0.012).rotateX(-Math.PI / 2),
-      lid: roundedBox(3.2, 2.1, 0.06, 0.1, 0.012),
-      pad: roundedBox(1.15, 0.68, 0.012, 0.05, 0.004).rotateX(-Math.PI / 2),
       slab: roundedBox(2.96, 1.85, 0.03, 0.045, 0.006),
       face: roundedPlane(2.9, 1.79, 0.04),
     }),
     [],
   );
 
-  const mats = useMemo(
-    () => ({
-      alu: new THREE.MeshStandardMaterial({ color: 0xc9ccd2, metalness: 1, roughness: 0.3, envMapIntensity: 1.25 }),
-      pad: new THREE.MeshStandardMaterial({ color: 0xb0b3ba, metalness: 1, roughness: 0.2, envMapIntensity: 1.3 }),
-      key: new THREE.MeshStandardMaterial({ color: 0x0f1014, metalness: 0.4, roughness: 0.5 }),
-      black: new THREE.MeshStandardMaterial({ color: 0x030304, metalness: 0.2, roughness: 0.25 }),
-    }),
-    [],
-  );
   const layerMats = useMemo(
     () =>
       layers.map((l, i) => ({
@@ -125,13 +160,6 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
   );
 
   useEffect(() => { screen.load(stage.covers); }, [screen]);
-
-  useLayoutEffect(() => {
-    const m = new THREE.Matrix4();
-    let i = 0;
-    for (let r = 0; r < 6; r++) for (let c = 0; c < 14; c++) { m.setPosition((c - 6.5) * 0.196, 0.104, -0.82 + r * 0.18); keys.current.setMatrixAt(i++, m); }
-    keys.current.instanceMatrix.needsUpdate = true;
-  }, []);
 
   const born = useRef<number | null>(null);
   useFrame((state, dt) => {
@@ -147,9 +175,9 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
 
     // ouverture du capot à l'arrivée
     const open = smooth(0.3, 2.1, t - born.current);
-    hinge.current.rotation.x = D.lerp(Math.PI / 2 - 0.02, -0.2, open);
+    lap.hinge.rotation.x = D.lerp(Math.PI / 2 + lap.tilt, 0, open);
     const opened = open > 0.995;
-    lidScreen.current.visible = !opened;
+    lap.screenMat.visible = !opened;
     lg.current.visible = opened;
 
     // placement du rig
@@ -179,8 +207,8 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     body.current.rotation.y = D.damp(body.current.rotation.y, e * 0.6, 3, dt);
 
     // couches : position repliée (plan de l'écran) → vue éclatée
-    lg.current.position.set(D.lerp(0, -0.1, e), D.lerp(1.1212, 1.55, e), D.lerp(-1.2783, 0.1, e));
-    lg.current.rotation.set(D.lerp(-0.2, -0.46, e), D.lerp(0, -0.62, e), D.lerp(0, 0.02, e));
+    lg.current.position.set(D.lerp(lap.screenCenter.x, -0.1, e), D.lerp(lap.screenCenter.y, 1.55, e), D.lerp(lap.screenCenter.z, 0.1, e));
+    lg.current.rotation.set(D.lerp(-lap.tilt, -0.46, e), D.lerp(0, -0.62, e), D.lerp(0, 0.02, e));
     const gap = D.lerp(0.004, 0.92, e);
     layerMats.forEach((lm, i) => {
       const it = items.current[i];
@@ -203,21 +231,7 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
   return (
     <group ref={rig}>
       <group ref={body}>
-        {/* base */}
-        <mesh geometry={g.base} material={mats.alu} position={[0, 0.045, 0]} />
-        <mesh rotation-x={-Math.PI / 2} position={[0, 0.0915, -0.38]} material={mats.black}><planeGeometry args={[2.86, 1.14]} /></mesh>
-        <instancedMesh ref={keys} args={[undefined, undefined, 84]} material={mats.key}><boxGeometry args={[0.165, 0.03, 0.15]} /></instancedMesh>
-        <mesh geometry={g.pad} material={mats.pad} position={[0, 0.093, 0.62]} />
-        {/* capot */}
-        <group ref={hinge} position={[0, 0.09, -1.08]}>
-          <mesh geometry={g.lid} material={mats.alu} position={[0, 1.05, -0.035]}>
-            <mesh material={mats.black} position={[0, 0, 0.0305]}><planeGeometry args={[3.08, 1.98]} /></mesh>
-            <mesh ref={lidScreen} position={[0, 0, 0.0312]}>
-              <planeGeometry args={[2.96, 1.85]} />
-              <meshBasicMaterial map={screen.tex} toneMapped={false} />
-            </mesh>
-          </mesh>
-        </group>
+        <primitive object={lap.root} />
         <ContactShadows position={[0, 0.002, 0]} opacity={0.55} scale={12} blur={2.6} far={3.5} resolution={lowPower ? 256 : 512} frames={lowPower ? 1 : Infinity} color="#000000" />
       </group>
 
@@ -254,7 +268,7 @@ export default function StageCanvas({ layers, accent, lowPower, running, onReady
         <Lightformer form="rect" intensity={3} color="#b5ccff" position={[8, 2, -2]} rotation-y={-Math.PI / 2} scale={[8, 6, 1]} />
         <Lightformer form="rect" intensity={2} position={[0, 3, -10]} scale={[16, 3, 1]} />
       </Environment>
-      <Rig layers={layers} accent={accent} lowPower={lowPower} onReady={onReady} />
+      <Suspense fallback={null}><Rig layers={layers} accent={accent} lowPower={lowPower} onReady={onReady} /></Suspense>
     </Canvas>
   );
 }
