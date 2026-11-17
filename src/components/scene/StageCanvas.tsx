@@ -215,10 +215,13 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
       if (!it) return;
       const act = stage.active === i && e > 0.5;
       lm.lift = D.damp(lm.lift, act ? 0.42 : 0, 5, dt);
-      lm.op = D.damp(lm.op, stage.active === -1 || act || e < 0.5 ? 1 : 0.26, 5, dt);
+      // les pages devant la couche active s'effacent progressivement pour ne pas la cacher ; celles derrière restent en retrait
+      const target = stage.active === -1 || e < 0.5 || act ? 1 : i < stage.active ? 0 : 0.3;
+      lm.op = D.damp(lm.op, target, 3, dt);
       it.position.z = -i * gap + 2 * gap * e + lm.lift;
       if (lm.face) lm.face.opacity = lm.op;
       lm.slab.opacity = lm.op;
+      it.visible = lm.op > 0.02;
     });
 
     // caméra

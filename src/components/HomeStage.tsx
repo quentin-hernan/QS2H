@@ -138,7 +138,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
                   </>
                 ) : (
                   <>
-                    <h2 id="layers-title" className="serif-it text-h2">{layers[active].title}</h2>
+                    <h2 id="layers-title" className="serif-it text-[clamp(1.7rem,3vw,2.7rem)] leading-[1.05] [hyphens:none]">{layers[active].title}</h2>
                     <p className="mt-4 text-[1.1rem] leading-relaxed">{layers[active].text}</p>
                   </>
                 )}
