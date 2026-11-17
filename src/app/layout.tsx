@@ -26,8 +26,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const s = await getSettings();
   const css = `:root{--accent:${hexToRgbTriplet(s.theme.accent)};--accent-hi:${lighten(s.theme.accent)};--accent-hover:${lighten(s.theme.accent, -0.25)}}`;
   return (
-    <html lang="fr" className={`${sans.variable} ${serif.variable}`}>
+    <html lang="fr" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
       <head>
+        <meta name="darkreader-lock" />
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <script dangerouslySetInnerHTML={{ __html: PRELOADER_SKIP }} />
       </head>
