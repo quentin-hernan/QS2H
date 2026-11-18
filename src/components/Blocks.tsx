@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Reveal, Lines } from "./Reveal";
 import { CountUp } from "./CountUp";
-import { AtelierBg, FrameDraw } from "./Motion";
+import { FrameDraw } from "./Motion";
 import { euro } from "@/lib/utils";
 
 /** Bandeau de mots-clés (services) qui défile lentement dans une bande biseautée. Rôle : montrer l'étendue de l'offre d'un coup d'œil. */
@@ -10,8 +10,8 @@ export function KeywordBand({ words }: { words: string[] }) {
   return (
     <div className="light-section py-6" aria-label="Nos services en un coup d'œil" role="group">
       <div className="band" aria-hidden="true">
-        <div className="band-track text-[0.9rem] font-semibold uppercase tracking-[0.22em]">
-          {[...row, ...row].map((w, i) => (<span key={i} className="flex items-center gap-12">{w}<span className="inline-block h-1.5 w-1.5 bg-white/70" /></span>))}
+        <div className="band-track font-serif text-[clamp(1.6rem,3.4vw,3rem)] font-extrabold tracking-tight">
+          {[...row, ...row].map((w, i) => (<span key={i} className="flex items-center gap-12">{w}<span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "rgb(var(--accent))" }} /></span>))}
         </div>
       </div>
       <ul className="sr-only">{words.map((w) => (<li key={w}>{w}</li>))}</ul>
@@ -117,8 +117,7 @@ function Stars({ n }: { n: number }) {
 
 export function CtaBand({ title, text }: { title: string; text: string }) {
   return (
-    <section className="dark-section sweep relative overflow-hidden py-28 md:py-44" aria-labelledby="cta-h">
-      <AtelierBg tone="dark" />
+    <section className="dark-section relative overflow-hidden py-28 md:py-44" aria-labelledby="cta-h">
       <FrameDraw className="container">
         <Lines as="h2" lines={[title]} className="text-display max-w-[14ch] font-medium [&_.ln]:pb-3" />
         <div className="mt-10 grid items-end gap-8 md:grid-cols-2">
@@ -132,8 +131,7 @@ export function CtaBand({ title, text }: { title: string; text: string }) {
 
 export function PageHero({ eyebrow, title, lead, children }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode }) {
   return (
-    <section className="dark-section sweep relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
-      <AtelierBg tone="dark" />
+    <section className="dark-section relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
       <FrameDraw className="container">
         {children}
         <p className="eyebrow mb-7">{eyebrow}</p>

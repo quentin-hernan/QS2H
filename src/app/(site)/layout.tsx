@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { CookieBanner } from "@/components/CookieBanner";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { Cursor } from "@/components/Cursor";
+import { Chatbot } from "@/components/Chatbot";
 import { LightDriver, PageTransitions, Preloader, ScrollUI } from "@/components/Motion";
 import { JsonLd } from "@/components/JsonLd";
 import { getProjects, getReviews, getSettings } from "@/lib/content";
@@ -30,6 +31,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <main id="contenu">{children}</main>
       </ViewerProvider>
       <Footer />
+      <Chatbot />
       <CookieBanner plausibleDomain={s.integrations.plausibleDomain} />
     </>
   );

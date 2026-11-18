@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ------------------------------------------------------------------ Préchargeur
-   Rôle : masquer le montage de la scène à la toute première visite. Les cadres d'angle se dessinent autour du logo (1,2 s max). */
+   Rôle : masquer le montage de la scène à la toute première visite. Le logo apparaît en fondu (1,2 s max). */
 export function Preloader() {
   const [gone, setGone] = useState(false);
   useEffect(() => {
@@ -19,7 +19,6 @@ export function Preloader() {
   return (
     <div className="preloader" aria-hidden="true">
       <div className="preloader-box">
-        <span className="pl-c pl-tl" /><span className="pl-c pl-br" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo-light.png" alt="" width={720} height={227} className="pl-logo" />
       </div>
@@ -128,22 +127,9 @@ export function LightDriver() {
   return null;
 }
 
-const PLANES: { x: string; y: string; w: string; h: string; d: number; m?: boolean }[] = [
-  { x: "62%", y: "8%", w: "34%", h: "46%", d: 1 },
-  { x: "-6%", y: "52%", w: "26%", h: "40%", d: 0.65 },
-  { x: "78%", y: "58%", w: "18%", h: "30%", d: 0.35, m: true },
-  { x: "30%", y: "-10%", w: "20%", h: "26%", d: 0.35, m: true },
-];
-export function AtelierBg({ tone = "dark" }: { tone?: "dark" | "light" }) {
-  return (
-    <div className={`atelier atelier-${tone}`} aria-hidden="true">
-      {PLANES.map((p, i) => (
-        <div key={i} className={`atelier-plane ${p.m ? "max-md:hidden" : ""}`} style={{ left: p.x, top: p.y, width: p.w, height: p.h, ["--d" as string]: p.d }}>
-          <span className="atelier-shadow" /><span className="atelier-face" />
-        </div>
-      ))}
-    </div>
-  );
+/** Ancien fond à plans flottants : supprimé (rendu trop décoratif). Conservé pour ne pas casser les imports. */
+export function AtelierBg(_props: { tone?: "dark" | "light" }) {
+  return null;
 }
 
 /* ------------------------------------------------------------------ Cadre d'angle qui se dessine à l'entrée de section */

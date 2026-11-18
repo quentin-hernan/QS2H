@@ -1,3 +1,4 @@
+import { MediaBand } from "@/components/MediaBand";
 import { MethodDevice } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -21,6 +22,7 @@ export default async function Methode() {
       <section className="light-section py-24 md:py-36">
         <div className="container grid gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]"><div id="method-steps"><Timeline steps={m.steps} /></div><div className="hidden lg:block"><MethodDevice target="method-steps" /></div></div>
       </section>
+      {((m.media ?? []) as { src?: string; alt?: string; title?: string; text?: string }[]).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}
       <CtaBand title="Première étape : un échange." text="Décrivez votre projet. Nous vous répondons sous 24 heures ouvrées pour fixer un rendez-vous de cadrage." />
     </>
   );

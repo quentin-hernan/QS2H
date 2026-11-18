@@ -1,4 +1,5 @@
 "use client";
+import { MediaPicker } from "./MediaPicker";
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { PageSchema } from "@/lib/defaults";
@@ -58,6 +59,23 @@ export function RowActions({ resourceKey, id, orderable, duplicable, first, last
 
 /* ------------------------------------------------------------ pages et textes */
 type PageVal = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+/** Champ média : image (tout format courant) ou vidéo, choisi dans la médiathèque ou importé. */
+function MediaField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (url: string, alt?: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const isVideo = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(value);
+  return (
+    <div>
+      <span className="label" id={id}>{label}</span>
+      <div className="flex flex-wrap items-center gap-4">
+        {value ? (isVideo ? <video src={value} muted preload="metadata" className="aspect-video w-48 rounded-lg object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={value} alt="" className="aspect-video w-48 rounded-lg object-cover" />) : <span className="muted text-sm">Aucun média choisi.</span>}
+        <button type="button" aria-labelledby={id} className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => setOpen(true)}>{value ? "Changer" : "Choisir une image ou une vidéo"}</button>
+        {value && <button type="button" className="err text-sm underline" onClick={() => onChange("")}>Retirer</button>}
+      </div>
+      <MediaPicker open={open} onClose={() => setOpen(false)} onPick={(m) => { onChange(m.url, m.alt); setOpen(false); }} />
+    </div>
+  );
+}
+
 export function PageEditor({ schema, initial, versions }: { schema: PageSchema; initial: PageVal; versions: { id: string; author: string; createdAt: string }[] }) {
   const router = useRouter();
   const [v, setV] = useState<PageVal>(initial);
@@ -74,7 +92,7 @@ export function PageEditor({ schema, initial, versions }: { schema: PageSchema; 
               <fieldset><legend className="label">{f.label}</legend>
                 <ul className="space-y-3">{(v[f.name] as Record<string, string>[]).map((row, i) => (
                   <li key={i} className="rounded-xl border p-4" style={ring}>
-                    <div className="grid gap-3">{f.itemFields!.map((it) => (<div key={it.name}><label className="label" htmlFor={`${f.name}-${i}-${it.name}`}>{it.label}</label>{it.type === "textarea" ? <textarea id={`${f.name}-${i}-${it.name}`} rows={3} className="field" value={row[it.name] ?? ""} onChange={(e) => set(f.name, (v[f.name] as Record<string, string>[]).map((r, n) => (n === i ? { ...r, [it.name]: e.target.value } : r)))} /> : <input id={`${f.name}-${i}-${it.name}`} className="field" value={row[it.name] ?? ""} onChange={(e) => set(f.name, (v[f.name] as Record<string, string>[]).map((r, n) => (n === i ? { ...r, [it.name]: e.target.value } : r)))} />}</div>))}</div>
+                    <div className="grid gap-3">{f.itemFields!.map((it) => it.type === "media" ? (<MediaField key={it.name} id={`${f.name}-${i}-${it.name}`} label={it.label} value={row[it.name] ?? ""} onChange={(url, alt) => set(f.name, (v[f.name] as Record<string, string>[]).map((r, n) => (n === i ? { ...r, [it.name]: url, ...(alt && !r.alt ? { alt } : {}) } : r)))} />) : (<div key={it.name}><label className="label" htmlFor={`${f.name}-${i}-${it.name}`}>{it.label}</label>{it.type === "textarea" ? <textarea id={`${f.name}-${i}-${it.name}`} rows={3} className="field" value={row[it.name] ?? ""} onChange={(e) => set(f.name, (v[f.name] as Record<string, string>[]).map((r, n) => (n === i ? { ...r, [it.name]: e.target.value } : r)))} /> : <input id={`${f.name}-${i}-${it.name}`} className="field" value={row[it.name] ?? ""} onChange={(e) => set(f.name, (v[f.name] as Record<string, string>[]).map((r, n) => (n === i ? { ...r, [it.name]: e.target.value } : r)))} />}</div>))}</div>
                     <button type="button" className="err mt-3 text-sm underline" onClick={() => set(f.name, (v[f.name] as unknown[]).filter((_, n) => n !== i))}>Supprimer</button>
                   </li>))}</ul>
                 <button type="button" className="btn btn-ghost mt-3 !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => set(f.name, [...(v[f.name] as unknown[]), Object.fromEntries(f.itemFields!.map((i) => [i.name, ""]))])}>+ Ajouter</button>

@@ -3,6 +3,8 @@ import { HomeStage } from "@/components/HomeStage";
 import { TrustBar, ServicesList, Reviews, CtaBand, KeywordBand } from "@/components/Blocks";
 import { ScrollWords } from "@/components/Motion";
 import { ProjectsGallery } from "@/components/ProjectsGallery";
+import { MediaBand } from "@/components/MediaBand";
+import { SiteBuilder } from "@/components/SiteBuilder";
 import { Timeline } from "@/components/Timeline";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
@@ -20,6 +22,7 @@ export const metadata = buildMetadata({
 export default async function Home() {
   const [page, method, s, services, projects, reviews, faqs] = await Promise.all([getPage("home"), getPage("method"), getSettings(), getServices(), getProjects(), getReviews(), getFaqs()]);
   const accent = `rgb(${lighten(s.theme.accent).split(" ").join(",")})`;
+  const media = (page.media ?? []) as { src?: string; alt?: string; title?: string; text?: string }[];
   const covers = projects.map((p) => p.cover).filter(Boolean);
   const shortFaq = faqs.slice(0, 5).map((f) => ({ q: f.question, a: f.answer }));
   return (
@@ -31,6 +34,10 @@ export default async function Home() {
       <KeywordBand words={services.map((x) => x.title)} />
 
       <ServicesList services={services} title={page.servicesTitle} lead={page.servicesLead} />
+
+      <MediaBand item={media[0]} />
+      <SiteBuilder steps={page.layers} title="Un site complet, construit pièce par pièce." />
+      <MediaBand item={media[1]} tone="dark" />
 
       <section className="dark-section py-24 md:py-36" aria-labelledby="real-h">
         <div className="container">
@@ -45,6 +52,8 @@ export default async function Home() {
           <ProjectsGallery items={projects.slice(0, 6).map((p) => ({ slug: p.slug, title: p.title, sector: p.sector, cover: p.cover, summary: p.summary, isExample: p.isExample }))} accent={accent} />
         </div>
       </section>
+
+      <MediaBand item={media[2]} />
 
       <Reviews reviews={reviews.filter((r) => !r.isExample).map((r) => ({ id: r.id, author: r.author, role: r.role, company: r.company, rating: r.rating, text: r.text, isExample: r.isExample }))} />
 
@@ -73,6 +82,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {media.slice(3).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}
       <CtaBand title={page.ctaTitle} text={page.ctaText} />
     </>
   );

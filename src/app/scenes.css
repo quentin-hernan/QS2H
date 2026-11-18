@@ -1,8 +1,8 @@
 /* Scènes contextuelles (CSS 3D) : transform et opacity uniquement */
 .lp { perspective: 1400px; width: 100%; padding: 0 6%; box-sizing: border-box; max-width: 460px; margin: 0 auto; color: #1C1C1C; }
-.lp-lid { position: relative; aspect-ratio: 16 / 10; background: #1C1C1C; padding: 10px; transform-origin: 50% 100%; transform: rotateX(calc((1 - var(--open, 1)) * 86deg)) rotateY(var(--tilt, -10deg)); transition: transform 1s var(--ease); clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px); box-shadow: 0 30px 40px -30px rgb(0 0 0 / 0.6); }
+.lp-lid { position: relative; aspect-ratio: 16 / 10; background: #1C1C1C; padding: 10px; transform-origin: 50% 100%; transform: rotateX(calc((1 - var(--open, 1)) * 86deg)) rotateY(var(--tilt, -10deg)); transition: transform 1s var(--ease); border-radius: 12px; box-shadow: 0 30px 40px -30px rgb(0 0 0 / 0.6); }
 .lp-screen { position: relative; height: 100%; overflow: hidden; background: #F8F8F7; }
-.lp-base { height: 12px; width: 112%; margin: 0 -6%; background: #CFD1D4; clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%); box-shadow: 0 24px 30px -12px rgb(0 0 0 / 0.5); }
+.lp-base { height: 12px; width: 112%; margin: 0 -6%; background: #CFD1D4; border-radius: 12px; box-shadow: 0 24px 30px -12px rgb(0 0 0 / 0.5); }
 .dark-section .lp-base { background: #8C9096; }
 
 .sc { padding: 8% 7%; display: flex; flex-direction: column; gap: 9px; height: 100%; }
@@ -34,7 +34,7 @@
 
 /* Tarifs : trois appareils */
 .dev { text-align: center; transition: transform 0.7s var(--ease); transform-origin: 50% 100%; }
-.dev-body { background: #1C1C1C; padding: 7px; margin: 0 auto; transition: box-shadow 0.7s var(--ease), transform 0.7s var(--ease); clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px); }
+.dev-body { background: #1C1C1C; padding: 7px; margin: 0 auto; transition: box-shadow 0.7s var(--ease), transform 0.7s var(--ease); border-radius: 12px; }
 .dev-phone .dev-body { width: 84px; height: 168px; }
 .dev-tablet .dev-body { width: 160px; height: 208px; }
 .dev-laptop .dev-body { width: 260px; height: 166px; }
@@ -57,7 +57,7 @@
 
 /* Blog : feuillets 3D */
 .sheets { position: absolute; right: 8%; top: 50%; width: 200px; height: 260px; transform: translateY(-50%) perspective(900px) rotateX(58deg) rotateZ(-30deg); transform-style: preserve-3d; pointer-events: none; z-index: 1; }
-.sheets i { position: absolute; inset: 0; background: rgb(248 248 247 / 0.07); border: 1px solid rgb(127 169 217 / 0.45); transform: translateZ(calc(var(--i) * 22px)); animation: sheetFloat 8s var(--ease) infinite alternate; animation-delay: calc(var(--i) * -1.2s); clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px); }
+.sheets i { position: absolute; inset: 0; background: rgb(248 248 247 / 0.07); border: 1px solid rgb(127 169 217 / 0.45); transform: translateZ(calc(var(--i) * 22px)); animation: sheetFloat 8s var(--ease) infinite alternate; animation-delay: calc(var(--i) * -1.2s); border-radius: 12px; }
 @keyframes sheetFloat { from { transform: translateZ(calc(var(--i) * 22px)); } to { transform: translateZ(calc(var(--i) * 30px + 6px)); } }
 
 /* Espace client : objet qui se construit selon l'étape */

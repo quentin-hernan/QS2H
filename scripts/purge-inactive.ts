@@ -38,6 +38,8 @@ async function main() {
       warned++;
     }
   }
+  const chats = await db.chatConversation.deleteMany({ where: { updatedAt: { lt: new Date(now - 90 * 864e5) } } });
+  console.log(`Conversations de l'assistant supprimées (90 jours) : ${chats.count}`);
   console.log(`Comptes avertis : ${warned} · supprimés : ${erased}`);
 }
 main().finally(() => db.$disconnect());

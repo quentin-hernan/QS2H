@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const groups: { title: string; items: { href: string; label: string; owner?: boolean }[] }[] = [
-  { title: "Activité", items: [{ href: "/admin", label: "Tableau de bord" }, { href: "/admin/demandes", label: "Demandes reçues" }, { href: "/admin/clients", label: "Clients" }] },
+  { title: "Activité", items: [{ href: "/admin", label: "Tableau de bord" }, { href: "/admin/demandes", label: "Demandes reçues" }, { href: "/admin/conversations", label: "Assistant (conversations)" }, { href: "/admin/clients", label: "Clients" }] },
   { title: "Contenu", items: [{ href: "/admin/realisations", label: "Réalisations" }, { href: "/admin/services", label: "Services" }, { href: "/admin/tarifs", label: "Tarifs" }, { href: "/admin/options", label: "Options tarifaires" }, { href: "/admin/avis", label: "Avis clients" }, { href: "/admin/equipe", label: "Équipe" }, { href: "/admin/articles", label: "Blog" }, { href: "/admin/faq", label: "FAQ" }, { href: "/admin/pages", label: "Pages et textes" }, { href: "/admin/mediatheque", label: "Médiathèque" }] },
   { title: "Site", items: [{ href: "/admin/seo", label: "SEO et redirections" }, { href: "/admin/parametres", label: "Paramètres entreprise", owner: true }, { href: "/admin/legal", label: "Textes légaux", owner: true }] },
   { title: "Administration", items: [{ href: "/admin/utilisateurs", label: "Utilisateurs", owner: true }, { href: "/admin/sauvegarde", label: "Sauvegardes et export", owner: true }, { href: "/admin/compte", label: "Mon compte" }] },

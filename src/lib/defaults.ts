@@ -43,7 +43,20 @@ export type FieldDef = {
   label: string;
   type: "text" | "textarea" | "list";
   hint?: string;
-  itemFields?: { name: string; label: string; type: "text" | "textarea" }[];
+  itemFields?: { name: string; label: string; type: "text" | "textarea" | "media" }[];
+};
+/** Emplacements média 16:9 (image ou vidéo) modifiables depuis l'admin. Vide = section masquée. */
+export const mediaField: FieldDef = {
+  name: "media",
+  label: "Visuels pleine largeur (image ou vidéo, format 16:9 conseillé)",
+  type: "list",
+  hint: "Chaque ligne crée un grand visuel dans la page. Images : JPEG, PNG, WebP, AVIF, GIF. Vidéos : MP4, WebM, MOV (lecture muette en boucle). Aucune ligne = aucun visuel.",
+  itemFields: [
+    { name: "src", label: "Image ou vidéo", type: "media" },
+    { name: "alt", label: "Texte alternatif (décrit le visuel)", type: "text" },
+    { name: "title", label: "Titre (facultatif)", type: "text" },
+    { name: "text", label: "Légende (facultatif)", type: "textarea" },
+  ],
 };
 export type PageSchema = { key: string; label: string; fields: FieldDef[]; defaults: Record<string, unknown> };
 
@@ -52,6 +65,7 @@ export const pageSchemas: PageSchema[] = [
     key: "home",
     label: "Accueil",
     fields: [
+      mediaField,
       { name: "kicker", label: "Sur-titre", type: "text" },
       { name: "line1", label: "Titre — ligne 1 (derrière l'objet 3D)", type: "text" },
       { name: "line2", label: "Titre — ligne 2 (derrière l'objet 3D)", type: "text" },
@@ -75,6 +89,7 @@ export const pageSchemas: PageSchema[] = [
       { name: "ctaText", label: "Texte de l'appel final", type: "textarea" },
     ],
     defaults: {
+      media: [],
       kicker: "Création de sites web · Bordeaux et toute la France",
       line1: "Des sites qui",
       line2: "travaillent",
@@ -100,6 +115,7 @@ export const pageSchemas: PageSchema[] = [
     key: "method",
     label: "Méthode",
     fields: [
+      mediaField,
       { name: "title", label: "Titre", type: "text" },
       { name: "intro", label: "Introduction", type: "textarea" },
       {
@@ -114,6 +130,7 @@ export const pageSchemas: PageSchema[] = [
       },
     ],
     defaults: {
+      media: [],
       title: "Une méthode claire, du premier échange à la mise en ligne.",
       intro: "Chaque projet suit les mêmes sept étapes. Vous savez toujours où nous en sommes, ce qui est attendu de vous, et ce que vous paierez.",
       steps: [
@@ -131,6 +148,7 @@ export const pageSchemas: PageSchema[] = [
     key: "about",
     label: "À propos",
     fields: [
+      mediaField,
       { name: "title", label: "Titre", type: "text" },
       { name: "intro", label: "Introduction", type: "textarea" },
       { name: "story", label: "Notre histoire (paragraphes séparés par une ligne vide)", type: "textarea" },
@@ -154,6 +172,7 @@ export const pageSchemas: PageSchema[] = [
       },
     ],
     defaults: {
+      media: [],
       title: "Une agence web à taille humaine, installée à Bordeaux.",
       intro: "QS2H accompagne les entreprises qui veulent un site à la hauteur de leur savoir-faire, sans passer par une grosse structure ni un modèle générique.",
       story:
@@ -168,6 +187,32 @@ export const pageSchemas: PageSchema[] = [
         { title: "Vous êtes propriétaire", text: "Nom de domaine, code, contenus et accès : tout vous est remis à la livraison, sans frais cachés." },
         { title: "Transparence des prix", text: "Prix fixe, périmètre écrit, options chiffrées. Pas de surprise en fin de projet." },
       ],
+    },
+  },
+  {
+    key: "chatbot",
+    label: "Assistant (chatbot)",
+    fields: [
+      { name: "enabled", label: "Activer l'assistant sur le site (oui / non)", type: "text" },
+      { name: "name", label: "Nom affiché", type: "text" },
+      { name: "welcome", label: "Message d'accueil", type: "textarea" },
+      { name: "fallback", label: "Réponse quand l'assistant ne sait pas", type: "textarea" },
+      {
+        name: "qa",
+        label: "Réponses sur mesure (prioritaires)",
+        type: "list",
+        itemFields: [
+          { name: "keywords", label: "Mots-clés déclencheurs, séparés par des virgules", type: "text" },
+          { name: "answer", label: "Réponse", type: "textarea" },
+        ],
+      },
+    ],
+    defaults: {
+      enabled: "oui",
+      name: "Assistant QS2H",
+      welcome: "Bonjour, je suis l'assistant de QS2H. Je peux vous renseigner sur nos services, nos tarifs et nos délais, ou transmettre votre demande à l'équipe. Que souhaitez-vous savoir ?",
+      fallback: "Je n'ai pas la réponse précise à cette question. Je peux transmettre votre message à l'équipe, qui vous répond sous 24 heures ouvrées.",
+      qa: [],
     },
   },
 ];

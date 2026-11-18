@@ -41,7 +41,9 @@ src/components/          UI publique ; scene/ = 3D ; admin/ = UI du back-office
 src/lib/                 db, auth (JWT + bcrypt), totp (2FA), seo (JSON-LD), content (lecture mise en cache), validators, legal, email
 prisma/                  schema.prisma + seed.ts
 tests/e2e/               tests Playwright
-scripts/                 génération du logo, des visuels d'exemple
+scripts/                 génération du logo, des visuels d'exemple, purge des comptes inactifs
+public/models/           modèle 3D du portable (macbook.fbx)
+docs/                    checklist de lancement, guide du back-office, plan éditorial
 _prototype/              première maquette HTML (archive, ignorée par le build)
 ```
 
@@ -58,9 +60,19 @@ _prototype/              première maquette HTML (archive, ignorée par le build
 - Animation (`src/components/Motion.tsx`, `src/app/motion.css`, `scenes.css`) : préchargeur à la première visite, transition de page (View Transitions API, repli en fondu), curseur contextuel, barre de progression, fond « atelier lumineux », cadres d'angle, texte vivant. Uniquement transform / opacité, 0,4 à 0,9 s, easing `cubic-bezier(0.22, 1, 0.36, 1)`, tout est réduit avec `prefers-reduced-motion`.
 - Scènes par page (CSS 3D) : `Scenes.tsx` (services, tarifs, méthode, contact, blog, espace client) ; mode bureau des réalisations : `ProjectsDesk.tsx`.
 
+### Visuels image / vidéo (admin)
+- **Admin > Pages et textes** (Accueil, Méthode, À propos) : champ « Visuels pleine largeur ». Chaque ligne crée un grand visuel 16:9 entre deux sections (image JPEG, PNG, WebP, AVIF, GIF — ou vidéo MP4, WebM, MOV, 80 Mo max). Aucune ligne = aucun visuel. Sur l'accueil, les 3 premiers prennent place après les services, après la scène « site en construction » et avant les avis ; les suivants s'ajoutent avant l'appel final.
+- Les vidéos jouent en boucle, muettes, uniquement quand elles sont visibles (et pas du tout avec « réduire les animations »). Le type est contrôlé sur le contenu réel du fichier. Composants : `MediaBand.tsx`, `MediaPicker.tsx`.
+
+### Assistant (chatbot)
+- Bouton flottant (robot bleu lumineux) → fenêtre de discussion : réponses sur les services, formules, délais, FAQ et horaires **tirées de la base** (rien d'inventé), boutons de réponse rapide, liens vers les pages, formulaire « laisser mes coordonnées » (consentement obligatoire) qui crée une demande dans **Demandes reçues** (source « chatbot ») et envoie un email.
+- **Admin > Pages et textes > Assistant (chatbot)** : activer/désactiver, message d'accueil, réponse par défaut, **réponses sur mesure** (mots-clés → réponse, prioritaires). **Admin > Assistant (conversations)** : historique lisible.
+- Fonctionne sans clé d'API (moteur à règles). Avec `ANTHROPIC_API_KEY` (et `CHATBOT_MODEL` en option), les réponses libres passent par Claude, limité à la base de connaissances du site.
+- RGPD : conversations conservées 90 jours (purge dans `scripts/purge-inactive.ts`), aucune IP stockée, mention affichée dans la fenêtre. Pensez à citer l'assistant dans la politique de confidentialité.
+
 ### Scène 3D
-- `components/HomeStage.tsx` : hero + section épinglée « vue éclatée » (GSAP ScrollTrigger).
-- `components/scene/StageCanvas.tsx` : portable modélisé en code (aucun fichier .glb à charger), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables.
+- `components/SiteBuilder.tsx` : scène 3D CSS liée au métier — une page web se construit bloc par bloc au scroll (couches de l'accueil éditables dans l'admin). `components/HomeStage.tsx` : hero + section épinglée « vue éclatée » (GSAP ScrollTrigger).
+- `components/scene/StageCanvas.tsx` : portable MacBook chargé depuis `public/models/macbook.fbx` (FBXLoader ; modèle normalisé : écran de 2,9 unités de large, base posée sur y = 0), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables. Les pages devant la couche active s'effacent (fondu court) et le portable reste visible jusqu'au bout. Les sources du modèle (`.blend`, `.obj`, textures) sont dans `3d-model/`, ignoré par git.
 - `components/scene/GalleryCanvas.tsx` : galerie d'écrans suspendus (drag, flèches, relief, clic → page projet).
 - Chargement **différé** après le premier rendu (le H1 est le LCP), **repli statique** (`public/hero-fallback.webp`) sans WebGL / appareil faible / `prefers-reduced-motion`, rendu **mis en pause** hors écran et onglet masqué, pixel ratio plafonné à 1,5 sur mobile.
 

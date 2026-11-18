@@ -212,6 +212,8 @@ model Media {
   width     Int      @default(0)
   height    Int      @default(0)
   size      Int      @default(0)
+  kind      String   @default("image") // image | video
+  mime      String   @default("")
   createdAt DateTime @default(now())
 }
 
@@ -323,4 +325,16 @@ model LegalVersion {
   createdAt DateTime @default(now())
 
   @@unique([doc, version])
+}
+
+model ChatConversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  String   @default("[]") // JSON [{role, text, at}]
+  page      String   @default("")
+  leadId    String?
+  handoff   Boolean  @default(false)
+
+  @@index([updatedAt])
 }

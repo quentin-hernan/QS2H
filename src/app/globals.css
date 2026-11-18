@@ -41,9 +41,7 @@ body::after {
   .hair { border-color: rgb(28 28 28 / 0.14); }
   .dark-section .hair { border-color: rgb(248 248 247 / 0.14); }
 
-  .eyebrow { @apply inline-flex items-center gap-3 text-[0.78rem] font-semibold uppercase tracking-[0.25em] muted; }
-  .eyebrow::before, .eyebrow::after { content: ""; width: 26px; height: 1px; background: rgb(var(--acc-ctx)); flex: none; }
-  .eyebrow.solo::after { display: none; }
+  .eyebrow { @apply inline-flex items-center gap-3 text-[0.8rem] font-semibold tracking-[0.04em] muted; }
 
   /* Un seul mot en bleu, jamais en italique */
   .serif-it { @apply font-serif; font-style: normal; color: rgb(var(--acc-ctx)); }
@@ -51,15 +49,13 @@ body::after {
   .dark-section .serif-it { color: inherit; text-decoration: underline; text-decoration-color: rgb(var(--accent-hi)); text-decoration-thickness: 0.07em; text-underline-offset: 0.14em; }
   .font-serif { font-weight: 800; font-stretch: 118%; font-style: normal; }
   /* Coins biseautés haut-gauche / bas-droite : reprise des angles du logo */
-  .chamfer { clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px); }
-  .chamfer-sm { clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+  .chamfer { border-radius: 20px; }
+  .chamfer-sm { border-radius: 14px; }
   /* Cadre d angle bleu autour d'un visuel (haut-gauche / bas-droite) */
   .corners { position: relative; }
-  .corners::before, .corners::after { content: ""; position: absolute; width: 34px; height: 34px; pointer-events: none; z-index: 2; border: 0 solid rgb(var(--acc-ctx)); }
-  .corners::before { left: -10px; top: -10px; border-width: 2px 0 0 2px; }
-  .corners::after { right: -10px; bottom: -10px; border-width: 0 2px 2px 0; }
+  .corners::before, .corners::after { display: none; }
 
-  .btn { @apply chamfer-sm inline-flex items-center justify-center gap-2.5 px-7 py-4 text-[0.95rem] font-medium leading-none transition-[background,color,transform,box-shadow,border-color] duration-300 ease-out min-h-[48px]; will-change: transform; }
+  .btn { @apply inline-flex items-center justify-center gap-2.5 px-7 py-4 text-[0.95rem] font-medium leading-none transition-[background,color,transform,box-shadow,border-color] duration-300 ease-out min-h-[48px] rounded-full; will-change: transform; }
   .btn { position: relative; isolation: isolate; overflow: hidden; }
   .btn:active { transform: scale(0.97); }
   .btn-primary { background: rgb(var(--accent)); color: #fff; }
@@ -67,8 +63,8 @@ body::after {
   .dark-section .btn-primary { background: rgb(var(--accent)); color: #fff; box-shadow: inset 0 0 0 1px rgb(var(--accent-hi) / 0.55); }
   .dark-section .btn-primary:hover { background: rgb(var(--accent-hover)); }
   /* remplissage biseauté qui glisse au survol */
-  .btn-fill::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgb(var(--accent-hover)); transform: translateX(-102%) skewX(-18deg); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-  .btn-fill:hover::before, .btn-fill:focus-visible::before { transform: translateX(0) skewX(0); }
+  .btn-fill::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: rgb(var(--accent-hover)); transform: translateY(102%); transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+  .btn-fill:hover::before, .btn-fill:focus-visible::before { transform: translateY(0); }
   .btn-primary.btn-fill:hover { background: rgb(var(--accent)); }
   .btn-outline { box-shadow: inset 0 0 0 1px currentColor; background: transparent; }
   .btn-outline:hover { background: rgb(var(--acc-ctx) / 0.12); }

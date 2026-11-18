@@ -1,3 +1,4 @@
+import { MediaBand } from "@/components/MediaBand";
 import Image from "next/image";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -61,6 +62,7 @@ export default async function About() {
           </ul>
         </div>
       </section>
+      {((a.media ?? []) as { src?: string; alt?: string; title?: string; text?: string }[]).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}
       <CtaBand title="Travaillons ensemble." text="Un échange de 30 minutes suffit pour savoir si nous pouvons vous aider." />
     </>
   );
