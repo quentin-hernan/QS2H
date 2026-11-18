@@ -21,7 +21,12 @@ export async function POST(req: Request) {
   try {
     const m = isVideo ? await saveVideo(buf, file.name, alt) : await saveImage(buf, file.name, alt);
     return NextResponse.json({ ok: true, media: m });
-  } catch {
-    return NextResponse.json({ ok: false, error: "Fichier illisible ou format non pris en charge (images : JPEG, PNG, WebP, AVIF, GIF ; vidéos : MP4, WebM, MOV)." }, { status: 422 });
+  } catch (e) {
+    const msg = (e as Error).message || "";
+    console.error("[upload]", msg);
+    if (msg === "STORAGE_NOT_CONFIGURED") return NextResponse.json({ ok: false, error: "Stockage des images non configuré : ajoutez SUPABASE_URL et SUPABASE_SECRET_KEY dans les variables d'environnement de l'hébergeur, puis redéployez." }, { status: 500 });
+    if (msg.startsWith("STORAGE")) return NextResponse.json({ ok: false, error: `Le stockage Supabase a refusé le fichier (${msg.slice(8)}). Vérifiez la clé et l'existence du bucket public « uploads ».` }, { status: 502 });
+    if (msg === "FORMAT") return NextResponse.json({ ok: false, error: "Fichier illisible ou format non pris en charge (images : JPEG, PNG, WebP, AVIF, GIF ; vidéos : MP4, WebM, MOV)." }, { status: 422 });
+    return NextResponse.json({ ok: false, error: `Enregistrement impossible : ${msg.slice(0, 160) || "erreur inconnue"}.` }, { status: 500 });
   }
 }

@@ -10,6 +10,9 @@ import path from "node:path";
 const URL_ = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || "";
 const remote = !!(URL_ && KEY);
+// Hébergement serverless (Netlify, Vercel) : le disque est en lecture seule, un stockage distant est obligatoire.
+const readOnlyHost = !!(process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const needRemote = () => { if (!remote && readOnlyHost) throw new Error("STORAGE_NOT_CONFIGURED"); };
 const PUBLIC_BUCKET = "uploads";
 const PRIVATE_BUCKET = "documents";
 // Anciennes clés (JWT « eyJ… ») : en-tête Authorization requis ; nouvelles clés « sb_secret_… » : apikey seul.
@@ -28,6 +31,7 @@ async function put(bucket: string, name: string, data: Buffer, type: string) {
 
 /** Enregistre un fichier public et renvoie son URL. */
 export async function putPublic(name: string, data: Buffer, type: string): Promise<string> {
+  needRemote();
   name = safe(name);
   if (remote) {
     await put(PUBLIC_BUCKET, name, data, type);
@@ -50,6 +54,7 @@ export async function removePublic(url: string) {
 }
 
 export async function putPrivate(name: string, data: Buffer, type: string) {
+  needRemote();
   name = safe(name);
   if (remote) return put(PRIVATE_BUCKET, name, data, type);
   const dir = path.join(process.cwd(), "storage", "documents");
