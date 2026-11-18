@@ -243,7 +243,7 @@ export function PasswordForm() {
       <div><label className="label" htmlFor="pw-c">Mot de passe actuel</label><input id="pw-c" name="current" type="password" autoComplete="current-password" required className="field" /></div>
       <div><label className="label" htmlFor="pw-n">Nouveau mot de passe</label><input id="pw-n" name="next" type="password" autoComplete="new-password" required className="field" /><p className="muted mt-1.5 text-xs">12 caractères minimum, avec majuscules, minuscules et chiffres.</p></div>
       <div><label className="label" htmlFor="pw-k">Confirmation</label><input id="pw-k" name="confirm" type="password" autoComplete="new-password" required className="field" /></div>
-      {state?.error && <p role="alert" className="err">{state.error}</p>}{state?.ok && <p role="status" className="acc">Mot de passe modifié.</p>}
+      {state?.error && <p role="alert" className="err">{state.error}</p>}{state?.ok && <p role="status" className="acc">Mot de passe modifié. Si la double authentification n'est pas encore activée, activez-la plus bas pour débloquer le reste de l'administration.</p>}
       <button className="btn btn-primary" disabled={pending}>Modifier</button>
     </form>
   );
@@ -266,7 +266,7 @@ export function TwoFactor({ enabled }: { enabled: boolean }) {
           <code className="block break-all rounded-lg bg-black/40 p-3 text-lg tracking-widest">{setup.secret}</code>
           <p className="muted break-all text-xs">Ou ouvrez ce lien depuis votre téléphone : {setup.uri}</p>
           <div><label className="label" htmlFor="tf-code">2. Saisissez le code affiché</label><input id="tf-code" inputMode="numeric" maxLength={7} className="field max-w-[200px]" value={code} onChange={(e) => setCode(e.target.value)} /></div>
-          <button type="button" className="btn btn-primary" onClick={async () => { const r = await confirm2fa(code); setMsg({ ok: r.ok, text: r.ok ? "2FA activée." : r.error || "Erreur" }); if (r.ok) { setSetup(null); router.refresh(); } }}>Confirmer</button>
+          <button type="button" className="btn btn-primary" onClick={async () => { const r = await confirm2fa(code); setMsg({ ok: r.ok, text: r.ok ? "2FA activée." : r.error || "Erreur" }); if (r.ok) { setSetup(null); router.push("/admin"); router.refresh(); } }}>Confirmer</button>
         </div>
       )}
       {enabled && (
