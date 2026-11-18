@@ -24,7 +24,7 @@ const RESSOURCES = [
 ];
 
 /** Barre d'en-tête : transparente en haut, floutée au scroll, claire ou sombre selon la section dessous, masquée en descendant. */
-export function Header({ services = [], hasCatalogue = false }: { services?: Svc[]; hasCatalogue?: boolean }) {
+export function Header({ services = [], hasCatalogue = false, email = "" }: { services?: Svc[]; hasCatalogue?: boolean; email?: string }) {
   const menu = hasCatalogue ? [...links.slice(0, 3), { href: "/catalogue", label: "Catalogue", hint: "Licences, logiciels et produits numériques." }, ...links.slice(3)] : links;
   const path = usePathname();
   const [open, setOpen] = useState(false);
@@ -159,7 +159,7 @@ export function Header({ services = [], hasCatalogue = false }: { services?: Svc
             ))}
           </nav>
           <aside className="hidden md:block" aria-hidden="true">
-            <div className="chamfer relative flex min-h-[260px] flex-col justify-between border hair p-8">
+            <div className="relative flex min-h-[260px] flex-col justify-between rounded-[1.5rem] border hair p-8">
               <span className="font-serif text-[3.5rem] leading-none" style={{ color: "rgb(var(--accent-hi))" }}>{String((hover ?? 0) + 1).padStart(2, "0")}</span>
               <p key={hover ?? 0} className="swap max-w-[28ch] text-lg">{menu[hover ?? 0].hint}</p>
             </div>
@@ -167,7 +167,9 @@ export function Header({ services = [], hasCatalogue = false }: { services?: Svc
         </div>
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <Link href="/contact" onClick={() => setOpen(false)} className="btn btn-primary btn-fill"><span>Demander un devis gratuit</span></Link>
+          <Link href="/rendez-vous" onClick={() => setOpen(false)} className="btn btn-outline">Prendre rendez-vous</Link>
           <Link href="/compte" onClick={() => setOpen(false)} className="btn btn-outline">Espace client</Link>
+          {email && <a href={`mailto:${email}`} className="muted text-sm underline md:ml-auto">{email}</a>}
         </div>
       </div>
     </>

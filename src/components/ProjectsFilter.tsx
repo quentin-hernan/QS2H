@@ -8,7 +8,7 @@ export function ProjectsFilter({ projects, sectors, services, level = 3 }: { lev
   const [sector, setSector] = useState("");
   const [service, setService] = useState("");
   const list = useMemo(() => projects.filter((p) => (!sector || p.sector === sector) && (!service || p.services.includes(service))), [projects, sector, service]);
-  const chip = (active: boolean) => ` border px-4 py-2 text-[0.9rem] transition-colors hair ${active ? "bg-ink-900 text-ivory border-transparent" : "hover:bg-ink-900/5"}`;
+  const chip = (on: boolean) => `min-h-[44px] rounded-full border px-4 py-2 text-[0.92rem] transition-colors ${on ? "border-ink-900 bg-ink-900 text-ivory" : "hair hover:bg-white"}`;
   return (
     <div>
       <div className="mb-12 grid gap-6 md:grid-cols-2" role="group" aria-label="Filtres">
@@ -31,7 +31,7 @@ export function ProjectsFilter({ projects, sectors, services, level = 3 }: { lev
       {list.length === 0 ? (
         <p className="muted py-16 text-center">Aucune réalisation pour cette combinaison. Essayez un autre filtre.</p>
       ) : (
-        <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">{list.map((p) => (<ProjectCard key={p.slug} p={p} level={level} />))}</div>
+        <div className="grid gap-x-10 gap-y-16 md:grid-cols-2">{list.map((p) => (<ProjectCard key={p.slug} p={p} level={level} />))}</div>
       )}
     </div>
   );

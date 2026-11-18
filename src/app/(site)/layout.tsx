@@ -27,7 +27,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <PageTransitions />
       <LightDriver />
       <ScrollUI />
-      <Header hasCatalogue={products.length > 0} services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline }))} />
+      <Header email={s.company.email} hasCatalogue={products.length > 0} services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline }))} />
       <ViewerProvider projects={vp}>
         <main id="contenu">{children}</main>
       </ViewerProvider>

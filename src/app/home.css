@@ -149,3 +149,25 @@
 .dm-chat, .dm-flow { min-height: 100%; justify-content: center; }
 .dm-flow { align-content: center; }
 @media (max-width: 639px) { .dm-screen { aspect-ratio: auto; } }
+
+/* ================================================================== Réalisations : cartes */
+.pc-media { border-radius: 20px; }
+.pc-img { transform: scale(1.02); transition: transform 1.1s var(--ease), filter 0.6s; }
+.pc:hover .pc-img, .pc:focus-visible .pc-img { transform: scale(1.07); }
+.pc-media::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 0 rgb(248 248 247 / 0); transition: box-shadow 0.6s var(--ease); pointer-events: none; }
+.pc:hover .pc-media::after { box-shadow: inset 0 0 0 10px rgb(248 248 247 / 0.9); }
+.pc-badge { position: absolute; left: 16px; top: 16px; padding: 5px 12px; border-radius: 999px; background: rgb(28 28 28 / 0.85); color: #F8F8F7; font-size: 0.75rem; font-weight: 600; }
+.pc-cta { position: absolute; right: 18px; bottom: 18px; display: inline-flex; gap: 6px; padding: 9px 16px; border-radius: 999px; background: #F8F8F7; color: #1C1C1C; font-size: 0.85rem; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity 0.4s var(--ease), transform 0.5s var(--ease); }
+.pc:hover .pc-cta, .pc:focus-visible .pc-cta { opacity: 1; transform: none; }
+@media (hover: none) { .pc-cta { opacity: 1; transform: none; } }
+.pc-title { transition: transform 0.5s var(--ease); }
+.pc:hover .pc-title { transform: translateX(6px); }
+
+/* ================================================================== Pied de page */
+.ft-big { font-family: var(--font-serif), system-ui, sans-serif; font-weight: 700; font-stretch: 108%; font-size: clamp(2.2rem, 6vw, 5.2rem); line-height: 1; letter-spacing: -0.03em; }
+.ft-mail { font-size: clamp(1.2rem, 2.6vw, 2rem); color: rgb(var(--accent-hi)); background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size 0.5s var(--ease); padding-bottom: 4px; overflow-wrap: anywhere; }
+.ft-mail span { transition: transform 0.5s var(--ease); }
+.ft-mail:hover { background-size: 100% 2px; }
+.ft-mail:hover span { transform: translateX(6px); }
+.ft-word { margin: 0 0 -0.18em; text-align: center; font-family: var(--font-serif), system-ui, sans-serif; font-weight: 800; font-stretch: 125%; font-size: clamp(5rem, 24vw, 22rem); line-height: 0.85; letter-spacing: -0.04em; color: rgb(248 248 247 / 0.05); user-select: none; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pc-img, .pc-cta, .pc-title, .pc-media::after { transition: none; } }

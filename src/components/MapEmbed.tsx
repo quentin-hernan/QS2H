@@ -5,7 +5,7 @@ import { useState } from "react";
 export function MapEmbed({ city }: { city: string }) {
   const [on, setOn] = useState(false);
   return (
-    <div className="relative aspect-[4/3] overflow-hidden chamfer border hair bg-ivory-200">
+    <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] border hair bg-ivory-200">
       {on ? (
         <iframe title={`Carte : ${city}`} loading="lazy" className="h-full w-full" src="https://www.openstreetmap.org/export/embed.html?bbox=-0.66%2C44.80%2C-0.50%2C44.88&layer=mapnik" />
       ) : (

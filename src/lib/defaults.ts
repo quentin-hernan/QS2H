@@ -33,7 +33,7 @@ export const defaultSettings = {
   integrations: { calendlyUrl: "", plausibleDomain: "", searchConsoleToken: "" },
   booking: { mon: "09:00-12:00,14:00-18:00", tue: "09:00-12:00,14:00-18:00", wed: "09:00-12:00,14:00-18:00", thu: "09:00-12:00,14:00-18:00", fri: "09:00-12:00,14:00-17:00", sat: "", sun: "", buffer: "15", maxPerDay: "6", noticeHours: "24", horizonDays: "45", closed: "" },
   sectionStyles: {} as StyleMap,
-  footerText: "Sites web sur mesure pour les entreprises. Conçus à Bordeaux, livrés partout en France.",
+  footerText: "Solutions digitales pour les professionnels : sites web, marketing, automatisation, chatbots et outils sur mesure. Basés à Bordeaux, avec des clients dans toute la France.",
   trust: [
     { value: "24 h", label: "pour recevoir votre devis (jours ouvrés)" },
     { value: "3 à 4 sem.", label: "délai indicatif d'un site vitrine" },

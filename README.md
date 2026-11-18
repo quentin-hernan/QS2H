@@ -149,3 +149,11 @@ Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image
 - **Fond** : couleur, dégradé (angle, 2 couleurs), image ou vidéo (médiathèque), opacité, flou, voile noir ou blanc, ajustement et position ; **emplacement** : toute la section, bande verticale à gauche ou à droite, bande horizontale en haut ou en bas (taille en % et coins arrondis). **Animation du fond** : zoom lent, panoramique, parallaxe, fond fixe, dégradé animé.
 - **Apparition** : fondu, montée, descente, glissement gauche ou droite, zoom, flou vers net (durée et délai réglables, bouton « Rejouer »). **Thème** clair ou sombre, espace en haut et en bas, hauteur minimale, afficher ou masquer la section.
 - Les réglages sont rattachés à l'**ordre des sections** de chaque page. Exclus : la scène 3D d'ouverture de l'accueil. Les animations sont désactivées avec « réduire les animations ». Pour réordonner des sections, utilisez une **page libre**.
+
+### Refonte « Modern editorial × digital craft » (master prompt)
+- **Accueil** : hero 3D (ordinateur conservé) → présentation éditoriale → 5 expertises (liste typographique qui s'ouvre) → démonstrations interactives par solution (maquettes illustratives, onglets accessibles au clavier, défilement automatique mis en pause au survol) → réalisations en grands visuels révélés par masque → méthode dont la ligne avance au défilement → « Pourquoi QS2H ? » → FAQ animée → appel final. Tous les textes : Admin > Pages et textes > Accueil. Fichiers : `HomeSections.tsx`, `HomeInteractive.tsx`, `app/home.css`.
+- **Réalisations** : grille éditoriale à grands visuels par défaut (recadrage et invitation « Voir le projet » au survol, visible au toucher) ; le mode bureau reste disponible en option sur ordinateur.
+- **Services** : section « Au-delà du site web » (marketing, automatisation, chatbots, matrices).
+- **Pied de page** : phrase de clôture, email en grand, expertises, services, navigation, coordonnées, mentions.
+- **Menu mobile** : plein écran, liens numérotés, devis, rendez-vous, espace client, email.
+- Transitions de page : View Transitions API (fondu court, sans flash), repli en fondu.

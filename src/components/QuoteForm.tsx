@@ -62,7 +62,7 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
   const aria = (k: keyof QuoteInput) => ({ "aria-invalid": errors[k] ? true : undefined, "aria-describedby": errors[k] ? `${k}-err` : undefined } as const);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="dark-section relative chamfer border p-6 md:p-10" style={{ borderColor: "rgb(242 239 233 / .14)", background: "#14171C" }} aria-label="Demande de devis">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="dark-section relative rounded-[1.5rem] border p-6 md:p-10" style={{ borderColor: "rgb(242 239 233 / .14)", background: "#14171C" }} aria-label="Demande de devis">
       {SITEKEY && <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer strategy="lazyOnload" />}
       <div className="mb-8">
         <div className="flex items-center justify-between text-[0.8rem] muted"><span>Étape {step + 1} sur {STEPS.length}</span><span>{STEPS[step]}</span></div>

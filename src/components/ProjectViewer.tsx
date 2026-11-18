@@ -92,7 +92,7 @@ function Viewer({ p, onClose, onNext }: { p: VProject; onClose: () => void; onNe
 
   return (
     <div ref={root} role="dialog" aria-modal="true" aria-label={`Vue éclatée : ${p.title}`} className="fixed inset-0 z-[80] flex items-stretch justify-center bg-ink-900/70 p-0 backdrop-blur-sm md:p-6" style={{ ["--fr" as string]: "rgb(var(--accent-hi))" }}>
-      <div className="light-section chamfer relative flex h-full w-full max-w-[1500px] flex-col overflow-hidden md:flex-row">
+      <div className="light-section rounded-[1.5rem] relative flex h-full w-full max-w-[1500px] flex-col overflow-hidden md:flex-row">
         <span className={`${frame} left-3 top-3 border-l-2 border-t-2`} aria-hidden="true" />
         <span className={`${frame} bottom-3 right-3 border-b-2 border-r-2`} aria-hidden="true" />
 

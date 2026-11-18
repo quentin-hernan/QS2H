@@ -5,23 +5,25 @@ import { useViewer } from "./ProjectViewer";
 
 type P = { slug: string; title: string; sector: string; summary: string; cover: string; isExample: boolean };
 
+/** Carte de réalisation : grand visuel recadré au survol, titre qui glisse, invitation « Voir le projet » (toujours visible au toucher). */
 export function ProjectCard({ p, priority = false, level = 3 }: { p: P; priority?: boolean; level?: 2 | 3 }) {
   const H = level === 2 ? "h2" : "h3";
   const v = useViewer();
   return (
-    <Link href={`/realisations/${p.slug}`} className="group block" data-cursor="Ouvrir" onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; if (v.open(p.slug)) e.preventDefault(); }}>
-      <div className="chamfer relative aspect-[8/5] overflow-hidden border hair bg-ivory-200">
+    <Link href={`/realisations/${p.slug}`} className="pc group block" data-cursor="Ouvrir" onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; if (v.open(p.slug)) e.preventDefault(); }}>
+      <div className="pc-media relative aspect-[16/10] overflow-hidden bg-ivory-200">
         {p.cover ? (
-          <Image src={p.cover} alt={`Aperçu du site ${p.title}`} fill sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw" priority={priority} className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.045]" />
+          <Image src={p.cover} alt={`Aperçu du site ${p.title}`} fill sizes="(min-width:768px) 50vw, 100vw" priority={priority} className="pc-img object-cover" />
         ) : null}
-        {p.isExample && <span className="absolute left-3 top-3 bg-ink-900/90 px-3 py-1 text-[0.72rem] uppercase tracking-[0.14em] text-ivory">Projet concept</span>}
+        {p.isExample && <span className="pc-badge">Projet concept</span>}
+        <span className="pc-cta" aria-hidden="true">Voir le projet <span>→</span></span>
       </div>
       <div className="mt-5 flex items-start justify-between gap-6">
         <div>
-          <H className="text-h3 font-medium">{p.title}</H>
-          <p className="muted mt-1.5 max-w-[34ch] text-[0.97rem] leading-snug">{p.summary}</p>
+          <H className="pc-title text-h3 font-medium">{p.title}</H>
+          <p className="muted mt-1.5 max-w-[46ch] text-[0.97rem] leading-snug">{p.summary}</p>
         </div>
-        <span className="muted mt-1 shrink-0 text-[0.8rem] uppercase tracking-[0.14em]">{p.sector}</span>
+        <span className="muted mt-1 shrink-0 text-[0.85rem]">{p.sector}</span>
       </div>
     </Link>
   );

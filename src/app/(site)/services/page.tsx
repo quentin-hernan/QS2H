@@ -3,6 +3,7 @@ import { ServicesStage } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import Link from "next/link";
+import { Expertises } from "@/components/HomeInteractive";
 import { getServices, getPage, getProducts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
@@ -14,7 +15,8 @@ export const metadata = buildMetadata({
 
 export default async function Services() {
   const sp = await getPage("services");
-  const [services, products] = await Promise.all([getServices(), getProducts()]);
+  const [services, products, home] = await Promise.all([getServices(), getProducts(), getPage("home")]);
+  const others = ((home.expertises ?? []) as { title: string; text: string; href?: string }[]).filter((e) => !/site/i.test(e.title));
   return (
     <>
       <PageHero image={sp.heroImage || ""} eyebrow="Services" title={<>Six façons de faire <span className="serif-it">travailler</span> votre site.</>} lead="Du site vitrine à la boutique en ligne, chaque service est conçu pour un objectif précis : vous faire trouver, vous faire choisir, vous faire contacter.">
@@ -24,6 +26,7 @@ export default async function Services() {
         <div className="container"><ServicesStage services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline, priceFrom: x.priceFrom, priceUnit: x.priceUnit }))} /></div>
       </section>
       {((sp.media ?? []) as MediaItemT[]).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}
+      {others.length > 0 && <Expertises items={others} title="Au-delà du site web." lead="Visibilité, automatisation, assistants et outils sur mesure : ce qui fait travailler votre site et votre équipe." />}
       {products.length > 0 && (
         <section className="bg-ivory-200 py-16 text-ink-900 md:py-20" aria-label="Catalogue">
           <div className="container flex flex-wrap items-center justify-between gap-6">

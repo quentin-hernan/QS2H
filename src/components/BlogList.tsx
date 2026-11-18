@@ -44,7 +44,7 @@ export function BlogList({ posts }: { posts: BP[] }) {
             <motion.li key={p.id} layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
               <Tilt>
                 <Link href={`/blog/${p.slug}`} className="group block" data-cursor="Lire">
-                  <div className="chamfer relative aspect-[3/2] overflow-hidden border hair bg-ink-900">
+                  <div className="rounded-[1.5rem] relative aspect-[3/2] overflow-hidden border hair bg-ink-900">
                     {p.cover ? <Image src={p.cover} alt="" fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" /> : (
                       <div className="flex h-full items-end p-6"><span className="font-serif text-2xl text-ivory">{p.category}</span></div>
                     )}
