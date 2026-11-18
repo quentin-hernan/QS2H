@@ -104,7 +104,7 @@ function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
     if (m.name === "Material.008") return screenMat;
     const alu = m.name === "Material.003";
     const behind = m.name === "Material.005" || m.name === "Material.006" || m.name === "Material.007"; // vitre et cadre du capot, derrière l'écran
-    return new THREE.MeshStandardMaterial({ name: m.name, color: behind ? 0x050506 : alu ? 0xc9ccd2 : m.color, metalness: alu ? 1 : 0.25, roughness: alu ? 0.32 : 0.5, envMapIntensity: alu ? 1.25 : 0.8, polygonOffset: behind, polygonOffsetFactor: behind ? 3 : 0, polygonOffsetUnits: behind ? 3 : 0 });
+    return new THREE.MeshStandardMaterial({ name: m.name, color: behind ? 0x050506 : alu ? 0x8e8f94 : m.color, metalness: alu ? 1 : 0.25, roughness: alu ? 0.4 : 0.5, envMapIntensity: alu ? 1.25 : 0.8, polygonOffset: behind, polygonOffsetFactor: behind ? 3 : 0, polygonOffsetUnits: behind ? 3 : 0 });
   };
   src.traverse((o) => { const me = o as THREE.Mesh; if (me.isMesh) me.material = Array.isArray(me.material) ? me.material.map((m) => tune(m as THREE.MeshPhongMaterial)) : tune(me.material as THREE.MeshPhongMaterial); });
 
@@ -175,9 +175,9 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
 
     // ouverture du capot à l'arrivée
     const age = t - born.current;
-    const arrive = smooth(0.2, 1.7, age); // arrivée : translation douce puis stabilisation
-    const open = smooth(0.9, 2.6, age); // le capot s'ouvre quand le portable est presque en place
-    lap.hinge.rotation.x = D.lerp(Math.PI / 2 + lap.tilt, 0, open);
+    const arrive = smooth(0.05, 1.0, age); // arrivée : translation douce puis stabilisation
+    const open = smooth(0.1, 1.1, age); // le capot s'ouvre quand le portable est presque en place
+    lap.hinge.rotation.x = D.lerp((Math.PI / 2 + lap.tilt) * 0.2, 0, open); // jamais complètement fermé : on ne voit pas « que le dessus »
     const opened = open > 0.995;
     // écran réel du portable tant que les couches ne sont pas déployées ; les couches apparaissent / disparaissent en fondu
     const lf = smooth(0.1, 0.4, e);
@@ -239,7 +239,7 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     <group ref={rig}>
       <group ref={body}>
         <primitive object={lap.root} />
-        <ContactShadows position={[0, 0.002, 0]} opacity={0.55} scale={12} blur={2.6} far={3.5} resolution={lowPower ? 256 : 512} frames={lowPower ? 1 : Infinity} color="#000000" />
+        <ContactShadows position={[0, 0.002, 0]} opacity={0.5} scale={4.6} blur={2.4} far={2.2} resolution={lowPower ? 256 : 512} frames={lowPower ? 1 : Infinity} color="#000000" />
       </group>
 
       {/* couches détachables (vue éclatée) */}

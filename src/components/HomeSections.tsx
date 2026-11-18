@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Lines, Reveal } from "./Reveal";
 import { ScrollWords } from "./Motion";
-import { IntroArt } from "./HomeInteractive";
+import { IntroArt, SweepLine } from "./HomeInteractive";
 
 type Item = { title: string; text: string };
 type Proj = { slug: string; title: string; sector: string; summary: string; cover: string; isExample: boolean };
@@ -24,8 +24,9 @@ export function Intro({ line1, line2, text, bg = "" }: { line1: string; line2: s
         </>
       )}
       <div className="container relative z-10">
-        <Lines as="h2" lines={[line1, <span key="b" className="text-mute-light">{line2}</span>]} className="max-w-[16ch] text-display font-medium" />
+        <Lines as="h2" lines={[line1, <SweepLine key="b">{line2}</SweepLine>]} className="max-w-[16ch] text-display font-medium" />
         <div className="mt-14 grid md:grid-cols-12"><ScrollWords text={text} className="text-[1.25rem] leading-[1.6] md:col-span-5" /></div>
+        <div className="mt-14 md:hidden"><IntroArt /></div>
       </div>
     </section>
   );

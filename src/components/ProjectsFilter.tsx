@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { ProjectCard } from "./ProjectCard";
+import { Reveal } from "./Reveal";
 
 type P = { slug: string; title: string; sector: string; summary: string; cover: string; isExample: boolean; services: string[] };
 
@@ -8,7 +9,7 @@ export function ProjectsFilter({ projects, sectors, services, level = 3 }: { lev
   const [sector, setSector] = useState("");
   const [service, setService] = useState("");
   const list = useMemo(() => projects.filter((p) => (!sector || p.sector === sector) && (!service || p.services.includes(service))), [projects, sector, service]);
-  const chip = (on: boolean) => `min-h-[44px] rounded-full border px-4 py-2 text-[0.92rem] transition-colors ${on ? "border-ink-900 bg-ink-900 text-ivory" : "hair hover:bg-white"}`;
+  const chip = (on: boolean) => `min-h-[44px] rounded-full border px-4 py-2 text-[0.92rem] transition-colors ${on ? "border-transparent bg-[color:var(--t-fg,#1C1C1C)] text-[color:var(--t-bg,#F8F8F7)]" : "hair hover:bg-[color:var(--t-card,#fff)]"}`;
   return (
     <div>
       <div className="mb-12 grid gap-6 md:grid-cols-2" role="group" aria-label="Filtres">
@@ -31,7 +32,7 @@ export function ProjectsFilter({ projects, sectors, services, level = 3 }: { lev
       {list.length === 0 ? (
         <p className="muted py-16 text-center">Aucune réalisation pour cette combinaison. Essayez un autre filtre.</p>
       ) : (
-        <div className="grid gap-x-10 gap-y-16 md:grid-cols-2">{list.map((p) => (<ProjectCard key={p.slug} p={p} level={level} />))}</div>
+        <div className="grid gap-x-10 gap-y-16 md:grid-cols-2">{list.map((p, i) => (<Reveal key={p.slug} delay={(i % 2) * 0.08}><ProjectCard p={p} level={level} /></Reveal>))}</div>
       )}
     </div>
   );

@@ -162,3 +162,7 @@ Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image
 - **Accueil** : hero 3D, présentation (fond modifiable : image, vidéo ou dessin animé par défaut), expertises, démonstrations, « Pourquoi QS2H ? », appel final.
 - **Réalisations** : projets récents en grands visuels, puis exploration par secteur et par service. **Méthode** : vue d'ensemble en 5 phases (Admin > Pages et textes > Méthode) puis étapes détaillées. **FAQ** : accordéon animé, tout le contenu de Admin > FAQ.
 - **Un seul appel à l'action en bas de chaque page** ; le pied de page ne répète plus le bouton « Parler de mon projet ».
+
+### Thème clair / sombre
+- Par défaut le site suit le thème du navigateur du visiteur (`prefers-color-scheme`). Le bouton soleil / lune de l'en-tête (et du menu mobile) permet de choisir ; le choix est mémorisé (`localStorage`, clé `qs2h-theme`) et posé avant le premier affichage, sans flash.
+- En sombre, toutes les sections du site public sont sombres ; en clair, toutes sont claires. Sections qui gardent un fond précis : celles avec image de fond, la formule mise en avant des tarifs, et celles où l'éditeur d'apparence impose « fond clair » ou « fond sombre ». Feuille : `src/app/theme.css`. L'administration n'est pas concernée.

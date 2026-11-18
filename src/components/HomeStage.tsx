@@ -2,6 +2,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { stage } from "./scene/store";
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function HomeStage({ hero, layers, covers, accent }: Props) {
+  preload("/models/macbook.fbx", { as: "fetch", crossOrigin: "anonymous" }); // le modèle se télécharge pendant l'affichage du texte
   const wrap = useRef<HTMLDivElement>(null);
   const heroEl = useRef<HTMLElement>(null);
   const expEl = useRef<HTMLElement>(null);
@@ -35,11 +37,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
     stage.covers = covers;
     if (!detect3D()) return setMode("static");
     lowPower.current = window.innerWidth < 900 || (navigator.hardwareConcurrency ?? 8) <= 4;
-    const go = () => setMode("3d");
-    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
-    const hasIdle = typeof w.requestIdleCallback === "function";
-    const id = hasIdle ? w.requestIdleCallback!(go, { timeout: 1500 }) : window.setTimeout(go, 400);
-    return () => (hasIdle ? w.cancelIdleCallback?.(id) : window.clearTimeout(id));
+    setMode("3d"); // le texte (LCP) est déjà affiché : la scène démarre tout de suite
   }, [covers]);
 
   // sécurité : si la scène 3D n'est pas prête après 6 s, on affiche l'image fixe
@@ -69,14 +67,17 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
     if (mode !== "3d" || !heroEl.current || !expEl.current) return;
     gsap.registerPlugin(ScrollTrigger);
     let last = -2;
+    let fHero = 1, fEnd = 1; // facteurs d'opacité : sortie du hero (téléphone) et fin de la vue éclatée
+    const sm = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const paint = () => { if (layerEl.current) layerEl.current.style.opacity = String(fHero * fEnd); };
     const ctx = gsap.context(() => {
-      ScrollTrigger.create({ trigger: heroEl.current, start: "top top", end: "bottom top", scrub: true, onUpdate: (s) => { stage.heroOut = s.progress; } });
+      ScrollTrigger.create({ trigger: heroEl.current, start: "top top", end: "bottom top", scrub: true, onUpdate: (s) => { stage.heroOut = s.progress; fHero = innerWidth < 900 ? 1 - sm(0.04, 0.38, s.progress) + sm(0.8, 1, s.progress) : 1; paint(); } });
       ScrollTrigger.create({
         trigger: expEl.current, start: "top top", end: "+=420%", pin: true, scrub: true, anticipatePin: 1,
         onUpdate: (s) => {
           stage.progress = s.progress;
           const p = s.progress;
-          if (layerEl.current) layerEl.current.style.opacity = String(p > 0.9 ? Math.max(0, 1 - (p - 0.9) / 0.08) : 1); // fondu avant la sortie de la section épinglée
+          fEnd = p > 0.9 ? Math.max(0, 1 - (p - 0.9) / 0.08) : 1; paint(); // fondu avant la sortie de la section épinglée
           const a = p < 0.2 || p > 0.88 ? -1 : Math.min(layers.length - 1, Math.floor(((p - 0.2) / 0.68) * layers.length));
           stage.active = a;
           if (a !== last) { last = a; setActive(a); }

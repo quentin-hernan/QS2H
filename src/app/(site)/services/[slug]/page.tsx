@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
+import { ServiceArt } from "@/components/ServiceArt";
 import { ProjectCard } from "@/components/ProjectCard";
 import { getProjects, getService, getServices } from "@/lib/content";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -32,12 +33,14 @@ export default async function ServicePage({ params }: P) {
     <>
       <JsonLd data={serviceJsonLd(s)} />
       {s.faq.length > 0 && <JsonLd data={faqJsonLd(s.faq)} />}
-      <PageHero eyebrow="Service" title={s.title} lead={s.tagline}>
+      <PageHero eyebrow="" art={<ServiceArt slug={s.slug} />} title={s.title} lead={s.tagline}
+        after={(
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <Link href="/contact" className="btn btn-primary btn-fill btn-arrow"><span>Demander un devis</span><span aria-hidden="true" className="arr">→</span></Link>
+            <p className="muted text-[0.95rem]">À partir de <strong className="text-lg font-medium">{euro(s.priceFrom)}</strong> {s.priceUnit.replace("€ ", "")} · {s.duration}</p>
+          </div>
+        )}>
         <Breadcrumbs items={[{ name: "Services", path: "/services" }, { name: s.title, path: `/services/${s.slug}` }]} />
-        <div className="mt-10 flex flex-wrap items-center gap-6">
-          <Link href="/contact" className="btn btn-primary">Demander un devis <span aria-hidden="true">→</span></Link>
-          <p className="muted text-[0.95rem]">À partir de <strong className="text-ivory text-lg font-medium">{euro(s.priceFrom)}</strong> {s.priceUnit.replace("€ ", "")} · {s.duration}</p>
-        </div>
       </PageHero>
 
       <section className="light-section py-20 md:py-32">

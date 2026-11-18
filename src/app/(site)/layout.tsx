@@ -19,6 +19,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const rating = real.length ? { value: Math.round((real.reduce((a, r) => a + r.rating, 0) / real.length) * 10) / 10, count: real.length } : null;
   return (
     <>
+    <div className="site-shell">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
       <JsonLd data={[orgJsonLd(s, rating), websiteJsonLd()]} />
       <SmoothScroll />
@@ -35,6 +36,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Chatbot />
       <SiteAppearance styles={s.sectionStyles ?? {}} />
       <CookieBanner plausibleDomain={s.integrations.plausibleDomain} />
+    </div>
     </>
   );
 }

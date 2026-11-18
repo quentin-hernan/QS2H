@@ -3,7 +3,6 @@ import { MethodDevice } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Timeline } from "@/components/Timeline";
-import { MethodLine } from "@/components/HomeInteractive";
 import { getPage } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
@@ -20,7 +19,6 @@ export default async function Methode() {
       <PageHero image={m.heroImage || ""} eyebrow="Méthode" title={m.title} lead={m.intro}>
         <Breadcrumbs items={[{ name: "Méthode", path: "/methode" }]} />
       </PageHero>
-      <MethodLine hideLink title={m.phasesTitle || "Notre méthode"} steps={(m.phases ?? []) as { title: string; text: string }[]} />
       <section className="light-section py-24 md:py-36" aria-label="Étapes détaillées">
         <div className="container grid gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]"><div id="method-steps"><Timeline steps={m.steps} /></div><div className="hidden lg:block"><MethodDevice target="method-steps" /></div></div>
       </section>

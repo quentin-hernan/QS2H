@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
   { href: "/services", label: "Services", hint: "Site vitrine, sur mesure, refonte, e-commerce, SEO, maintenance." },
@@ -22,6 +23,18 @@ const RESSOURCES = [
   { href: "/a-propos", label: "À propos", text: "Qui nous sommes et nos engagements." },
   { href: "/contact", label: "Contact et devis", text: "Une estimation sous 24 heures ouvrées." },
 ];
+
+/** Le fond effectif sous un élément est-il sombre ? (remonte jusqu'à un fond opaque, calcule la luminance) */
+function isDarkAt(el: Element | null) {
+  for (let n: Element | null = el; n; n = n.parentElement) {
+    const m = getComputedStyle(n).backgroundColor.match(/rgba?\(([^)]+)\)/);
+    if (!m) continue;
+    const [r, g, b, a = "1"] = m[1].split(/[ ,/]+/).filter(Boolean);
+    if (parseFloat(a) < 0.5) continue;
+    return (0.2126 * +r + 0.7152 * +g + 0.0722 * +b) / 255 < 0.5;
+  }
+  return document.documentElement.dataset.theme === "dark";
+}
 
 /** Barre d'en-tête : transparente en haut, floutée au scroll, claire ou sombre selon la section dessous, masquée en descendant. */
 export function Header({ services = [], hasCatalogue = false, email = "" }: { services?: Svc[]; hasCatalogue?: boolean; email?: string }) {
@@ -56,7 +69,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
       const el = document.elementFromPoint(window.innerWidth / 2, (y > 24 ? 60 : 76) + 6); // section juste sous la barre
       const sec = el?.closest("section, header, footer, main > div, [data-tone]") as HTMLElement | null;
       const tone = sec?.closest("[data-tone]")?.getAttribute("data-tone");
-      if (!megaRef.current) setDark(tone ? tone === "dark" : !!sec?.closest(".dark-section")); // figé tant qu'un panneau est ouvert
+      if (!megaRef.current) setDark(tone ? tone === "dark" : isDarkAt(el));
     };
     const on = () => { if (!raf) raf = requestAnimationFrame(tick); };
     tick();
@@ -81,7 +94,9 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
     return () => window.removeEventListener("keydown", esc);
   }, [open]);
 
-  const light = dark || open; // texte et logo clairs
+  const [themeDark, setThemeDark] = useState(false);
+  useEffect(() => { const u = () => setThemeDark(document.documentElement.dataset.theme === "dark"); u(); const mo = new MutationObserver(u); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] }); return () => mo.disconnect(); }, []);
+  const light = open ? themeDark : dark; // texte et logo clairs
   const bg = scrolled && !open ? (dark ? "bg-ink-900/80 border-b" : "bg-ivory/85 border-b") : "border-b border-transparent";
   const line = dark ? "rgb(248 248 247 / .14)" : "rgb(28 28 28 / .1)";
 
@@ -115,6 +130,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
               })}
             </nav>
             <div className="relative z-[60] flex items-center gap-3">
+              <ThemeToggle />
               <Link href="/compte" className="btn btn-outline hidden !min-h-[44px] !px-5 !py-2.5 text-[0.88rem] xl:inline-flex">Espace client</Link>
               <Link href="/contact" className="btn btn-primary btn-fill !min-h-[44px] !px-5 !py-2.5 text-[0.9rem]"><span className="sm:hidden">Devis</span><span className="hidden sm:inline">Demander un devis</span></Link>
               <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem] lg:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
@@ -169,6 +185,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
           <Link href="/contact" onClick={() => setOpen(false)} className="btn btn-primary btn-fill"><span>Demander un devis gratuit</span></Link>
           <Link href="/rendez-vous" onClick={() => setOpen(false)} className="btn btn-outline">Prendre rendez-vous</Link>
           <Link href="/compte" onClick={() => setOpen(false)} className="btn btn-outline">Espace client</Link>
+          <ThemeToggle />
           {email && <a href={`mailto:${email}`} className="muted text-sm underline md:ml-auto">{email}</a>}
         </div>
       </div>

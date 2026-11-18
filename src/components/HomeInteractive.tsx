@@ -11,7 +11,7 @@ export function Expertises({ items, title, lead, bg = "" }: { items: Item[]; tit
   const [open, setOpen] = useState(0);
   const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(bg);
   return (
-    <section id="expertises" className={`${bg ? "dark-section" : "light-section"} relative overflow-hidden py-24 md:py-36`} aria-labelledby="exp-h">
+    <section id="expertises" className={`${bg ? "dark-section keep-dark" : "light-section"} relative overflow-hidden py-24 md:py-36`} aria-labelledby="exp-h">
       {bg && (<>{video ? <video src={bg} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={bg} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}<div className="absolute inset-0 bg-ink-900/75" aria-hidden="true" /></>)}
       <div className="container relative z-10">
         <div className="mb-14 grid gap-6 md:grid-cols-12">
@@ -243,4 +243,18 @@ export function IntroArt() {
       </svg>
     </div>
   );
+}
+
+/* ================================================================== Texte à balayage : se remplit de gauche à droite avec le défilement */
+export function SweepLine({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.style.setProperty("--sw", "1"); return; }
+    gsap.registerPlugin(ScrollTrigger);
+    const st = ScrollTrigger.create({ trigger: el, start: "top 85%", end: "top 35%", scrub: 0.6, onUpdate: (x) => el.style.setProperty("--sw", x.progress.toFixed(3)) });
+    return () => st.kill();
+  }, []);
+  return <span ref={ref} className="sweep-line" style={{ ["--sw" as string]: 0 }}>{children}</span>;
 }

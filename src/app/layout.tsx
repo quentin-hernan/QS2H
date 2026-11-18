@@ -5,6 +5,7 @@ import "./motion.css";
 import "./scenes.css";
 import "./chatbot.css";
 import "./home.css";
+import "./theme.css";
 import { getSettings } from "@/lib/content";
 import { PRELOADER_SKIP } from "@/lib/motion-const";
 import { SITE_URL, hexToRgbTriplet, lighten } from "@/lib/utils";
@@ -24,6 +25,8 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: "#1C1C1C", width: "device-width", initialScale: 1 };
 
+const THEME_INIT = `(function(){try{var t=localStorage.getItem("qs2h-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const s = await getSettings();
   const css = `:root{--accent:${hexToRgbTriplet(s.theme.accent)};--accent-hi:${lighten(s.theme.accent)};--accent-hover:${lighten(s.theme.accent, -0.25)}}`;
@@ -33,6 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="darkreader-lock" />
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <script dangerouslySetInnerHTML={{ __html: PRELOADER_SKIP }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
       <body>{children}</body>
     </html>

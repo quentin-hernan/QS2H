@@ -17,7 +17,8 @@ export async function Footer() {
       <div className="container pt-20 md:pt-28">
         <div className="grid gap-12 py-16 md:grid-cols-12">
           <div className="md:col-span-4">
-            <Image src="/logo-light.png" alt="QS2H, solutions digitales" width={720} height={227} sizes="180px" className="h-12 w-auto" />
+            <Image src="/logo-light.png" alt="QS2H, solutions digitales" width={720} height={227} sizes="180px" className="logo-on-dark h-12 w-auto" />
+            <Image src="/logo.png" alt="" aria-hidden="true" width={720} height={227} sizes="180px" className="logo-on-light h-12 w-auto" />
             <p className="muted mt-6 max-w-sm leading-relaxed">{s.footerText}</p>
           </div>
           <nav aria-label="Pied de page" className="grid grid-cols-2 gap-10 md:col-span-8 md:grid-cols-4">
@@ -51,7 +52,6 @@ export async function Footer() {
           </ul>
         </div>
       </div>
-      <p className="ft-word" aria-hidden="true">QS2H</p>
     </footer>
   );
 }

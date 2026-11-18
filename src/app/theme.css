@@ -1,0 +1,104 @@
+/* ================================================================== Thèmes clair / sombre (site public uniquement)
+   Par défaut : thème du navigateur (prefers-color-scheme). Le visiteur peut choisir (bouton soleil / lune), son choix est mémorisé.
+   Toutes les sections (.light-section, .dark-section) prennent le thème actif. .keep-dark / .keep-light conservent un fond précis
+   (sections avec image de fond, formule mise en avant, choix « thème » de l'éditeur d'apparence). */
+
+html[data-theme="light"] { --t-bg: #F8F8F7; --t-bg2: #EFEFED; --t-card: #FFFFFF; --t-fg: #1C1C1C; --t-line: rgb(28 28 28 / 0.14); color-scheme: light; }
+html[data-theme="dark"] { --t-bg: #1C1C1C; --t-bg2: #242424; --t-card: #262626; --t-fg: #F8F8F7; --t-line: rgb(248 248 247 / 0.16); color-scheme: dark; }
+html[data-theme] body { background-color: var(--t-bg); color: var(--t-fg); }
+
+/* variables de « look » portées par chaque section */
+html[data-theme="light"] .site-shell :is(.light-section, .dark-section),
+html[data-theme] .site-shell :is(.light-section, .dark-section).keep-light {
+  --s-bg: #F8F8F7; --s-fg: #1C1C1C; --s-muted: #5A5F66; --s-line: rgb(28 28 28 / 0.14); --s-acc: var(--accent); --s-cs: light;
+  --s-ghost: rgb(28 28 28 / 0.2); --s-ghost-h: rgb(28 28 28 / 0.06); --s-field: rgb(28 28 28 / 0.25); --s-err: #b3261e; --s-ring: none;
+  --sw-fg: #1C1C1C; --sw-bg: #8C9096;
+}
+html[data-theme="dark"] .site-shell :is(.light-section, .dark-section),
+html[data-theme] .site-shell :is(.light-section, .dark-section).keep-dark {
+  --s-bg: #1C1C1C; --s-fg: #F8F8F7; --s-muted: #A9AEB5; --s-line: rgb(248 248 247 / 0.16); --s-acc: var(--accent-hi); --s-cs: dark;
+  --s-ghost: rgb(248 248 247 / 0.24); --s-ghost-h: rgb(248 248 247 / 0.1); --s-field: rgb(248 248 247 / 0.28); --s-err: #ff8a80; --s-ring: inset 0 0 0 1px rgb(var(--accent-hi) / 0.55);
+  --sw-fg: #F8F8F7; --sw-bg: #6c7178;
+}
+html[data-theme] .site-shell :is(.light-section, .dark-section) { background-color: var(--s-bg); color: var(--s-fg); --acc-ctx: var(--s-acc); color-scheme: var(--s-cs); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .muted { color: var(--s-muted); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .hair { border-color: var(--s-line); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .btn-ghost { box-shadow: inset 0 0 0 1px var(--s-ghost); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .btn-ghost:hover { background: var(--s-ghost-h); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .btn-primary { box-shadow: var(--s-ring); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .field { border-color: var(--s-field); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .err { color: var(--s-err); }
+html[data-theme] .site-shell :is(.light-section, .dark-section) .eyebrow { color: var(--s-muted); }
+
+/* surfaces Tailwind utilisées dans les pages */
+html[data-theme] .site-shell .bg-ivory { background-color: var(--t-bg); }
+html[data-theme] .site-shell .bg-ivory-200 { background-color: var(--t-bg2); color: var(--t-fg); --acc-ctx: var(--s-acc, var(--accent)); }
+html[data-theme="dark"] .site-shell .bg-ivory-200 { --acc-ctx: var(--accent-hi); --s-muted: #A9AEB5; --s-line: rgb(248 248 247 / 0.16); }
+html[data-theme="dark"] .site-shell .bg-ivory-200 .muted { color: #A9AEB5; }
+html[data-theme="dark"] .site-shell .bg-ivory-200 .hair { border-color: rgb(248 248 247 / 0.16); }
+html[data-theme] .site-shell .bg-white { background-color: var(--t-card); }
+html[data-theme] .site-shell .text-ink-900 { color: var(--t-fg); }
+html[data-theme="dark"] .site-shell .bg-ivory-200 { color: #F8F8F7; }
+
+/* éléments dessinés en CSS qui supposaient un fond précis */
+html[data-theme] .site-shell :is(.light-section, .dark-section) :is(.xp-list, .xp-row, .why-row, .hf-list, .hf-item) { border-color: var(--s-line); }
+html[data-theme] .site-shell .why-row:last-child { border-color: var(--t-line); }
+html[data-theme] .site-shell .ia-grid { background-image: radial-gradient(var(--s-line) 1px, transparent 1px); }
+html[data-theme="dark"] .site-shell .ia-node { fill: #1C1C1C; }
+html[data-theme="dark"] .site-shell .ia-fill { fill: rgb(var(--accent-hi) / 0.08); }
+html[data-theme="dark"] .site-shell .ia-d { stroke: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .ia-node, html[data-theme="dark"] .site-shell .ia-ring, html[data-theme="dark"] .site-shell .ia-dot, html[data-theme="dark"] .site-shell .sa-bar { stroke: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .ia-dot, html[data-theme="dark"] .site-shell .sa-badge, html[data-theme="dark"] .site-shell .sa-cursor { fill: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .sa-bar { fill: rgb(var(--accent-hi) / 0.2); }
+html[data-theme="dark"] .site-shell .sa-beat { stroke: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .sa-check.big { stroke: rgb(var(--accent-hi)); }
+html[data-theme] .site-shell .ml-line { background: var(--t-line); }
+html[data-theme="dark"] .site-shell .ml-dot { background: #1C1C1C; border-color: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .ml-line > span { background: rgb(var(--accent-hi)); }
+html[data-theme="dark"] .site-shell .ml-k, html[data-theme="dark"] .site-shell .why-k { color: rgb(var(--accent-hi)); }
+html[data-theme] .site-shell .pc-media::after { box-shadow: inset 0 0 0 0 transparent; }
+html[data-theme] .site-shell .pc:hover .pc-media::after { box-shadow: inset 0 0 0 10px var(--t-bg); }
+html[data-theme] .site-shell .pc-cta { background: var(--t-bg); color: var(--t-fg); }
+html[data-theme="dark"] .site-shell .sc-media, html[data-theme="dark"] .site-shell .pc-media { background: #262626; }
+html[data-theme="light"] .site-shell .dm-tab { color: var(--s-muted); }
+html[data-theme="light"] .site-shell .dm-tab:hover { color: var(--t-fg); }
+html[data-theme="light"] .site-shell .dm-tab[aria-selected="true"] { background: rgb(28 28 28 / 0.07); color: var(--t-fg); }
+html[data-theme="light"] .site-shell .dm-timer, html[data-theme="light"] .site-shell .fc-rule { background: rgb(var(--accent)); }
+html[data-theme="light"] .site-shell .ft-mail { color: rgb(var(--accent)); }
+html[data-theme="light"] .site-shell .dm-window { box-shadow: 0 30px 60px -40px rgb(0 0 0 / 0.35), 0 0 0 1px rgb(28 28 28 / 0.1); }
+html[data-theme="dark"] .site-shell .plan:not(.plan-hot) { background: rgb(248 248 247 / 0.03); }
+html[data-theme] .site-shell .plan.plan-hot { background: #1C1C1C; color: #F8F8F7; --acc-ctx: var(--accent-hi); }
+html[data-theme] .site-shell .plan.plan-hot .muted { color: #A9AEB5; }
+html[data-theme] .site-shell .plan.plan-hot .hair { border-color: rgb(248 248 247 / 0.16); }
+html[data-theme="dark"] .site-shell .plan.plan-hot { background: #2A2F36; }
+
+/* espace client */
+html[data-theme="dark"] .site-shell .espace { background: #151515; }
+html[data-theme="dark"] .site-shell .es-card { background: #242424; border-color: rgb(248 248 247 / 0.1); }
+html[data-theme="dark"] .site-shell .es-link { color: rgb(248 248 247 / 0.75); }
+html[data-theme="dark"] .site-shell .es-link:hover { background: #242424; color: #fff; }
+html[data-theme="dark"] .site-shell .es-link[aria-current="page"] { background: #F8F8F7; color: #1C1C1C; }
+html[data-theme="dark"] .site-shell .es-link[aria-current="page"] .es-badge { background: #1C1C1C; color: #fff; }
+html[data-theme="dark"] .site-shell :is(.es-row, .es-steps li, .es-bubble, .es-reply, .es-status) { background: #2c2c2c; }
+html[data-theme="dark"] .site-shell .es-steps li[data-s="en-cours"] { background: #F8F8F7; color: #1C1C1C; }
+html[data-theme="dark"] .site-shell .es-steps li[data-s="en-cours"] .muted { color: #5A5F66; }
+html[data-theme="dark"] .site-shell .es-chat li.me .es-bubble { background: #F8F8F7; color: #1C1C1C; }
+html[data-theme="dark"] .site-shell .es-chip { border-color: rgb(248 248 247 / 0.2); }
+html[data-theme="dark"] .site-shell .es-chip:hover { background: #242424; }
+html[data-theme="dark"] .site-shell .es-chip[aria-current="page"] { background: #F8F8F7; color: #1C1C1C; border-color: #F8F8F7; }
+html[data-theme="dark"] .site-shell .es-bar { background: rgb(248 248 247 / 0.12); }
+html[data-theme="dark"] .site-shell .es-status[data-s="terminée"] { background: #1F3A2A; color: #8fd2a8; }
+html[data-theme="dark"] .site-shell .es-timeline, html[data-theme="dark"] .site-shell .es-feed li { border-color: rgb(248 248 247 / 0.14); }
+
+/* logos : variante claire sur fond sombre, variante sombre sur fond clair (pied de page, suit le thème) */
+.logo-on-dark { display: none; } .logo-on-light { display: block; }
+html[data-theme="dark"] .logo-on-dark { display: block; } html[data-theme="dark"] .logo-on-light { display: none; }
+html:not([data-theme]) .logo-on-dark { display: block; } html:not([data-theme]) .logo-on-light { display: none; }
+
+/* bouton de bascule */
+.theme-toggle { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid currentColor; background: transparent; color: inherit; cursor: pointer; opacity: 0.85; transition: opacity 0.3s, background-color 0.3s, transform 0.4s var(--ease); }
+.theme-toggle:hover { opacity: 1; background: rgb(128 128 128 / 0.16); transform: rotate(12deg); }
+.theme-toggle .sun { display: none; }
+html[data-theme="dark"] .theme-toggle .sun { display: block; } html[data-theme="dark"] .theme-toggle .moon { display: none; }
+@media (prefers-reduced-motion: no-preference) { .site-shell :is(.light-section, .dark-section) { transition: background-color 0.4s, color 0.4s; } }
+html[data-theme="dark"] .site-shell :is(.dev-body, .lp-lid) { outline: 2px solid rgb(248 248 247 / 0.55); outline-offset: -2px; }

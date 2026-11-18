@@ -27,7 +27,7 @@ export function BlogList({ posts }: { posts: BP[] }) {
     const n = q.trim().toLowerCase();
     return posts.filter((p) => (!cat || p.category === cat) && (!n || `${p.title} ${p.excerpt}`.toLowerCase().includes(n)));
   }, [posts, cat, q]);
-  const chip = (on: boolean) => `border px-4 py-2 text-[0.9rem] transition-colors hair ${on ? "bg-ink-900 text-ivory border-transparent" : "hover:bg-ink-900/5"}`;
+  const chip = (on: boolean) => `border px-4 py-2 text-[0.9rem] transition-colors hair ${on ? "bg-[color:var(--t-fg,#1C1C1C)] text-[color:var(--t-bg,#F8F8F7)] border-transparent" : "hover:bg-[color:var(--t-line,rgb(28_28_28/0.06))]"}`;
   return (
     <div>
       <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
@@ -42,19 +42,19 @@ export function BlogList({ posts }: { posts: BP[] }) {
         <AnimatePresence mode="popLayout" initial={false}>
           {list.map((p) => (
             <motion.li key={p.id} layout initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}>
-              <Tilt>
+              <div className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1">
                 <Link href={`/blog/${p.slug}`} className="group block" data-cursor="Lire">
                   <div className="rounded-[1.5rem] relative aspect-[3/2] overflow-hidden border hair bg-ink-900">
                     {p.cover ? <Image src={p.cover} alt="" fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" /> : (
                       <div className="flex h-full items-end p-6"><span className="font-serif text-2xl text-ivory">{p.category}</span></div>
                     )}
-                    <span className="absolute inset-0 origin-left scale-x-0 bg-[rgb(var(--accent)/0.55)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" aria-hidden="true" style={{ mixBlendMode: "multiply" }} />
+                    <span className="absolute inset-0 origin-left scale-x-0 bg-[rgb(var(--accent)/0.55)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" aria-hidden="true" />
                   </div>
                   <p className="muted mt-5 text-[0.82rem] uppercase tracking-wider">{p.category} · {p.date} · {p.minutes} min de lecture</p>
                   <h2 className="mt-2 text-h3">{p.title}</h2>
                   <p className="muted mt-3 leading-relaxed">{p.excerpt}</p>
                 </Link>
-              </Tilt>
+              </div>
             </motion.li>
           ))}
         </AnimatePresence>

@@ -122,22 +122,24 @@ export function CtaBand({ title, text }: { title: string; text: string }) {
   );
 }
 
-export function PageHero({ eyebrow, title, lead, children, image = "" }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode; image?: string }) {
+export function PageHero({ eyebrow, title, lead, children, image = "", art, after }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode; image?: string; art?: React.ReactNode; after?: React.ReactNode }) {
   const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(image);
+  const side = !!image || !!art;
   return (
     <section className="dark-section relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
-      <FrameDraw className={`container ${image ? "grid items-center gap-12 lg:grid-cols-12" : ""}`}>
-        <div className={image ? "lg:col-span-7" : ""}>
+      <FrameDraw className={`container ${side ? "grid items-center gap-12 lg:grid-cols-12" : ""}`}>
+        <div className={side ? "lg:col-span-7" : ""}>
           {children}
-          <p className="eyebrow mb-7">{eyebrow}</p>
-          <h1 className={`text-h1 font-medium ${image ? "" : "max-w-[18ch]"}`}>{title}</h1>
+          {eyebrow && <p className="eyebrow mb-7">{eyebrow}</p>}
+          <h1 className={`text-h1 font-medium ${side ? "" : "max-w-[18ch]"}`}>{title}</h1>
           {lead && <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{lead}</p>}
+          {after}
         </div>
-        {image && (
+        {image ? (
           <div className="relative aspect-video overflow-hidden rounded-[1.5rem] bg-ink-800 lg:col-span-5">
             {video ? <video src={image} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={image} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />}
           </div>
-        )}
+        ) : art ? <div className="hidden md:block lg:col-span-5">{art}</div> : null}
       </FrameDraw>
     </section>
   );

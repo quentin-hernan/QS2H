@@ -143,8 +143,6 @@ export const pageSchemas: PageSchema[] = [
       mediaField,
       { name: "title", label: "Titre", type: "text" },
       { name: "intro", label: "Introduction", type: "textarea" },
-      { name: "phasesTitle", label: "Vue d'ensemble — titre", type: "text" },
-      { name: "phases", label: "Vue d'ensemble — 5 phases", type: "list", itemFields: [{ name: "title", label: "Phase", type: "text" }, { name: "text", label: "Texte", type: "textarea" }] },
       {
         name: "steps",
         label: "Étapes détaillées (avec durées)",
@@ -157,14 +155,6 @@ export const pageSchemas: PageSchema[] = [
       },
     ],
     defaults: {
-      phasesTitle: "Notre méthode",
-      phases: [
-        { title: "Découverte", text: "Nous écoutons votre activité, vos clients et vos objectifs avant de proposer quoi que ce soit." },
-        { title: "Stratégie", text: "Nous définissons ensemble le périmètre, les priorités et le budget, écrits dans un devis clair." },
-        { title: "Création", text: "Maquettes, développement, contenus : vous validez chaque étape avant la suivante." },
-        { title: "Déploiement", text: "Mise en ligne, configuration et prise en main : tout vous est remis et expliqué." },
-        { title: "Suivi", text: "Après le lancement, nous restons disponibles pour faire évoluer vos outils." },
-      ],
       media: [],
       title: "Une méthode claire, du premier échange à la mise en ligne.",
       intro: "Chaque projet suit les mêmes sept étapes. Vous savez toujours où nous en sommes, ce qui est attendu de vous, et ce que vous paierez.",

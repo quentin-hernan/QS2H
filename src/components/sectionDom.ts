@@ -37,6 +37,7 @@ export function applyStyle(el: HTMLElement, style: SectionStyle | null, opts: { 
     const was = el.classList.contains("dark-section") ? "dark-section" : el.classList.contains("light-section") ? "light-section" : "";
     const now = style.tone === "dark" ? "dark-section" : "light-section";
     if (was !== now) { el.classList.remove("dark-section", "light-section"); el.classList.add(now); }
+    el.classList.add(style.tone === "dark" ? "keep-dark" : "keep-light"); // le thème du site ne l'écrase pas
   }
   if (style.padTop != null) el.style.paddingTop = `${style.padTop}px`;
   if (style.padBottom != null) el.style.paddingBottom = `${style.padBottom}px`;
