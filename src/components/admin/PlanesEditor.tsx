@@ -10,7 +10,8 @@ const KINDS = [
 const bd = { borderColor: "rgb(242 239 233 / .16)" };
 
 /** Éditeur des plans de la vue éclatée : trois modes d'ajout (lien, fichiers, manuel), réordonnancement, légendes. */
-export function PlanesEditor({ value, onChange, url, title, onMeta, pickImage }: {
+export function PlanesEditor({ value, onChange, url, title, onMeta, pickImage, onCapture, capturing }: {
+  onCapture?: () => void; capturing?: boolean;
   value: PlaneV[]; onChange: (v: PlaneV[]) => void; url: string; title: string;
   onMeta: (m: Record<string, unknown>) => void; pickImage: (cb: (u: string) => void) => void;
 }) {
@@ -49,7 +50,7 @@ export function PlanesEditor({ value, onChange, url, title, onMeta, pickImage }:
       <legend className="label">Plans de la vue éclatée 3D</legend>
       <p className="muted mb-4 text-[0.85rem]">Ordre = du fond vers l&apos;avant. Un plan « Mobile » est placé devant sur un téléphone. Texte alternatif et légende sont lus par les moteurs et les lecteurs d&apos;écran.</p>
       <div className="mb-5 flex flex-wrap gap-3">
-        <button type="button" className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5 text-sm" disabled={pending || !url} onClick={capture} title={url ? "" : "Renseignez d'abord l'URL du site"}>{pending ? "Traitement…" : "A · Capturer depuis l'URL"}</button>
+        <button type="button" className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5 text-sm" disabled={pending || capturing || !url} onClick={onCapture ?? capture} title={url ? "" : "Renseignez d'abord l'URL du site"}>{pending || capturing ? "Traitement…" : "A · Capturer depuis l'URL"}</button>
         <button type="button" className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5 text-sm" disabled={pending} onClick={() => file.current?.click()}>B · Importer des images</button>
         <button type="button" className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => pickImage((u) => onChange([...value, { id: `m${Date.now().toString(36)}`, name: "Nouveau plan", kind: "section", image: u, caption: "", depth: value.length }]))}>C · Plan manuel (médiathèque)</button>
         <input ref={file} type="file" accept="image/png,image/jpeg,image/webp,image/avif" multiple className="sr-only" aria-label="Importer des images" onChange={(e) => importFiles(e.target.files)} />

@@ -372,7 +372,7 @@ export async function captureProject(url: string, title: string) {
     const raw = process.env.CAPTURE_WORKER_URL ? await captureViaWorker(url) : await captureSite(url);
     const out = await storeCapture(raw, title || "projet");
     await audit(s.email, "capture de site", "project", url);
-    return { ok: true as const, planes: out.planes, meta: out.meta };
+    return { ok: true as const, planes: out.planes, meta: out.meta, cover: out.cover };
   } catch (e) {
     const m = (e as Error).message || "";
     const known = /URL|adresse|Adresse|port|domaine|Redirection|répondu|refusé|identifiants/.test(m);

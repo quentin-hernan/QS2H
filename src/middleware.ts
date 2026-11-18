@@ -29,6 +29,8 @@ export async function middleware(req: NextRequest) {
   }
   const res = NextResponse.next();
   res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  // témoin sans secret : permet au site public d'afficher l'éditeur visuel aux administrateurs connectés
+  if (ok) res.cookies.set("qs2h_ui", "1", { httpOnly: false, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 8 });
   res.headers.set("Cache-Control", "no-store");
   return res;
 }

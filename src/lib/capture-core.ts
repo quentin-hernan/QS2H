@@ -15,9 +15,12 @@ export type CaptureMeta = {
   lang: string;
   technologies: string[];
   lighthouse: { performance: number; accessibility: number; bestPractices: number; seo: number; source: string } | null;
+  siteName?: string;
+  ogTitle?: string;
+  ogDescription?: string;
 };
 export type RawPlane = Omit<Plane, "image" | "id"> & { png: Buffer };
-export type Captured = { planes: RawPlane[]; meta: CaptureMeta };
+export type Captured = { planes: RawPlane[]; meta: CaptureMeta; cover?: Buffer };
 
 const NAV_TIMEOUT = 30_000;
 const MAX_PAGE_H = 14_000;
@@ -71,7 +74,14 @@ export async function captureSite(rawUrl: string, opts: { trusted?: boolean; psi
   const trusted = !!opts.trusted;
   const url = trusted ? new URL(rawUrl) : await assertPublicUrl(rawUrl);
   const { chromium } = await import("playwright-core");
-  const browser = await chromium.launch({ args: ["--disable-dev-shm-usage"] });
+  // navigateur fourni par Playwright, sinon Chrome ou Edge installés sur la machine
+  const tries: (string | undefined)[] = [process.env.CAPTURE_BROWSER_CHANNEL || undefined, undefined, "chrome", "msedge"];
+  let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null;
+  let lastErr: unknown = null;
+  for (const channel of tries) {
+    try { browser = await chromium.launch({ args: ["--disable-dev-shm-usage"], ...(channel ? { channel } : {}) }); break; } catch (e) { lastErr = e; }
+  }
+  if (!browser) throw new Error("Aucun navigateur disponible pour la capture (installez Chrome, ou lancez « npx playwright install chromium »). " + String((lastErr as Error)?.message ?? "").slice(0, 80));
   const hostOk = new Map<string, boolean>();
   async function allowed(u: URL) {
     if (trusted) return true;
@@ -142,11 +152,15 @@ export async function captureSite(rawUrl: string, opts: { trusted?: boolean; psi
         h1: Array.from(document.querySelectorAll("h1")).map((h) => (h.textContent || "").replace(/\s+/g, " ").trim()).slice(0, 5),
         hn,
         lang: document.documentElement.lang || "",
+        siteName: document.querySelector('meta[property="og:site_name"]')?.getAttribute("content") || "",
+        ogTitle: document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "",
+        ogDescription: document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
       };
     }, MAX_SECTIONS);
     const pageH = Math.min(info.total, MAX_PAGE_H);
     const full = await d.page.screenshot({ fullPage: true, type: "png", clip: { x: 0, y: 0, width: 1440, height: pageH } });
     await d.ctx.close();
+    const cover = await sharp(full).extract({ left: 0, top: 0, width: 1440, height: Math.min(900, pageH) }).png().toBuffer();
 
     const planes: RawPlane[] = [];
     let rects = info.rects.filter((r) => r.y < pageH && r.h > 20).sort((a, b) => a.y - b.y);
@@ -175,10 +189,11 @@ export async function captureSite(rawUrl: string, opts: { trusted?: boolean; psi
       capturedAt: new Date().toISOString(),
       url: url.toString(),
       title: info.title, description: info.description, h1: info.h1, headings: info.hn, lang: info.lang,
+      siteName: info.siteName, ogTitle: info.ogTitle, ogDescription: info.ogDescription,
       technologies: detectTech(info.html, info.scripts, info.generator),
       lighthouse: opts.psi === false || trusted ? null : await lighthouse(url.toString()),
     };
-    return { planes, meta };
+    return { planes, meta, cover };
   } finally {
     await browser.close();
   }

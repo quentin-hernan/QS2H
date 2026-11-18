@@ -22,7 +22,7 @@ http.createServer(async (req, res) => {
     busy = true;
     const { url } = JSON.parse(raw) as { url: string };
     const out = await captureSite(url);
-    send(200, { meta: out.meta, planes: out.planes.map((p) => ({ ...p, png: p.png.toString("base64") })) });
+    send(200, { meta: out.meta, cover: out.cover ? out.cover.toString("base64") : undefined, planes: out.planes.map((p) => ({ ...p, png: p.png.toString("base64") })) });
   } catch (e) {
     send(422, { error: (e as Error).message });
   } finally { busy = false; }

@@ -15,14 +15,15 @@ const DEFAULT_CAPTIONS: Record<PlaneKind, string> = {
 };
 
 /** Enregistre les captures dans la médiathèque et retourne les plans prêts à être édités. */
-export async function storeCapture(c: Captured, projectTitle: string): Promise<{ planes: Plane[]; meta: CaptureMeta }> {
+export async function storeCapture(c: Captured, projectTitle: string): Promise<{ planes: Plane[]; meta: CaptureMeta; cover: string }> {
   const planes: Plane[] = [];
   for (const [i, p] of c.planes.entries()) {
     const maxW = p.kind === "mobile" ? 780 : 1600;
     const m = await saveImage(p.png, `${projectTitle}-${p.kind}-${i + 1}`, `${p.name} — ${projectTitle}`, maxW);
     planes.push({ id: `p${Date.now().toString(36)}${i}`, name: p.name, kind: p.kind, image: m.url, caption: p.caption || DEFAULT_CAPTIONS[p.kind], depth: p.depth });
   }
-  return { planes, meta: c.meta };
+  const cover = c.cover ? (await saveImage(c.cover, `${projectTitle}-couverture`, `Page d'accueil du site ${c.meta.siteName || c.meta.title || projectTitle}`, 1600)).url : planes.find((p) => p.kind === "hero")?.image ?? "";
+  return { planes, meta: c.meta, cover };
 }
 
 /** Capture déléguée à un worker externe (Docker sur Railway / Fly.io…) si CAPTURE_WORKER_URL est défini. */
@@ -35,6 +36,6 @@ export async function captureViaWorker(url: string): Promise<Captured> {
     signal: AbortSignal.timeout(120_000),
   });
   if (!r.ok) throw new Error("Le service de capture a refusé la demande.");
-  const j = (await r.json()) as { meta: CaptureMeta; planes: (Omit<RawPlane, "png"> & { png: string })[] };
-  return { meta: j.meta, planes: j.planes.map((p) => ({ ...p, png: Buffer.from(p.png, "base64") })) };
+  const j = (await r.json()) as { meta: CaptureMeta; cover?: string; planes: (Omit<RawPlane, "png"> & { png: string })[] };
+  return { meta: j.meta, cover: j.cover ? Buffer.from(j.cover, "base64") : undefined, planes: j.planes.map((p) => ({ ...p, png: Buffer.from(p.png, "base64") })) };
 }

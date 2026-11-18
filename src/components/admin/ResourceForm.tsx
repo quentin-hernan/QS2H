@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Field, Resource } from "@/lib/admin-resources";
-import { saveResource } from "@/app/admin/actions";
+import { captureProject, saveResource } from "@/app/admin/actions";
 import { slugify } from "@/lib/utils";
 import { MediaPicker, type MediaItem } from "./MediaPicker";
 import { RichText } from "./RichText";
@@ -34,6 +34,41 @@ export function ResourceForm({ resource, id, initial, serviceOptions }: { resour
   const [slugTouched, setSlugTouched] = useState(id !== "new");
   const [picker, setPicker] = useState<{ field: string; multi: boolean; cb?: (u: string) => void } | null>(null);
   const [pending, start] = useTransition();
+  const [capturing, startCap] = useTransition();
+  const [capMsg, setCapMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  /** Réalisations : à partir de la seule URL, récupère titre, description, image de couverture, technologies, scores et vues (bureau, tablette, mobile). */
+  function runCapture() {
+    const url = String(v.url || "").trim();
+    if (!url) { setCapMsg({ ok: false, text: "Renseignez d'abord l'URL du site." }); return; }
+    if (!confirm("Récupérer depuis ce site : titre, description, image de couverture, technologies, scores et vues (bureau, tablette, mobile).\n\nLes valeurs actuelles de ces champs seront remplacées. Continuer ?")) return;
+    setCapMsg(null);
+    startCap(async () => {
+      const r = await captureProject(url, String(v.title || ""));
+      if (!r.ok) { setCapMsg({ ok: false, text: r.error }); return; }
+      const m = r.meta as unknown as Record<string, unknown>;
+      const site = String(m.siteName || "").trim();
+      const rawTitle = String(m.ogTitle || m.title || "").trim();
+      const title = (rawTitle.split(/\s[|–—-]\s/)[0] || rawTitle).trim();
+      const desc = String(m.ogDescription || m.description || "").trim();
+      const filled = [r.cover && "image de couverture", Array.isArray(m.technologies) && m.technologies.length && "technologies", desc && "description", title && "titre"].filter(Boolean) as string[];
+      setDirty(true);
+      setV((p) => {
+        const n: Vals = { ...p, planes: r.planes, meta: m };
+        if (r.cover) n.cover = r.cover;
+        if (Array.isArray(m.technologies) && m.technologies.length) n.technologies = m.technologies;
+        if (desc) n.summary = desc.slice(0, 300);
+        if (title) n.title = title.slice(0, 120);
+        if (!String(p.client || "").trim() && (site || title)) n.client = (site || title).slice(0, 120);
+        if ((!slugTouched || !p.slug) && n.title) n.slug = slugify(String(n.title));
+        if (!p.year) n.year = new Date().getFullYear();
+        if (!String(p.seoDescription || "").trim() && desc) n.seoDescription = desc.slice(0, 170);
+        return n;
+      });
+      const lh = m.lighthouse as { performance?: number } | null;
+      setCapMsg({ ok: true, text: `Récupéré : ${r.planes.length} vues, ${filled.join(", ") || "aucun texte"}${lh ? ", scores PageSpeed" : ""}. Relisez puis enregistrez.` });
+    });
+  }
 
   useEffect(() => {
     if (!dirty) return;
@@ -71,10 +106,11 @@ export function ResourceForm({ resource, id, initial, serviceOptions }: { resour
     <form onSubmit={submit} noValidate className="grid gap-10 xl:grid-cols-[1fr_340px]">
       <div className="space-y-6">
         {msg && <p role={msg.ok ? "status" : "alert"} className={`rounded-xl border p-4 ${msg.ok ? "acc acc-border" : "err"}`}>{msg.text}</p>}
+        {capMsg && <p role={capMsg.ok ? "status" : "alert"} className={`rounded-xl border p-4 ${capMsg.ok ? "acc acc-border" : "err"}`}>{capMsg.text}</p>}
         <div className="grid gap-6 md:grid-cols-2">
           {resource.fields.map((f) => (
             <div key={f.name} className={f.half ? "" : "md:col-span-2"}>
-              <FieldInput f={f} all={v} setField={set} pickImage={(cb) => setPicker({ field: f.name, multi: false, cb })} value={v[f.name]} error={errors[f.name]?.[0]} onChange={(x) => { if (f.type === "slug") setSlugTouched(true); set(f.name, x); }} serviceOptions={serviceOptions} openPicker={(multi) => setPicker({ field: f.name, multi })} />
+              <FieldInput f={f} all={v} setField={set} pickImage={(cb) => setPicker({ field: f.name, multi: false, cb })} value={v[f.name]} error={errors[f.name]?.[0]} onChange={(x) => { if (f.type === "slug") setSlugTouched(true); set(f.name, x); }} serviceOptions={serviceOptions} onCapture={resource.key === "realisations" ? runCapture : undefined} capturing={capturing} openPicker={(multi) => setPicker({ field: f.name, multi })} />
             </div>
           ))}
         </div>
@@ -118,7 +154,7 @@ export function ResourceForm({ resource, id, initial, serviceOptions }: { resour
   );
 }
 
-function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all, setField, pickImage }: { all: Vals; setField: (n: string, v: unknown) => void; pickImage: (cb: (u: string) => void) => void; f: Field; value: any; error?: string; onChange: (v: unknown) => void; serviceOptions: { value: string; label: string }[]; openPicker: (multi: boolean) => void }) { // eslint-disable-line @typescript-eslint/no-explicit-any
+function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all, setField, pickImage, onCapture, capturing }: { onCapture?: () => void; capturing?: boolean; all: Vals; setField: (n: string, v: unknown) => void; pickImage: (cb: (u: string) => void) => void; f: Field; value: any; error?: string; onChange: (v: unknown) => void; serviceOptions: { value: string; label: string }[]; openPicker: (multi: boolean) => void }) { // eslint-disable-line @typescript-eslint/no-explicit-any
   const id = `f-${f.name}`;
   const aria = { "aria-invalid": error ? true : undefined, "aria-describedby": error ? `${id}-e` : f.hint ? `${id}-h` : undefined } as const;
   const Label = <label className="label" htmlFor={id}>{f.label}{f.required && " *"}</label>;
@@ -127,6 +163,9 @@ function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all
 
   switch (f.type) {
     case "text": case "slug":
+      if (f.name === "url" && onCapture) return (
+        <div>{Label}<div className="flex flex-wrap gap-3"><input id={id} className="field min-w-[240px] flex-1" value={value} placeholder="https://…" onChange={(e) => onChange(e.target.value)} {...aria} /><button type="button" className="btn btn-primary !min-h-[48px] !px-5" disabled={capturing || !String(value).trim()} onClick={onCapture}>{capturing ? "Récupération… (30 à 90 s)" : "Tout récupérer depuis ce site"}</button></div><p className="muted mt-1.5 text-[0.8rem]">Remplit titre, description, image de couverture, technologies, scores PageSpeed et les vues bureau / tablette / mobile de la vue éclatée.</p>{Err}</div>
+      );
       return <div>{Label}<input id={id} className="field" value={value} maxLength={f.max} onChange={(e) => onChange(e.target.value)} {...aria} />{f.max && <p className="muted mt-1 text-right text-xs">{String(value).length}/{f.max}</p>}{Hint}{Err}</div>;
     case "textarea":
       return <div>{Label}<textarea id={id} rows={f.rows ?? 4} className="field" value={value} maxLength={f.max} onChange={(e) => onChange(e.target.value)} {...aria} />{f.max && <p className="muted mt-1 text-right text-xs">{String(value).length}/{f.max}</p>}{Hint}{Err}</div>;
@@ -162,7 +201,7 @@ function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all
         </li>))}</ul><button type="button" className="btn btn-ghost mt-3 !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => onChange([...rows, Object.fromEntries(f.itemFields!.map((i) => [i.name, ""]))])}>+ Ajouter</button></fieldset>);
     }
     case "planes":
-      return <PlanesEditor value={value as PlaneV[]} onChange={onChange} url={String(all.url || "")} title={String(all.title || "")} onMeta={(m) => { setField("meta", m); if (Array.isArray(m.technologies) && !(all.technologies as string[]).filter(Boolean).length) setField("technologies", m.technologies); }} pickImage={pickImage} />;
+      return <PlanesEditor onCapture={onCapture} capturing={capturing} value={value as PlaneV[]} onChange={onChange} url={String(all.url || "")} title={String(all.title || "")} onMeta={(m) => { setField("meta", m); if (Array.isArray(m.technologies) && !(all.technologies as string[]).filter(Boolean).length) setField("technologies", m.technologies); }} pickImage={pickImage} />;
     case "meta":
       return <MetaView meta={value as Record<string, unknown>} onClear={() => onChange({})} />;
     case "richtext":

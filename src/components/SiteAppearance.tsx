@@ -32,7 +32,8 @@ export function SiteAppearance({ styles }: { styles: StyleMap }) {
 
   // un cookie témoin (sans secret) indique qu'une session d'administration existe ; l'API confirme
   useEffect(() => {
-    if (!/(?:^|; )qs2h_ui=1/.test(document.cookie)) return;
+    const wanted = /(?:^|; )qs2h_ui=1/.test(document.cookie) || new URLSearchParams(location.search).get("edit") === "1";
+    if (!wanted) return;
     fetch("/api/admin/me").then((r) => r.json()).then((j) => setAdmin(!!j.admin)).catch(() => {});
   }, [path]);
 
