@@ -97,3 +97,11 @@ html:not([data-theme]) .logo-on-dark { display: block; } html:not([data-theme]) 
 html[data-theme="dark"] .theme-toggle .sun { display: block; } html[data-theme="dark"] .theme-toggle .moon { display: none; }
 @media (prefers-reduced-motion: no-preference) { .site-shell :is(.light-section, .dark-section) { transition: background-color 0.4s, color 0.4s; } }
 html[data-theme="dark"] .site-shell :is(.dev-body, .lp-lid) { outline: 2px solid rgb(248 248 247 / 0.55); outline-offset: -2px; }
+
+/* Listes déroulantes (éditeur d'apparence, formulaires) : la liste ouverte suit le thème, texte toujours lisible */
+select.field, .field select { color-scheme: light dark; }
+html[data-theme="dark"] select, html[data-theme="dark"] select option, html[data-theme="dark"] select optgroup { background-color: #1F1F1F; color: #F8F8F7; }
+html[data-theme="light"] select option, html[data-theme="light"] select optgroup { background-color: #FFFFFF; color: #1C1C1C; }
+html[data-theme="dark"] select { color-scheme: dark; }
+html[data-theme="light"] select { color-scheme: light; }
+select option:disabled { color: #8A8F96; }
