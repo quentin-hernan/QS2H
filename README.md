@@ -135,3 +135,8 @@ L'accueil présente (hero 3D + vue éclatée, engagements, services avec image d
 ### Catalogue (licences, logiciels, produits)
 - **Admin > Catalogue (produits)** : nom, catégorie, prix affiché, image, présentation, éléments inclus, SEO. Aucun produit publié = aucune trace sur le site. Dès qu'un produit est publié : page **/catalogue** (regroupée par catégorie), fiche **/catalogue/<produit>**, lien dans le menu et le plan du site, mention sur la page Services, et l'assistant le connaît.
 - Le bouton « Demander ce produit » ouvre le formulaire de devis pré-rempli. Visuels de la page : Admin > Pages et textes > Page Catalogue. **Pas de paiement en ligne ni de suivi de commande pour l'instant** : à ajouter plus tard (panier, paiement, statuts de commande) au-dessus de ce modèle.
+
+### Pages libres (éditeur par sections)
+- **Admin > Pages libres** : créez de nouvelles pages sans code (offre, promotion, page partenaire…) en assemblant des sections : bandeau d'introduction, texte, image ou vidéo 16:9, colonnes, questions fréquentes, appel à l'action. Ajout, duplication, suppression, **glisser-déposer** ou boutons ↑ ↓ pour réordonner, fond clair ou sombre par section, annulation (Ctrl+Z), **aperçu ordinateur / tablette / mobile**, brouillon ou publication, adresse et description Google modifiables.
+- Une page publiée est servie à `/<adresse>` et ajoutée au plan du site. Les adresses déjà utilisées par le site (services, tarifs, blog…) sont refusées. Les liens de boutons n'acceptent que les chemins internes, https et mailto ; le contenu est nettoyé côté serveur (types et champs connus uniquement).
+- Limite actuelle : pas d'historique de versions pour les pages libres (contrairement aux pages « Pages et textes »).

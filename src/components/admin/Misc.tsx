@@ -60,7 +60,7 @@ export function RowActions({ resourceKey, id, orderable, duplicable, first, last
 /* ------------------------------------------------------------ pages et textes */
 type PageVal = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 /** Champ média : image (tout format courant) ou vidéo, choisi dans la médiathèque ou importé. */
-function MediaField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (url: string, alt?: string) => void }) {
+export function MediaField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (url: string, alt?: string) => void }) {
   const [open, setOpen] = useState(false);
   const isVideo = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(value);
   return (
