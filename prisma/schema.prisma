@@ -1,13 +1,13 @@
-// SQLite en local. Pour la production, remplacer le provider par "postgresql"
-// et DATABASE_URL par l'URL Postgres (Neon, Supabase…). Les listes/objets sont stockés en JSON texte
-// pour rester portables entre les deux.
+// PostgreSQL (Supabase). DATABASE_URL = connexion poolée (port 6543, pour le site) ; DIRECT_URL = connexion directe (port 5432, pour prisma db push).
+// Les listes/objets sont stockés en JSON texte.
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {

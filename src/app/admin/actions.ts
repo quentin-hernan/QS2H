@@ -1,7 +1,5 @@
 "use server";
 import crypto from "node:crypto";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
@@ -17,6 +15,7 @@ import { esc, layout, sendMail } from "@/lib/email";
 import { SITE_URL } from "@/lib/utils";
 import { captureSite, captureViaWorker, storeCapture } from "@/lib/capture";
 import { saveImage } from "@/lib/media";
+import { removePrivate, removePublic } from "@/lib/storage";
 
 type Result = { ok: boolean; error?: string; id?: string; fields?: Record<string, string[] | undefined> };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -357,7 +356,7 @@ export async function deleteMedia(id: string) {
   const s = await requireSession();
   const m = await db.media.findUnique({ where: { id } });
   if (!m) return;
-  if (m.url.startsWith("/uploads/")) await fs.unlink(path.join(process.cwd(), "public", m.url)).catch(() => {});
+  await removePublic(m.url);
   await db.media.delete({ where: { id } });
   await audit(s.email, "suppression média", "media", id);
   revalidatePath("/admin/mediatheque");
@@ -467,7 +466,7 @@ export async function deleteClientDocument(clientId: string, docId: string) {
   const d = await db.clientDocument.findUnique({ where: { id: docId } });
   if (!d) return;
   await db.clientDocument.delete({ where: { id: docId } });
-  await fs.rm(path.join(process.cwd(), "storage", "documents", d.file), { force: true });
+  await removePrivate(d.file);
   await audit(s.email, "suppression document client", "client", clientId);
   revalidatePath(`/admin/clients/${clientId}`);
 }

@@ -2,7 +2,7 @@
 
 Site de l'agence **QS2H** (solutions digitales, La Rochelle) : site public avec ordinateur 3D et vue éclatée, boutique en ligne, espace client conforme RGPD, assistant QS2H (chatbot), back-office complet `/admin`, éditeur visuel des pages, SEO.
 
-**Stack** : Next.js 15 (App Router) · TypeScript strict · Tailwind CSS · Prisma (SQLite en local, PostgreSQL en production) · Three.js / React Three Fiber · GSAP + Lenis · Zod · Tiptap · Playwright.
+**Stack** : Next.js 15 (App Router) · TypeScript strict · Tailwind CSS · Prisma (PostgreSQL : Supabase) · Three.js / React Three Fiber · GSAP + Lenis · Zod · Tiptap · Playwright.
 
 ---
 
@@ -13,7 +13,7 @@ Prérequis : Node.js 20+.
 ```bash
 npm install
 cp .env.example .env        # puis éditer (voir §4)
-npm run db:setup            # crée la base SQLite + données d'exemple + compte propriétaire
+npm run db:setup            # crée les tables dans la base PostgreSQL + données d'exemple + compte propriétaire
 npm run dev                 # http://localhost:3000  (administration : /admin)
 ```
 

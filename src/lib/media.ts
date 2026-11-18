@@ -1,22 +1,20 @@
 import "server-only";
-import fs from "node:fs/promises";
-import path from "node:path";
 import sharp from "sharp";
 import { db } from "./db";
 import { slugify } from "./utils";
+import { putPublic } from "./storage";
 
 /**
  * Enregistre une image : contrôle du contenu réel, rotation EXIF, redimensionnement, conversion WebP.
- * En production serverless, remplacer l'écriture disque par un stockage objet (R2 / Supabase) ici uniquement.
+ * Le fichier part dans Supabase Storage (production) ou sur le disque local (développement) : voir storage.ts.
  */
 export async function saveImage(buf: Buffer, baseName: string, alt: string, maxWidth = 2400) {
   const meta = await sharp(buf).metadata();
   if (!meta.format || !["jpeg", "png", "webp", "avif", "gif"].includes(meta.format)) throw new Error("FORMAT");
   const name = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}-${slugify(baseName.replace(/\.[^.]+$/, "")) || "image"}.webp`;
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(dir, { recursive: true });
-  const out = await sharp(buf, { animated: meta.format === "gif" }).rotate().resize({ width: maxWidth, withoutEnlargement: true }).webp({ quality: 82 }).toFile(path.join(dir, name));
-  return db.media.create({ data: { filename: name, url: `/uploads/${name}`, alt: alt.slice(0, 300), width: out.width, height: out.height, size: out.size, kind: "image", mime: "image/webp" } });
+  const { data, info: out } = await sharp(buf, { animated: meta.format === "gif" }).rotate().resize({ width: maxWidth, withoutEnlargement: true }).webp({ quality: 82 }).toBuffer({ resolveWithObject: true });
+  const url = await putPublic(name, data, "image/webp");
+  return db.media.create({ data: { filename: name, url, alt: alt.slice(0, 300), width: out.width, height: out.height, size: out.size, kind: "image", mime: "image/webp" } });
 }
 
 const VIDEO_TYPES: Record<string, string> = { mp4: "video/mp4", webm: "video/webm", mov: "video/quicktime", ogv: "video/ogg" };
@@ -36,8 +34,6 @@ export async function saveVideo(buf: Buffer, baseName: string, alt: string) {
   const v = sniffVideo(buf);
   if (!v) throw new Error("FORMAT");
   const name = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}-${slugify(baseName.replace(/\.[^.]+$/, "")) || "video"}.${v.ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, name), buf);
-  return db.media.create({ data: { filename: name, url: `/uploads/${name}`, alt: alt.slice(0, 300), size: buf.length, kind: "video", mime: v.mime } });
+  const url = await putPublic(name, buf, v.mime);
+  return db.media.create({ data: { filename: name, url, alt: alt.slice(0, 300), size: buf.length, kind: "video", mime: v.mime } });
 }

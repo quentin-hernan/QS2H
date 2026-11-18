@@ -22,7 +22,7 @@ export default async function Backup() {
       </section>
       <section className="muted rounded-2xl border p-6 text-sm leading-relaxed md:p-8" style={ring}>
         <h2 className="mb-2 text-xl font-medium text-ivory">Sauvegardes automatiques</h2>
-        <p>Avec une base PostgreSQL hébergée (Neon, Supabase), les sauvegardes quotidiennes et la restauration à un instant donné sont assurées par l&apos;hébergeur. Activez-les dans le tableau de bord du service. Les images sont stockées dans <code>public/uploads</code> en local ; en production, utilisez un stockage objet (Cloudflare R2, Supabase Storage) avec sauvegarde.</p>
+        <p>Avec une base PostgreSQL hébergée (Neon, Supabase), les sauvegardes quotidiennes et la restauration à un instant donné sont assurées par l&apos;hébergeur. Activez-les dans le tableau de bord du service. Les images et documents sont stockés dans Supabase Storage (buckets <code>uploads</code> et <code>documents</code>) lorsque les variables <code>SUPABASE_URL</code> et <code>SUPABASE_SERVICE_ROLE_KEY</code> sont renseignées ; pensez à en faire une copie régulière.</p>
       </section>
     </div>
   );

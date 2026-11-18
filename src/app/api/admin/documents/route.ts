@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import fs from "node:fs/promises";
-import path from "node:path";
 import crypto from "node:crypto";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { putPrivate } from "@/lib/storage";
 
 export const runtime = "nodejs";
 const MAX = 15 * 1024 * 1024;
@@ -28,9 +27,7 @@ export async function POST(req: Request) {
   const buf = Buffer.from(await file.arrayBuffer());
   if (file.type === "application/pdf" && buf.subarray(0, 4).toString() !== "%PDF") return NextResponse.json({ ok: false, error: "PDF invalide." }, { status: 422 });
   const name = `${crypto.randomBytes(16).toString("hex")}${ext}`;
-  const dir = path.join(process.cwd(), "storage", "documents");
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, name), buf);
+  await putPrivate(name, buf, file.type);
   const d = await db.clientDocument.create({ data: { clientId, projectId, kind, title, file: name, mime: file.type } });
   await db.auditLog.create({ data: { userEmail: s.email, action: "dépôt de document client", entity: "clientDocument", entityId: d.id } });
   return NextResponse.json({ ok: true, id: d.id });

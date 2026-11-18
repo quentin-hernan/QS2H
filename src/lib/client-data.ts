@@ -1,7 +1,6 @@
 import "server-only";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { db } from "./db";
+import { removePrivate } from "./storage";
 
 /** Supprime ou anonymise toutes les données du client. Les factures sont dissociées du compte et conservées 10 ans (obligation légale). */
 export async function eraseClient(id: string) {
@@ -11,7 +10,7 @@ export async function eraseClient(id: string) {
   const retain = new Date(Date.now() + 10 * 365 * 864e5);
   for (const d of docs) {
     if (d.kind === "facture") await db.clientDocument.update({ where: { id: d.id }, data: { clientId: null, projectId: null, retainedUntil: retain, title: `${d.title} (client supprimé)` } });
-    else { await db.clientDocument.delete({ where: { id: d.id } }); await fs.rm(path.join(process.cwd(), "storage", "documents", d.file), { force: true }); }
+    else { await db.clientDocument.delete({ where: { id: d.id } }); await removePrivate(d.file); }
   }
   await db.lead.deleteMany({ where: { OR: [{ clientId: id }, { email: c.email }] } });
   await db.client.delete({ where: { id } });

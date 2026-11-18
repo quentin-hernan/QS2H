@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import fs from "node:fs/promises";
 import path from "node:path";
 import { getClient } from "@/lib/client-auth";
 import { db } from "@/lib/db";
+import { getPrivate } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
@@ -13,7 +13,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const d = await db.clientDocument.findFirst({ where: { id: (await params).id, clientId: c.id } });
   if (!d) return NextResponse.json({ error: "Introuvable." }, { status: 404 });
   try {
-    const buf = await fs.readFile(path.join(process.cwd(), "storage", "documents", path.basename(d.file)));
+    const buf = await getPrivate(d.file);
     const ext = d.mime === "application/pdf" ? ".pdf" : path.extname(d.file);
     return new NextResponse(new Uint8Array(buf), { headers: { "content-type": d.mime, "content-disposition": `attachment; filename="${d.title.replace(/[^\w\- ]+/g, "").trim() || "document"}${ext}"`, "cache-control": "private, no-store", "x-content-type-options": "nosniff" } });
   } catch {
