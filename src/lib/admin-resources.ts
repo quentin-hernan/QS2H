@@ -18,7 +18,7 @@ export type Resource = {
   key: string; // segment d'URL /admin/<key>
   label: string;
   singular: string;
-  model: "project" | "service" | "plan" | "planOption" | "faq" | "review" | "post" | "teamMember" | "redirect";
+  model: "project" | "service" | "product" | "plan" | "planOption" | "faq" | "review" | "post" | "teamMember" | "redirect";
   titleField: string;
   columns: { name: string; label: string }[];
   fields: Field[];
@@ -84,6 +84,27 @@ export const resources: Resource[] = [
       { name: "priceFrom", label: "À partir de (€)", type: "number", half: true },
       { name: "priceUnit", label: "Unité du prix", type: "text", half: true, hint: "Ex. « € HT » ou « € HT / mois »" },
       { name: "faq", label: "Questions fréquentes du service", type: "objlist", itemFields: [{ name: "q", label: "Question", type: "text" }, { name: "a", label: "Réponse", type: "textarea" }] },
+      { name: "seoTitle", label: "Titre SEO", type: "text", max: 70 },
+      { name: "seoDescription", label: "Meta description", type: "textarea", rows: 2, max: 170 },
+    ],
+  },
+  {
+    key: "produits", label: "Catalogue (produits)", singular: "produit", model: "product", titleField: "title", orderable: true, duplicable: true,
+    statusField: { name: "published", bool: true },
+    json: ["features"],
+    columns: [{ name: "title", label: "Titre" }, { name: "category", label: "Catégorie" }, { name: "price", label: "Prix" }, { name: "published", label: "Publié" }],
+    help: "Licences, logiciels, produits numériques… Le catalogue (page /catalogue et lien dans le menu) n'apparaît que lorsqu'au moins un produit est publié. Le bouton « Demander ce produit » ouvre le formulaire de devis pré-rempli.",
+    fields: [
+      { name: "title", label: "Nom du produit", type: "text", required: true },
+      { name: "slug", label: "Adresse (slug)", type: "slug", from: "title", required: true, half: true },
+      { name: "published", label: "Publié", type: "boolean", half: true },
+      { name: "category", label: "Catégorie", type: "text", half: true, hint: "Ex. Licences bureautiques, Logiciels, Matrices… Les produits sont regroupés par catégorie." },
+      { name: "price", label: "Prix affiché", type: "text", required: true, half: true, hint: "Ex. « 79 € » ou « Sur devis »" },
+      { name: "priceNote", label: "Mention", type: "text", half: true, hint: "Ex. « HT », « TTC / an »" },
+      { name: "tagline", label: "Accroche", type: "textarea", required: true, rows: 2, max: 200 },
+      { name: "image", label: "Image du produit (4:3 conseillé)", type: "image" },
+      { name: "description", label: "Présentation", type: "textarea", rows: 6 },
+      { name: "features", label: "Ce qui est inclus", type: "list", hint: "Une ligne par élément." },
       { name: "seoTitle", label: "Titre SEO", type: "text", max: 70 },
       { name: "seoDescription", label: "Meta description", type: "textarea", rows: 2, max: 170 },
     ],

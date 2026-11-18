@@ -1,5 +1,5 @@
 import "server-only";
-import { getFaqs, getPage, getPlans, getServices, getSettings } from "./content";
+import { getFaqs, getPage, getPlans, getProducts, getServices, getSettings } from "./content";
 
 export type ChatTurn = { role: "user" | "bot"; text: string };
 export type ChatReply = { reply: string; quick: string[]; links: { label: string; href: string }[]; form: boolean };
@@ -11,8 +11,8 @@ const has = (m: string, re: RegExp) => re.test(m);
 
 type Knowledge = Awaited<ReturnType<typeof loadKnowledge>>;
 async function loadKnowledge() {
-  const [s, services, plans, faqs, bot] = await Promise.all([getSettings(), getServices(), getPlans(), getFaqs(), getPage("chatbot")]);
-  return { s, services, plans: plans.plans, faqs, bot: bot as { enabled: string; name: string; welcome: string; fallback: string; qa: { keywords: string; answer: string }[] } };
+  const [s, services, plans, faqs, bot, products] = await Promise.all([getSettings(), getServices(), getPlans(), getFaqs(), getPage("chatbot"), getProducts()]);
+  return { s, services, products, plans: plans.plans, faqs, bot: bot as { enabled: string; name: string; welcome: string; fallback: string; qa: { keywords: string; answer: string }[] } };
 }
 
 export async function getChatConfig() {
@@ -34,6 +34,7 @@ export function knowledgeText(k: Knowledge) {
     `Entreprise : ${c.name} (${c.tagline}), agence web à ${c.city}. Email : ${c.email}. Horaires : ${c.hours}. Zone : ${c.area}`,
     "Services :",
     ...k.services.map((x) => `- ${x.title} : ${x.tagline}. ${x.solution}${x.priceFrom ? ` Prix à partir de ${x.priceFrom.toLocaleString("fr-FR")} ${x.priceUnit}.` : ""}${x.duration ? ` Délai : ${x.duration}.` : ""}`),
+    ...(k.products.length ? ["Catalogue :", ...k.products.map((p) => `- ${p.title} (${p.category || "produit"}) : ${p.tagline} Prix : ${p.price} ${p.priceNote}.`)] : []),
     "Formules :",
     ...k.plans.map((p) => `- ${p.name} : ${p.price} € ${p.priceNote}. ${p.description} Inclus : ${p.features.join(", ")}.`),
     "FAQ :",
@@ -77,6 +78,8 @@ async function ruleAnswer(message: string, k: Knowledge): Promise<ChatReply> {
     const d = k.services.filter((x) => x.duration).slice(0, 4).map((x) => `${x.title} : ${x.duration}`);
     return out(d.length ? `Délais indicatifs — ${d.join(" · ")}. La date de livraison figure dans le devis.` : "Le délai dépend du projet ; il est écrit dans le devis.", ["Demander un devis"], false, [{ label: "Notre méthode", href: "/methode" }]);
   }
+  const pHit = k.products.find((x) => words(x.title).some((w) => w.length > 3 && m.includes(w)));
+  if (pHit) return out(`${pHit.title} : ${pHit.tagline} Prix : ${pHit.price} ${pHit.priceNote}.`, ["Demander ce produit", "Demander un devis"], false, [{ label: "Voir le produit", href: `/catalogue/${pHit.slug}` }]);
   // 5. services
   if (has(m, /\b(services?|proposez|propose|faites|prestations?)\b/) && !svHit) {
     return out(`Nous réalisons : ${k.services.map((x) => x.title).join(", ")}. Dites-moi ce qui vous intéresse et je détaille.`, k.services.slice(0, 4).map((x) => x.title), false, [{ label: "Tous les services", href: "/services" }]);

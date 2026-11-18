@@ -24,7 +24,8 @@ const RESSOURCES = [
 ];
 
 /** Barre d'en-tête : transparente en haut, floutée au scroll, claire ou sombre selon la section dessous, masquée en descendant. */
-export function Header({ services = [] }: { services?: Svc[] }) {
+export function Header({ services = [], hasCatalogue = false }: { services?: Svc[]; hasCatalogue?: boolean }) {
+  const menu = hasCatalogue ? [...links.slice(0, 3), { href: "/catalogue", label: "Catalogue", hint: "Licences, logiciels et produits numériques." }, ...links.slice(3)] : links;
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -93,7 +94,7 @@ export function Header({ services = [] }: { services?: Svc[] }) {
               <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="160px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-7" : "h-8"}`} />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex" data-mega onMouseLeave={() => openMega(null, 160)}>
-              {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/tarifs", label: "Tarifs" }, { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
+              {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/tarifs", label: "Tarifs" }, ...(hasCatalogue ? [{ href: "/catalogue", label: "Catalogue" }] : []), { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
                 const active = path === l.href || path.startsWith(l.href + "/") || (l.k === "ressources" && ["/blog", "/faq", "/rendez-vous", "/a-propos", "/contact"].some((p) => path.startsWith(p)));
                 if (l.k) {
                   const k = l.k;
@@ -150,7 +151,7 @@ export function Header({ services = [] }: { services?: Svc[] }) {
       <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" hidden={!open} data-tone="dark" className={`dark-section fixed inset-0 z-40 flex flex-col justify-between overflow-y-auto px-6 pb-10 pt-28 transition-opacity duration-500 md:px-16 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}>
         <div className="grid flex-1 gap-10 md:grid-cols-[1.2fr_1fr] md:items-center">
           <nav aria-label="Navigation du menu" className="flex flex-col">
-            {links.map((l, i) => (
+            {menu.map((l, i) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)} onMouseEnter={() => setHover(i)} onFocus={() => setHover(i)} onMouseLeave={() => setHover(null)} className="menu-row group flex items-baseline gap-5 border-b hair py-3 md:py-4">
                 <span className="muted w-8 text-[0.8rem] tabular-nums tracking-[0.2em]">{String(i + 1).padStart(2, "0")}</span>
                 <span className="menu-mask"><span className="menu-text font-serif text-[clamp(1.5rem,3vw,2.3rem)] leading-[1.1]" style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms", transform: open ? "none" : "translateY(110%)" }}>{l.label}</span></span>
@@ -160,7 +161,7 @@ export function Header({ services = [] }: { services?: Svc[] }) {
           <aside className="hidden md:block" aria-hidden="true">
             <div className="chamfer relative flex min-h-[260px] flex-col justify-between border hair p-8">
               <span className="font-serif text-[3.5rem] leading-none" style={{ color: "rgb(var(--accent-hi))" }}>{String((hover ?? 0) + 1).padStart(2, "0")}</span>
-              <p key={hover ?? 0} className="swap max-w-[28ch] text-lg">{links[hover ?? 0].hint}</p>
+              <p key={hover ?? 0} className="swap max-w-[28ch] text-lg">{menu[hover ?? 0].hint}</p>
             </div>
           </aside>
         </div>

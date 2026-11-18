@@ -103,3 +103,12 @@ export async function getService(slug: string) {
 export async function getPost(slug: string) {
   return (await getPosts()).find((p) => p.slug === slug) ?? null;
 }
+
+async function loadProducts() {
+  const rows = await db.product.findMany({ where: { published: true }, orderBy: { order: "asc" } });
+  return rows.map((p) => ({ ...p, features: parseJson<string[]>(p.features, []) }));
+}
+export const getProducts = cached(loadProducts, "products");
+export async function getProduct(slug: string) {
+  return (await getProducts()).find((p) => p.slug === slug) ?? null;
+}

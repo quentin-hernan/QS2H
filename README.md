@@ -131,3 +131,7 @@ Voir `docs/CHECKLIST-LANCEMENT.md`. Les identifiants légaux (SIREN, adresse, t�
 
 ### Accueil : une seule fois chaque information
 L'accueil présente (hero 3D + vue éclatée, engagements, services avec image de fond modifiable, visuels, avis réels, appel final) et renvoie vers les pages détaillées : réalisations, méthode, FAQ et tarifs ne sont plus répétés. Images et vidéos modifiables dans Admin > Pages et textes : Accueil (fond de « Ce que nous construisons » + visuels pleine largeur), Services, Tarifs, Méthode, À propos.
+
+### Catalogue (licences, logiciels, produits)
+- **Admin > Catalogue (produits)** : nom, catégorie, prix affiché, image, présentation, éléments inclus, SEO. Aucun produit publié = aucune trace sur le site. Dès qu'un produit est publié : page **/catalogue** (regroupée par catégorie), fiche **/catalogue/<produit>**, lien dans le menu et le plan du site, mention sur la page Services, et l'assistant le connaît.
+- Le bouton « Demander ce produit » ouvre le formulaire de devis pré-rempli. Visuels de la page : Admin > Pages et textes > Page Catalogue. **Pas de paiement en ligne ni de suivi de commande pour l'instant** : à ajouter plus tard (panier, paiement, statuts de commande) au-dessus de ce modèle.

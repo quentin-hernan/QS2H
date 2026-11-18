@@ -170,3 +170,8 @@ h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *, h4 * { font-style: normal !important; 
 .opt-row:hover > th { background: rgb(var(--acc-ctx) / 0.07); border-radius: 18px 0 0 18px; padding-left: 1rem; }
 .opt-row:hover > td { background: rgb(var(--acc-ctx) / 0.07); border-radius: 0 18px 18px 0; padding-right: 1rem; }
 @media (prefers-reduced-motion: reduce) { .plans .plan, .plan li { transition: none; } .plan:hover { transform: none; } }
+
+/* Catalogue */
+.product-card { transition: transform 0.5s var(--ease, ease), box-shadow 0.5s var(--ease, ease); }
+.product-card:hover, .product-card:focus-visible { transform: translateY(-6px); box-shadow: 0 30px 50px -30px rgb(28 28 28 / 0.35); }
+@media (prefers-reduced-motion: reduce) { .product-card:hover { transform: none; } }

@@ -28,7 +28,7 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
       const raw = localStorage.getItem(DRAFT);
       if (raw) { const d = JSON.parse(raw); reset({ ...d, consent: undefined, website: "", turnstileToken: "" }); }
     } catch {}
-    if (presetPlan) setValue("message", `Formule envisagée : ${presetPlan}.\n`, { shouldDirty: true });
+    if (presetPlan) setValue("message", `Demande concernant : ${presetPlan}.\n`, { shouldDirty: true });
   }, [reset, presetPlan, setValue]);
   useEffect(() => {
     const sub = watch((v) => { try { localStorage.setItem(DRAFT, JSON.stringify({ ...v, consent: undefined, turnstileToken: undefined })); } catch {} });

@@ -225,6 +225,12 @@ export const pageSchemas: PageSchema[] = [
     defaults: { media: [] },
   },
   {
+    key: "catalogue",
+    label: "Page Catalogue (visuels)",
+    fields: [mediaField],
+    defaults: { media: [] },
+  },
+  {
     key: "pricing",
     label: "Page Tarifs (visuels)",
     fields: [mediaField],

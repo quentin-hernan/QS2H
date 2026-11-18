@@ -355,3 +355,20 @@ model Appointment {
 
   @@index([startsAt, status])
 }
+
+model Product {
+  id             String  @id @default(cuid())
+  slug           String  @unique
+  title          String
+  tagline        String
+  description    String  @default("")
+  category       String  @default("")
+  price          String
+  priceNote      String  @default("HT")
+  image          String  @default("")
+  features       String  @default("[]") // JSON string[]
+  seoTitle       String  @default("")
+  seoDescription String  @default("")
+  order          Int     @default(0)
+  published      Boolean @default(false)
+}

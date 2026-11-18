@@ -6,12 +6,12 @@ import { Cursor } from "@/components/Cursor";
 import { Chatbot } from "@/components/Chatbot";
 import { LightDriver, PageTransitions, Preloader, ScrollUI } from "@/components/Motion";
 import { JsonLd } from "@/components/JsonLd";
-import { getProjects, getReviews, getServices, getSettings } from "@/lib/content";
+import { getProjects, getProducts, getReviews, getServices, getSettings } from "@/lib/content";
 import { ViewerProvider } from "@/components/ProjectViewer";
 import { orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [s, reviews, projects, services] = await Promise.all([getSettings(), getReviews(), getProjects(), getServices()]);
+  const [s, reviews, projects, services, products] = await Promise.all([getSettings(), getReviews(), getProjects(), getServices(), getProducts()]);
   const vp = projects.filter((p) => p.planes.length).map((p) => ({ slug: p.slug, title: p.title, client: p.client, sector: p.sector, year: p.year, isExample: p.isExample, url: p.url, summary: p.summary, planes: p.planes, meta: p.meta }));
   // AggregateRating uniquement avec de vrais avis (jamais avec les avis d'exemple)
   const real = reviews.filter((r) => !r.isExample);
@@ -26,7 +26,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <PageTransitions />
       <LightDriver />
       <ScrollUI />
-      <Header services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline }))} />
+      <Header hasCatalogue={products.length > 0} services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline }))} />
       <ViewerProvider projects={vp}>
         <main id="contenu">{children}</main>
       </ViewerProvider>
