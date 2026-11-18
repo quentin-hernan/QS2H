@@ -13,7 +13,7 @@ import { pageSchemas } from "@/lib/defaults";
 import { cleanHtml } from "@/lib/sanitize";
 import { esc, layout, sendMail } from "@/lib/email";
 import { SITE_URL } from "@/lib/utils";
-import { captureSite, captureViaWorker, storeCapture } from "@/lib/capture";
+import { captureSite, captureViaService, captureViaWorker, storeCapture } from "@/lib/capture";
 import { saveImage } from "@/lib/media";
 import { removePrivate, removePublic } from "@/lib/storage";
 
@@ -370,15 +370,18 @@ export async function captureProject(url: string, title: string) {
   try {
     const { assertPublicUrl } = await import("@/lib/ssrf");
     await assertPublicUrl(url);
-    const raw = process.env.CAPTURE_WORKER_URL ? await captureViaWorker(url) : await captureSite(url);
+    // 1) serveur de capture dédié s'il est configuré, 2) navigateur de la machine, 3) service de capture public (aucune installation)
+    let raw;
+    if (process.env.CAPTURE_WORKER_URL) raw = await captureViaWorker(url);
+    else { try { raw = await captureSite(url); } catch (err) { console.error("capture locale", (err as Error).message); raw = await captureViaService(url); } }
     const out = await storeCapture(raw, title || "projet");
     await audit(s.email, "capture de site", "project", url);
     return { ok: true as const, planes: out.planes, meta: out.meta, cover: out.cover };
   } catch (e) {
     const m = (e as Error).message || "";
-    const known = /URL|adresse|Adresse|port|domaine|Redirection|répondu|refusé|identifiants/.test(m);
+    const known = /URL|adresse|Adresse|port|domaine|Redirection|répondu|refusé|identifiants|Quota|service de capture|Capture/.test(m);
     console.error("capture", m);
-    return { ok: false as const, error: known ? m : "Capture impossible (navigateur indisponible ou site inaccessible). Ajoutez les images à la main ou configurez CAPTURE_WORKER_URL." };
+    return { ok: false as const, error: known ? m : "Capture impossible (site inaccessible ou protégé). Réessayez, ou ajoutez les images à la main." };
   }
 }
 

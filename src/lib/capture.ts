@@ -39,3 +39,46 @@ export async function captureViaWorker(url: string): Promise<Captured> {
   const j = (await r.json()) as { meta: CaptureMeta; cover?: string; planes: (Omit<RawPlane, "png"> & { png: string })[] };
   return { meta: j.meta, cover: j.cover ? Buffer.from(j.cover, "base64") : undefined, planes: j.planes.map((p) => ({ ...p, png: Buffer.from(p.png, "base64") })) };
 }
+
+/**
+ * Capture sans navigateur ni serveur à déployer : un service de capture public (Microlink, gratuit sans clé, quota limité)
+ * prend la page en entier ; on la découpe ici en plans (navigation, accueil, sections, pied de page) + une vue mobile.
+ * MICROLINK_API_KEY (facultative) lève le quota gratuit.
+ */
+export async function captureViaService(url: string): Promise<Captured> {
+  const sharp = (await import("sharp")).default;
+  const call = async (q: Record<string, string>) => {
+    const p = new URLSearchParams({ url, screenshot: "true", meta: "true", ...q });
+    const r = await fetch(`https://api.microlink.io/?${p}`, { headers: process.env.MICROLINK_API_KEY ? { "x-api-key": process.env.MICROLINK_API_KEY } : {}, signal: AbortSignal.timeout(60_000) });
+    const j = (await r.json().catch(() => null)) as { status?: string; message?: string; data?: { title?: string; description?: string; lang?: string; publisher?: string; screenshot?: { url?: string } } } | null;
+    if (!j || j.status !== "success" || !j.data?.screenshot?.url) throw new Error(r.status === 429 ? "Quota du service de capture atteint pour aujourd'hui, réessayez demain ou ajoutez les images à la main." : "Le service de capture n'a pas pu ouvrir ce site.");
+    const shot = new URL(j.data.screenshot.url);
+    if (shot.protocol !== "https:") throw new Error("Capture invalide.");
+    const img = await fetch(shot, { signal: AbortSignal.timeout(60_000) });
+    if (!img.ok) throw new Error("Capture illisible.");
+    return { data: j.data, png: Buffer.from(await img.arrayBuffer()) };
+  };
+  const [desk, mob] = await Promise.all([
+    call({ fullPage: "true", "viewport.width": "1440", "viewport.height": "900", waitForTimeout: "2500" }),
+    call({ "viewport.width": "390", "viewport.height": "844", "viewport.isMobile": "true", "viewport.hasTouch": "true", "viewport.deviceScaleFactor": "2", waitForTimeout: "2000" }).catch(() => null),
+  ]);
+  const meta0 = await sharp(desk.png, { limitInputPixels: 400_000_000 }).metadata();
+  const scale = (meta0.width || 1440) / 1440;
+  const pageH = Math.min(Math.round((meta0.height || 900) / scale), 14_000);
+  const cut = async (top: number, h: number) => {
+    const t = Math.round(top * scale), hh = Math.min(Math.round(h * scale), (meta0.height || 0) - t);
+    return hh > 20 ? sharp(desk.png, { limitInputPixels: 400_000_000 }).extract({ left: 0, top: t, width: meta0.width || 1440, height: hh }).resize({ width: 1440 }).png().toBuffer() : null;
+  };
+  const planes: RawPlane[] = [];
+  const add = async (name: string, kind: PlaneKind, top: number, h: number) => { const png = await cut(top, h); if (png) planes.push({ name, kind, caption: "", depth: planes.length, png }); };
+  const NAV = 90, FOOT = pageH > 2400 ? 520 : 0;
+  await add("Navigation", "nav", 0, NAV);
+  await add("Accueil", "hero", NAV, Math.min(820, pageH - NAV));
+  const end = pageH - FOOT;
+  for (let y = NAV + 820, i = 1; y < end - 120 && i <= 5; y += 900, i++) await add(`Section ${i}`, "section", y, Math.min(900, end - y));
+  if (FOOT) await add("Pied de page", "footer", pageH - FOOT, FOOT);
+  if (mob) planes.push({ name: "Version mobile", kind: "mobile", caption: "", depth: planes.length, png: await sharp(mob.png).resize({ width: 780 }).png().toBuffer() });
+  const cover = await cut(0, 900) ?? undefined;
+  const d = desk.data;
+  return { planes, cover, meta: { capturedAt: new Date().toISOString(), url, title: d.title || "", description: d.description || "", h1: d.title ? [d.title] : [], headings: {}, lang: d.lang || "", technologies: [], lighthouse: null, siteName: d.publisher || "" } };
+}
