@@ -20,6 +20,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const heroEl = useRef<HTMLElement>(null);
   const expEl = useRef<HTMLElement>(null);
+  const layerEl = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"pending" | "3d" | "static">("pending");
   const [ready, setReady] = useState(false);
   const [running, setRunning] = useState(true);
@@ -71,6 +72,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
         onUpdate: (s) => {
           stage.progress = s.progress;
           const p = s.progress;
+          if (layerEl.current) layerEl.current.style.opacity = String(p > 0.9 ? Math.max(0, 1 - (p - 0.9) / 0.08) : 1); // fondu avant la sortie de la section épinglée
           const a = p < 0.2 || p > 0.88 ? -1 : Math.min(layers.length - 1, Math.floor(((p - 0.2) / 0.68) * layers.length));
           stage.active = a;
           if (a !== last) { last = a; setActive(a); }
@@ -78,7 +80,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
         },
       });
     }, wrap);
-    return () => { ctx.revert(); stage.heroOut = 0; stage.progress = 0; stage.active = -1; };
+    return () => { ctx.revert(); if (layerEl.current) layerEl.current.style.opacity = "1"; stage.heroOut = 0; stage.progress = 0; stage.active = -1; };
   }, [mode, layers.length]);
 
   const intro = active === -1 && prog < 0.5;
@@ -86,7 +88,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
   return (
     <div ref={wrap} className="dark-section relative overflow-clip">
       {/* Couche 3D (sticky derrière le texte de premier plan, devant le texte d'arrière-plan) */}
-      <div className="pointer-events-none sticky top-0 z-[1] -mb-[100svh] h-[100svh] w-full" style={{ opacity: 1 }} aria-hidden="true">
+      <div ref={layerEl} className="pointer-events-none sticky top-0 z-[1] -mb-[100svh] h-[100svh] w-full" aria-hidden="true">
         {/* repli statique : affiché pendant le chargement, sans WebGL, ou sur appareil faible */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero-fallback.webp" alt="" width={1600} height={1000} fetchPriority="high" className={`absolute inset-y-0 right-0 my-auto h-auto w-[55%] max-w-[800px] translate-y-[9%] object-contain transition-opacity duration-700 max-md:inset-x-0 max-md:bottom-[-4%] max-md:top-auto max-md:right-auto max-md:mx-auto max-md:my-0 max-md:w-[135%] ${ready ? "opacity-0" : "opacity-100"}`} />

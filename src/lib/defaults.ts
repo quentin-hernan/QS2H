@@ -42,7 +42,7 @@ export const defaultSettings = {
 export type FieldDef = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "list";
+  type: "text" | "textarea" | "list" | "media";
   hint?: string;
   itemFields?: { name: string; label: string; type: "text" | "textarea" | "media" }[];
 };
@@ -85,6 +85,7 @@ export const pageSchemas: PageSchema[] = [
       },
       { name: "servicesTitle", label: "Titre de la section services", type: "text" },
       { name: "servicesLead", label: "Introduction des services", type: "textarea" },
+      { name: "servicesBg", label: "Image ou vidéo de fond de « Ce que nous construisons » (facultatif)", type: "media" },
       { name: "projectsTitle", label: "Titre de la section réalisations", type: "text" },
       { name: "ctaTitle", label: "Titre de l'appel final", type: "text" },
       { name: "ctaText", label: "Texte de l'appel final", type: "textarea" },
@@ -105,6 +106,7 @@ export const pageSchemas: PageSchema[] = [
         { title: "Référencement", text: "Structure, balises, données structurées, fiche Google : les bases pour apparaître quand on cherche votre métier près de chez vous." },
         { title: "Performance", text: "Images optimisées, chargement différé, mobile d'abord. Un site rapide est mieux classé et fait plus de demandes de contact." },
       ],
+      servicesBg: "",
       servicesTitle: "Ce que nous construisons",
       servicesLead: "Six services, une même exigence : un site que vous êtes fier de montrer et qui sert votre activité.",
       projectsTitle: "Réalisations",
@@ -215,6 +217,18 @@ export const pageSchemas: PageSchema[] = [
       fallback: "Je n'ai pas la réponse précise à cette question. Je peux transmettre votre message à l'équipe, qui vous répond sous 24 heures ouvrées.",
       qa: [],
     },
+  },
+  {
+    key: "services",
+    label: "Page Services (visuels)",
+    fields: [mediaField],
+    defaults: { media: [] },
+  },
+  {
+    key: "pricing",
+    label: "Page Tarifs (visuels)",
+    fields: [mediaField],
+    defaults: { media: [] },
   },
 ];
 

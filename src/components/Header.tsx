@@ -88,9 +88,9 @@ export function Header({ services = [] }: { services?: Svc[] }) {
     <>
       <header className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${hidden && !open ? "-translate-y-full" : "translate-y-0"}`} data-header>
         <div className={`${bg} backdrop-blur-md transition-[background-color,border-color,backdrop-filter] duration-300`} style={{ borderColor: scrolled && !open ? line : "transparent", color: light ? "#F8F8F7" : "#1C1C1C", ["--acc-ctx" as string]: light ? "var(--accent-hi)" : "var(--accent)" }}>
-          <div className={`container flex max-w-[1440px] items-center justify-between transition-[height] duration-300 ease-out ${scrolled ? "h-[60px]" : "h-[76px]"}`}>
+          <div className={`container flex max-w-[1440px] items-center justify-between transition-[height] duration-300 ease-out ${scrolled ? "h-[54px]" : "h-[64px]"}`}>
             <Link href="/" aria-label="QS2H — accueil" className="relative z-[60] block shrink-0">
-              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="160px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-9" : "h-11"}`} />
+              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="160px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-7" : "h-8"}`} />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex" data-mega onMouseLeave={() => openMega(null, 160)}>
               {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/tarifs", label: "Tarifs" }, { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
@@ -116,7 +116,7 @@ export function Header({ services = [] }: { services?: Svc[] }) {
             <div className="relative z-[60] flex items-center gap-3">
               <Link href="/compte" className="btn btn-outline hidden !min-h-[44px] !px-5 !py-2.5 text-[0.88rem] xl:inline-flex">Espace client</Link>
               <Link href="/contact" className="btn btn-primary btn-fill !min-h-[44px] !px-5 !py-2.5 text-[0.9rem]"><span className="sm:hidden">Devis</span><span className="hidden sm:inline">Demander un devis</span></Link>
-              <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem]" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
+              <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem] lg:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
             </div>
           </div>
           {mega && (
@@ -153,13 +153,13 @@ export function Header({ services = [] }: { services?: Svc[] }) {
             {links.map((l, i) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)} onMouseEnter={() => setHover(i)} onFocus={() => setHover(i)} onMouseLeave={() => setHover(null)} className="menu-row group flex items-baseline gap-5 border-b hair py-3 md:py-4">
                 <span className="muted w-8 text-[0.8rem] tabular-nums tracking-[0.2em]">{String(i + 1).padStart(2, "0")}</span>
-                <span className="menu-mask"><span className="menu-text font-serif text-[clamp(2rem,6vw,4.4rem)] leading-[1.05]" style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms", transform: open ? "none" : "translateY(110%)" }}>{l.label}</span></span>
+                <span className="menu-mask"><span className="menu-text font-serif text-[clamp(1.5rem,3vw,2.3rem)] leading-[1.1]" style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms", transform: open ? "none" : "translateY(110%)" }}>{l.label}</span></span>
               </Link>
             ))}
           </nav>
           <aside className="hidden md:block" aria-hidden="true">
             <div className="chamfer relative flex min-h-[260px] flex-col justify-between border hair p-8">
-              <span className="font-serif text-[7rem] leading-none" style={{ color: "rgb(var(--accent-hi))" }}>{String((hover ?? 0) + 1).padStart(2, "0")}</span>
+              <span className="font-serif text-[3.5rem] leading-none" style={{ color: "rgb(var(--accent-hi))" }}>{String((hover ?? 0) + 1).padStart(2, "0")}</span>
               <p key={hover ?? 0} className="swap max-w-[28ch] text-lg">{links[hover ?? 0].hint}</p>
             </div>
           </aside>

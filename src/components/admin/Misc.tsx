@@ -97,6 +97,8 @@ export function PageEditor({ schema, initial, versions }: { schema: PageSchema; 
                   </li>))}</ul>
                 <button type="button" className="btn btn-ghost mt-3 !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => set(f.name, [...(v[f.name] as unknown[]), Object.fromEntries(f.itemFields!.map((i) => [i.name, ""]))])}>+ Ajouter</button>
               </fieldset>
+            ) : f.type === "media" ? (
+              <MediaField id={f.name} label={f.label} value={(v[f.name] as string) ?? ""} onChange={(url) => set(f.name, url)} />
             ) : f.type === "textarea" ? (
               <div><label className="label" htmlFor={f.name}>{f.label}</label><textarea id={f.name} rows={f.name === "story" ? 10 : 4} className="field" value={v[f.name] ?? ""} onChange={(e) => set(f.name, e.target.value)} /></div>
             ) : (

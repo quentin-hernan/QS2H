@@ -65,7 +65,7 @@ _prototype/              première maquette HTML (archive, ignorée par le build
 - Les vidéos jouent en boucle, muettes, uniquement quand elles sont visibles (et pas du tout avec « réduire les animations »). Le type est contrôlé sur le contenu réel du fichier. Composants : `MediaBand.tsx`, `MediaPicker.tsx`.
 
 ### Assistant (chatbot)
-- Bouton flottant (robot bleu lumineux) → fenêtre de discussion : réponses sur les services, formules, délais, FAQ et horaires **tirées de la base** (rien d'inventé), boutons de réponse rapide, liens vers les pages, formulaire « laisser mes coordonnées » (consentement obligatoire) qui crée une demande dans **Demandes reçues** (source « chatbot ») et envoie un email.
+- Bouton flottant sobre (bulle de discussion) → fenêtre de discussion : réponses sur les services, formules, délais, FAQ et horaires **tirées de la base** (rien d'inventé), boutons de réponse rapide, liens vers les pages, formulaire « laisser mes coordonnées » (consentement obligatoire) qui crée une demande dans **Demandes reçues** (source « chatbot ») et envoie un email.
 - **Admin > Pages et textes > Assistant (chatbot)** : activer/désactiver, message d'accueil, réponse par défaut, **réponses sur mesure** (mots-clés → réponse, prioritaires). **Admin > Assistant (conversations)** : historique lisible.
 - Fonctionne sans clé d'API (moteur à règles). Avec `ANTHROPIC_API_KEY` (et `CHATBOT_MODEL` en option), les réponses libres passent par Claude, limité à la base de connaissances du site.
 - RGPD : conversations conservées 90 jours (purge dans `scripts/purge-inactive.ts`), aucune IP stockée, mention affichée dans la fenêtre. Pensez à citer l'assistant dans la politique de confidentialité.
@@ -76,7 +76,6 @@ _prototype/              première maquette HTML (archive, ignorée par le build
 - **En-tête** : méga-menus « Services » (liste issue de l'admin) et « Ressources » (blog, FAQ, rendez-vous, à propos, contact), ouverture au survol avec délai ou au clic, fermeture par Échap.
 
 ### Scène 3D
-- `components/SiteBuilder.tsx` : scène 3D CSS liée au métier — une page web se construit bloc par bloc au scroll (couches de l'accueil éditables dans l'admin). `components/HomeStage.tsx` : hero + section épinglée « vue éclatée » (GSAP ScrollTrigger).
 - `components/scene/StageCanvas.tsx` : portable MacBook chargé depuis `public/models/macbook.fbx` (FBXLoader ; modèle normalisé : écran de 2,9 unités de large, base posée sur y = 0), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables. Les pages devant la couche active s'effacent (fondu court) et le portable reste visible jusqu'au bout. Les sources du modèle (`.blend`, `.obj`, textures) sont dans `3d-model/`, ignoré par git.
 - `components/scene/GalleryCanvas.tsx` : galerie d'écrans suspendus (drag, flèches, relief, clic → page projet).
 - Chargement **différé** après le premier rendu (le H1 est le LCP), **repli statique** (`public/hero-fallback.webp`) sans WebGL / appareil faible / `prefers-reduced-motion`, rendu **mis en pause** hors écran et onglet masqué, pixel ratio plafonné à 1,5 sur mobile.
@@ -129,3 +128,6 @@ Tests Playwright : 61 tests (pages publiques desktop + mobile, vue éclatée, de
 ## 8. À compléter avant lancement
 
 Voir `docs/CHECKLIST-LANCEMENT.md`. Les identifiants légaux (SIREN, adresse, téléphone…) sont à saisir dans **/admin > Paramètres entreprise** : les mentions légales, la politique de confidentialité, les CGV et les données structurées s'en nourrissent.
+
+### Accueil : une seule fois chaque information
+L'accueil présente (hero 3D + vue éclatée, engagements, services avec image de fond modifiable, visuels, avis réels, appel final) et renvoie vers les pages détaillées : réalisations, méthode, FAQ et tarifs ne sont plus répétés. Images et vidéos modifiables dans Admin > Pages et textes : Accueil (fond de « Ce que nous construisons » + visuels pleine largeur), Services, Tarifs, Méthode, À propos.

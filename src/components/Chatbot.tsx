@@ -6,17 +6,12 @@ type Msg = { role: "user" | "bot"; text: string; links?: { label: string; href: 
 type Cfg = { enabled: boolean; name: string; welcome: string };
 const STORE = "qs2h-chat-v1";
 
-/** Robot de l'assistant : antenne, tête arrondie, oreillettes, bulle de discussion à trois points (lueur bleue). */
-export function BotIcon({ size = 36, glow = true }: { size?: number; glow?: boolean }) {
+/** Icône de discussion : une bulle, sans effet. */
+export function BotIcon({ size = 26 }: { size?: number; glow?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false" style={glow ? { filter: "drop-shadow(0 0 6px rgb(127 169 217 / 0.65))" } : undefined}>
-      <rect x="30" y="9" width="4" height="8" rx="2" fill="#2A5587" />
-      <circle cx="32" cy="7" r="5" fill="#4F83B8" />
-      <rect x="3" y="26" width="7" height="16" rx="3.5" fill="#4F83B8" />
-      <rect x="54" y="26" width="7" height="16" rx="3.5" fill="#4F83B8" />
-      <path d="M17 17h30a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8H27l-9 7 1.6-8.4A8 8 0 0 1 9 45V25a8 8 0 0 1 8-8z" fill="#12304F" stroke="#2A5587" strokeWidth="1.5" />
-      <path d="M21 31q3-3 6 0M37 31q3-3 6 0" stroke="#7FA9D9" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.9" />
-      <circle cx="25" cy="42" r="2.6" fill="#7FA9D9" /><circle cx="32" cy="42" r="2.6" fill="#7FA9D9" /><circle cx="39" cy="42" r="2.6" fill="#7FA9D9" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" />
+      <path d="M8.5 12h.01M12 12h.01M15.5 12h.01" strokeWidth="2.4" />
     </svg>
   );
 }
@@ -30,7 +25,6 @@ export function Chatbot() {
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(false);
   const [sent, setSent] = useState(false);
-  const [hint, setHint] = useState(false);
   const [err, setErr] = useState("");
   const idRef = useRef<string>("");
   const log = useRef<HTMLDivElement>(null);
@@ -50,17 +44,9 @@ export function Chatbot() {
     }).catch(() => {});
   }, []);
   useEffect(() => { try { if (msgs.length) sessionStorage.setItem(STORE, JSON.stringify({ id: idRef.current, msgs: msgs.slice(-40), quick })); } catch { /* navigation privée */ } }, [msgs, quick]);
-  // bulle d'invitation une seule fois par session
-  useEffect(() => {
-    let seen = false;
-    try { seen = !!sessionStorage.getItem("qs2h-chat-hint"); } catch { /* */ }
-    if (seen) return;
-    const t = setTimeout(() => { setHint(true); try { sessionStorage.setItem("qs2h-chat-hint", "1"); } catch { /* */ } }, 7000);
-    return () => clearTimeout(t);
-  }, []);
   useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: "smooth" }); }, [msgs, busy, form, sent]);
   useEffect(() => {
-    if (open) { setHint(false); setTimeout(() => input.current?.focus(), 80); }
+    if (open) { setTimeout(() => input.current?.focus(), 80); }
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape" && open) { setOpen(false); launcher.current?.focus(); } };
     addEventListener("keydown", esc);
     return () => removeEventListener("keydown", esc);
@@ -114,8 +100,8 @@ export function Chatbot() {
       {open && (
         <section role="dialog" aria-label={cfg.name} aria-modal="false" className="qchat-panel">
           <header className="qchat-head">
-            <span className="qchat-avatar"><BotIcon size={30} /></span>
-            <span className="min-w-0 flex-1"><strong className="block truncate">{cfg.name}</strong><span className="qchat-sub"><i /> En ligne · répond immédiatement</span></span>
+            <span className="qchat-avatar"><span className="qchat-mono">Q</span></span>
+            <span className="min-w-0 flex-1"><strong className="block truncate">{cfg.name}</strong><span className="qchat-sub">Assistant automatique</span></span>
             <button type="button" onClick={reset} className="qchat-icon" aria-label="Recommencer la conversation" title="Recommencer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg></button>
             <button type="button" onClick={() => { setOpen(false); launcher.current?.focus(); }} className="qchat-icon" aria-label="Fermer l'assistant"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
           </header>
@@ -123,14 +109,13 @@ export function Chatbot() {
           <div ref={log} className="qchat-log" role="log" aria-live="polite" aria-label="Conversation">
             {msgs.map((m, i) => (
               <div key={i} className={`qchat-row ${m.role}`}>
-                {m.role === "bot" && <span className="qchat-mini"><BotIcon size={18} glow={false} /></span>}
                 <div className="qchat-bubble">
                   <p>{m.text}</p>
                   {m.links && m.links.length > 0 && (<div className="qchat-links">{m.links.map((l) => (<Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="qchat-link">{l.label} →</Link>))}</div>)}
                 </div>
               </div>
             ))}
-            {busy && (<div className="qchat-row bot"><span className="qchat-mini"><BotIcon size={18} glow={false} /></span><div className="qchat-bubble qchat-typing" aria-label="L'assistant écrit"><i /><i /><i /></div></div>)}
+            {busy && (<div className="qchat-row bot"><div className="qchat-bubble qchat-typing" aria-label="L'assistant écrit"><i /><i /><i /></div></div>)}
 
             {form && !sent && (
               <form onSubmit={submitLead} className="qchat-form" noValidate>
@@ -158,10 +143,8 @@ export function Chatbot() {
         </section>
       )}
 
-      {!open && hint && (<button type="button" className="qchat-hint" onClick={() => setOpen(true)}>Une question sur votre site&nbsp;?</button>)}
-      <button ref={launcher} type="button" className="qchat-launch" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}>
-        <span className="qchat-halo" aria-hidden="true" />
-        {open ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg> : <BotIcon size={38} />}
+            <button ref={launcher} type="button" className="qchat-launch" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}>
+        {open ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg> : <BotIcon size={26} />}
       </button>
     </div>
   );

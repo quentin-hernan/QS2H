@@ -3,7 +3,6 @@ import { Inter, Archivo } from "next/font/google";
 import "./globals.css";
 import "./motion.css";
 import "./scenes.css";
-import "./sitebuilder.css";
 import "./chatbot.css";
 import { getSettings } from "@/lib/content";
 import { PRELOADER_SKIP } from "@/lib/motion-const";

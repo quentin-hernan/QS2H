@@ -4,6 +4,13 @@ import { usePathname, useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+/** Remise en haut de page : avec Lenis, window.scrollTo seul est ré-écrasé par la position interne de Lenis. */
+function toTop() {
+  const l = (window as unknown as { __lenis?: { scrollTo: (n: number, o: object) => void } }).__lenis;
+  if (l) l.scrollTo(0, { immediate: true, force: true });
+  else window.scrollTo(0, 0);
+  setTimeout(() => ScrollTrigger.refresh(), 120);
+}
 const reduced = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ------------------------------------------------------------------ Préchargeur
@@ -53,13 +60,13 @@ export function PageTransitions() {
       else {
         const main = document.getElementById("contenu");
         main?.classList.add("route-out");
-        go().then(() => { main?.classList.remove("route-out"); main?.classList.add("route-in"); setTimeout(() => main?.classList.remove("route-in"), 450); window.scrollTo(0, 0); });
+        go().then(() => { main?.classList.remove("route-out"); main?.classList.add("route-in"); setTimeout(() => main?.classList.remove("route-in"), 450); toTop(); });
       }
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, [router]);
-  useEffect(() => { if (!reduced()) window.scrollTo(0, 0); }, [path]);
+  useEffect(() => { if (!reduced() && !location.hash) toTop(); }, [path]);
   return null;
 }
 

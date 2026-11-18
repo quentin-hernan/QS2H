@@ -5,7 +5,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/Reveal";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
-import { getFaqs, getPlans } from "@/lib/content";
+import { MediaBand, type MediaItemT } from "@/components/MediaBand";
+import { getFaqs, getPage, getPlans } from "@/lib/content";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -15,7 +16,7 @@ export const metadata = buildMetadata({
 });
 
 export default async function Tarifs() {
-  const [{ plans, options }, faqs] = await Promise.all([getPlans(), getFaqs()]);
+  const [{ plans, options }, faqs, tp] = await Promise.all([getPlans(), getFaqs(), getPage("pricing")]);
   const f = faqs.slice(0, 3).map((x) => ({ q: x.question, a: x.answer }));
   return (
     <>
@@ -27,10 +28,10 @@ export default async function Tarifs() {
       <section className="light-section py-20 md:py-28">
         <div className="container">
           <PlanDevices names={plans.map((p) => p.name)} />
-          <div className="grid gap-5 lg:grid-cols-3">
+          <div className="plans grid gap-5 lg:grid-cols-3">
             {plans.map((p, i) => (
               <Reveal key={p.id} delay={i * 0.08}>
-                <article data-plan={i} className={`flex h-full flex-col chamfer border p-8 md:p-10 ${p.highlighted ? "dark-section border-transparent shadow-[0_40px_80px_-40px_rgba(12,14,17,.7)]" : "hair"}`}>
+                <article data-plan={i} className={`plan flex h-full flex-col rounded-[2rem] border p-8 md:p-10 ${p.highlighted ? "dark-section border-transparent shadow-[0_40px_80px_-40px_rgba(12,14,17,.7)]" : "hair"}`}>
                   <p className="acc mb-3 min-h-[1.2em] text-[0.75rem] font-medium uppercase tracking-[0.16em]">{p.highlighted ? "Le plus demandé" : ""}</p>
                   <h2 className="text-h3 font-medium">{p.name}</h2>
                   <p className="muted mt-2 min-h-[3em] text-[0.95rem] leading-snug">{p.description}</p>
@@ -54,7 +55,7 @@ export default async function Tarifs() {
               <thead className="sr-only"><tr><th>Option</th><th>Tarif</th></tr></thead>
               <tbody>
                 {options.map((o) => (
-                  <tr key={o.id} className="border-t hair last:border-b align-top">
+                  <tr key={o.id} className="opt-row border-t hair last:border-b align-top">
                     <th scope="row" className="py-6 pr-6 font-medium"><span className="block text-[1.15rem]">{o.name}</span><span className="muted mt-1 block max-w-[44ch] text-[0.93rem] font-normal">{o.description}</span></th>
                     <td className="whitespace-nowrap py-6 text-right text-[1.1rem]">{o.price}</td>
                   </tr>
@@ -72,6 +73,7 @@ export default async function Tarifs() {
           <div className="lg:col-span-8"><Faq items={f} /></div>
         </div>
       </section>
+      {((tp.media ?? []) as MediaItemT[]).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}
       <CtaBand title="Votre devis, sous 24 h." text="Décrivez votre projet en quelques lignes : budget, délai, objectifs. Nous revenons vers vous avec un prix fixe." />
     </>
   );

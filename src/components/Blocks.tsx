@@ -4,21 +4,6 @@ import { CountUp } from "./CountUp";
 import { FrameDraw } from "./Motion";
 import { euro } from "@/lib/utils";
 
-/** Bandeau de mots-clés (services) qui défile lentement dans une bande biseautée. Rôle : montrer l'étendue de l'offre d'un coup d'œil. */
-export function KeywordBand({ words }: { words: string[] }) {
-  const row = [...words, ...words];
-  return (
-    <div className="light-section py-6" aria-label="Nos services en un coup d'œil" role="group">
-      <div className="band" aria-hidden="true">
-        <div className="band-track font-serif text-[clamp(1.6rem,3.4vw,3rem)] font-extrabold tracking-tight">
-          {[...row, ...row].map((w, i) => (<span key={i} className="flex items-center gap-12">{w}<span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "rgb(var(--accent))" }} /></span>))}
-        </div>
-      </div>
-      <ul className="sr-only">{words.map((w) => (<li key={w}>{w}</li>))}</ul>
-    </div>
-  );
-}
-
 export function TrustBar({ items }: { items: { value: string; label: string }[] }) {
   return (
     <section className="light-section border-b hair" aria-label="Nos engagements">
@@ -35,10 +20,18 @@ export function TrustBar({ items }: { items: { value: string; label: string }[] 
 }
 
 type Svc = { slug: string; title: string; tagline: string; priceFrom: number; priceUnit: string };
-export function ServicesList({ services, title, lead, theme = "light" }: { services: Svc[]; title: string; lead: string; theme?: "light" | "dark" }) {
+export function ServicesList({ services, title, lead, theme = "light", bg = "" }: { services: Svc[]; title: string; lead: string; theme?: "light" | "dark"; bg?: string }) {
+  const dark = theme === "dark" || !!bg;
+  const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(bg);
   return (
-    <section className={`${theme === "dark" ? "dark-section" : "light-section"} py-24 md:py-36`} aria-labelledby="services-h">
-      <div className="container grid gap-12 lg:grid-cols-12">
+    <section className={`${dark ? "dark-section" : "light-section"} relative overflow-hidden py-24 md:py-36`} aria-labelledby="services-h">
+      {bg && (
+        <>
+          {video ? <video src={bg} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={bg} alt="" loading="lazy" decoding="async" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />}
+          <div className="absolute inset-0 bg-ink-900/75" aria-hidden="true" />
+        </>
+      )}
+      <div className="container relative z-10 grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-32">
             <p className="eyebrow mb-6">Services</p>
