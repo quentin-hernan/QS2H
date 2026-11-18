@@ -2,6 +2,7 @@ import { requireClient } from "@/lib/client-auth";
 import { db } from "@/lib/db";
 import { logoutClient } from "../actions";
 import { EspaceNav } from "@/components/EspaceNav";
+import { VerifyBanner } from "@/components/VerifyBanner";
 
 /** Espace client : coque d'application (navigation latérale, compteurs) partagée par toutes les pages du compte. */
 export default async function Espace({ children }: { children: React.ReactNode }) {
@@ -24,7 +25,7 @@ export default async function Espace({ children }: { children: React.ReactNode }
             <EspaceNav badges={{ "/compte/messages": unread, "/compte/documents": toValidate, "/compte/demandes": openReq }} />
             <form action={logoutClient} className="mt-4 hidden lg:block"><button className="muted px-4 text-sm underline">Me déconnecter</button></form>
           </aside>
-          <div className="min-w-0">{children}</div>
+          <div className="min-w-0">{!c.emailVerifiedAt && <VerifyBanner email={c.email} />}{children}</div>
         </div>
       </div>
     </section>

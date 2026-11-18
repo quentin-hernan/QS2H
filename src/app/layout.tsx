@@ -6,6 +6,7 @@ import "./scenes.css";
 import "./chatbot.css";
 import "./home.css";
 import "./theme.css";
+import "./shop.css";
 import { getSettings } from "@/lib/content";
 import { PRELOADER_SKIP } from "@/lib/motion-const";
 import { SITE_URL, hexToRgbTriplet, lighten } from "@/lib/utils";
@@ -16,7 +17,7 @@ const serif = Archivo({ subsets: ["latin"], axes: ["wdth"], weight: "variable", 
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "QS2H — Création de sites web pour entreprises à Bordeaux", template: "%s | QS2H" },
+  title: { default: "QS2H — Création de sites web pour entreprises à La Rochelle", template: "%s | QS2H" },
   description: "QS2H conçoit des sites vitrines, sur mesure et e-commerce pour TPE, PME et indépendants : design soigné, chargement rapide, référencement Google.",
   applicationName: "QS2H",
   icons: { icon: "/icon-512.png", apple: "/apple-touch-icon.png" },

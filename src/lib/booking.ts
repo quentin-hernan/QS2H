@@ -7,7 +7,7 @@ import { defaultSettings } from "./defaults";
 export const KINDS = [
   { id: "decouverte", label: "Appel découverte", minutes: 20, text: "Par téléphone, pour cadrer votre besoin." },
   { id: "visio", label: "Visio", minutes: 45, text: "Présentation de votre projet et démonstration." },
-  { id: "sur-place", label: "Rendez-vous sur place", minutes: 60, text: "À Bordeaux ou en Gironde." },
+  { id: "sur-place", label: "Rendez-vous sur place", minutes: 60, text: "À La Rochelle ou en Charente-Maritime." },
 ] as const;
 export type KindId = (typeof KINDS)[number]["id"];
 export const kindById = (id: string) => KINDS.find((k) => k.id === id);

@@ -127,7 +127,7 @@ export function ResourceForm({ resource, id, initial, serviceOptions }: { resour
           {preview === "project" ? (
             <div className="light-section overflow-hidden rounded-2xl p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {v.cover ? <img src={v.cover} alt="" className="aspect-[8/5] w-full rounded-xl object-cover" /> : <div className="aspect-[8/5] rounded-xl bg-ivory-200" />}
+              {v.cover ? <img src={v.cover} alt="" className="aspect-video w-full rounded-xl object-cover object-top" /> : <div className="flex aspect-video items-center justify-center rounded-xl bg-ivory-200 text-xs text-mute-light">Aucune image</div>}
               <h3 className="mt-4 text-xl font-medium">{v.title || "Titre"}</h3>
               <p className="muted mt-1 text-sm">{v.summary || "Description courte…"}</p>
               <p className="muted mt-2 text-xs uppercase tracking-wider">{v.sector}</p>
@@ -135,6 +135,8 @@ export function ResourceForm({ resource, id, initial, serviceOptions }: { resour
             </div>
           ) : (
             <div className="light-section max-h-[70vh] overflow-auto rounded-2xl p-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {v.cover ? <img src={v.cover} alt="" className="mb-5 aspect-video w-full rounded-xl object-cover" /> : null}
               <p className="muted text-xs uppercase tracking-wider">{v.category}</p>
               <h3 className="mt-2 text-2xl font-medium">{v.title || "Titre"}</h3>
               <p className="muted mt-2">{v.excerpt}</p>
@@ -170,7 +172,7 @@ function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all
     case "textarea":
       return <div>{Label}<textarea id={id} rows={f.rows ?? 4} className="field" value={value} maxLength={f.max} onChange={(e) => onChange(e.target.value)} {...aria} />{f.max && <p className="muted mt-1 text-right text-xs">{String(value).length}/{f.max}</p>}{Hint}{Err}</div>;
     case "number":
-      return <div>{Label}<input id={id} type="number" min={0} className="field" value={value} onChange={(e) => onChange(Number(e.target.value))} {...aria} />{Hint}{Err}</div>;
+      return <div>{Label}<input id={id} type="number" min={f.min ?? 0} step={f.decimal ? "0.01" : "1"} className="field" value={value} onChange={(e) => onChange(Number(e.target.value))} {...aria} />{Hint}{Err}</div>;
     case "boolean":
       return <label className="flex cursor-pointer items-center gap-3 py-2"><input type="checkbox" className="h-5 w-5 accent-[rgb(127,169,217)]" checked={!!value} onChange={(e) => onChange(e.target.checked)} /><span>{f.label}</span></label>;
     case "select":
@@ -196,7 +198,7 @@ function FieldInput({ f, value, error, onChange, serviceOptions, openPicker, all
       const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= rows.length) return; const c = [...rows]; [c[i], c[j]] = [c[j], c[i]]; onChange(c); };
       return (<fieldset><legend className="label">{f.label}</legend><ul className="space-y-3">{rows.map((r, i) => (
         <li key={i} className="rounded-xl border p-4" style={{ borderColor: "rgb(242 239 233 / .16)" }}>
-          <div className="grid gap-3">{f.itemFields!.map((it) => (<div key={it.name}><label className="label" htmlFor={`${id}-${i}-${it.name}`}>{it.label}</label>{it.type === "textarea" ? <textarea id={`${id}-${i}-${it.name}`} rows={3} className="field" value={r[it.name] ?? ""} onChange={(e) => upd(i, it.name, e.target.value)} /> : <input id={`${id}-${i}-${it.name}`} className="field" value={r[it.name] ?? ""} onChange={(e) => upd(i, it.name, e.target.value)} />}</div>))}</div>
+          <div className="grid gap-3">{f.itemFields!.map((it) => (<div key={it.name}><label className="label" htmlFor={`${id}-${i}-${it.name}`}>{it.label}</label>{it.type === "image" ? (<div className="flex items-center gap-3">{/* eslint-disable-next-line @next/next/no-img-element */}{r[it.name] ? <img src={r[it.name]} alt="" className="h-16 w-24 rounded-lg object-cover" /> : <span className="muted text-xs">Aucune image</span>}<button type="button" className="btn btn-ghost !min-h-[40px] !px-4 !py-2 text-sm" onClick={() => pickImage((u) => upd(i, it.name, u))}>{r[it.name] ? "Changer" : "Choisir une image"}</button>{r[it.name] && <button type="button" className="muted text-sm underline" onClick={() => upd(i, it.name, "")}>Retirer</button>}</div>) : it.type === "textarea" ? <textarea id={`${id}-${i}-${it.name}`} rows={3} className="field" value={r[it.name] ?? ""} onChange={(e) => upd(i, it.name, e.target.value)} /> : <input id={`${id}-${i}-${it.name}`} className="field" value={r[it.name] ?? ""} onChange={(e) => upd(i, it.name, e.target.value)} />}</div>))}</div>
           <div className="mt-3 flex gap-2 text-sm"><button type="button" className="muted underline" onClick={() => move(i, -1)}>↑ Monter</button><button type="button" className="muted underline" onClick={() => move(i, 1)}>↓ Descendre</button><button type="button" className="err ml-auto underline" onClick={() => onChange(rows.filter((_, k) => k !== i))}>Supprimer</button></div>
         </li>))}</ul><button type="button" className="btn btn-ghost mt-3 !min-h-[44px] !px-4 !py-2.5 text-sm" onClick={() => onChange([...rows, Object.fromEntries(f.itemFields!.map((i) => [i.name, ""]))])}>+ Ajouter</button></fieldset>);
     }

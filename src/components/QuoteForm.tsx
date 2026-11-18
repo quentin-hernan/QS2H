@@ -62,11 +62,11 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
   const aria = (k: keyof QuoteInput) => ({ "aria-invalid": errors[k] ? true : undefined, "aria-describedby": errors[k] ? `${k}-err` : undefined } as const);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="dark-section relative rounded-[1.5rem] border p-6 md:p-10" style={{ borderColor: "rgb(242 239 233 / .14)", background: "#14171C" }} aria-label="Demande de devis">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="dark-section relative rounded-[1.5rem] border p-6 md:p-10" style={{ borderColor: "var(--s-line, var(--s-line, rgb(242 239 233 / .14)))", background: "color-mix(in srgb, var(--s-fg, #F8F8F7) 5%, var(--s-bg, #14171C))" }} aria-label="Demande de devis">
       {SITEKEY && <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer strategy="lazyOnload" />}
       <div className="mb-8">
         <div className="flex items-center justify-between text-[0.8rem] muted"><span>Étape {step + 1} sur {STEPS.length}</span><span>{STEPS[step]}</span></div>
-        <div className="mt-3 h-px bg-white/15" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-label="Progression du formulaire"><div className="h-px acc-bg transition-[width] duration-500 ease-out" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
+        <div className="mt-3 h-px bg-current/15" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-label="Progression du formulaire"><div className="h-px acc-bg transition-[width] duration-500 ease-out" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
       </div>
 
       <h2 ref={head} tabIndex={-1} className="mb-7 text-h3 font-medium outline-none">
@@ -77,9 +77,9 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
         <fieldset><legend className="sr-only">Type de projet</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             {PROJECT_TYPES.map((t) => (
-              <label key={t} className={`flex min-h-[56px] cursor-pointer items-center gap-3 border px-4 py-3 transition-colors ${type === t ? "acc-border bg-white/5" : "hover:bg-white/5"}`} style={type === t ? undefined : { borderColor: "rgb(242 239 233 / .22)" }}>
+              <label key={t} className={`flex min-h-[56px] cursor-pointer items-center gap-3 border px-4 py-3 transition-colors ${type === t ? "acc-border bg-[color-mix(in_srgb,currentColor_8%,transparent)]" : "hover:bg-[color-mix(in_srgb,currentColor_8%,transparent)]"}`} style={type === t ? undefined : { borderColor: "var(--s-line, rgb(242 239 233 / .22))" }}>
                 <input type="radio" value={t} className="peer sr-only" {...register("projectType", { onChange: () => trigger("projectType") })} />
-                <span className={`h-4 w-4 shrink-0 rounded-full border ${type === t ? "acc-bg acc-border" : ""}`} style={type === t ? undefined : { borderColor: "rgb(242 239 233 / .4)" }} aria-hidden="true" />
+                <span className={`h-4 w-4 shrink-0 rounded-full border ${type === t ? "acc-bg acc-border" : ""}`} style={type === t ? undefined : { borderColor: "var(--s-line, rgb(242 239 233 / .4))" }} aria-hidden="true" />
                 <span className="text-[0.97rem]">{t}</span>
               </label>
             ))}
@@ -113,7 +113,7 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
             <span>J&apos;accepte que QS2H utilise ces informations pour répondre à ma demande. Elles sont conservées 3 ans maximum et ne sont jamais revendues. <a className="link-u acc" href="/politique-de-confidentialite" target="_blank">En savoir plus</a>.</span>
           </label><Err k="consent" />
         </div>
-        {SITEKEY && <div className="sm:col-span-2"><div className="cf-turnstile" data-sitekey={SITEKEY} data-callback="onTurnstile" data-theme="dark" /></div>}
+        {SITEKEY && <div className="sm:col-span-2"><div className="cf-turnstile" data-sitekey={SITEKEY} data-callback="onTurnstile" data-theme="auto" /></div>}
       </div>
 
       {serverError && <p role="alert" className="err mt-5 border border-current/30 p-3">{serverError}</p>}

@@ -1,8 +1,8 @@
 # QS2H — site officiel
 
-Site de l'agence de création de sites web **QS2H** (Bordeaux) : site public avec expérience 3D et vue éclatée par réalisation, espace client conforme RGPD, back-office `/admin`, SEO complet.
+Site de l'agence **QS2H** (solutions digitales, La Rochelle) : site public avec ordinateur 3D et vue éclatée, boutique en ligne, espace client conforme RGPD, assistant QS2H (chatbot), back-office complet `/admin`, éditeur visuel des pages, SEO.
 
-**Stack** : Next.js 15 (App Router) · TypeScript strict · Tailwind CSS · Prisma · Three.js / React Three Fiber · GSAP + Lenis · Zod + React Hook Form · Tiptap · Playwright.
+**Stack** : Next.js 15 (App Router) · TypeScript strict · Tailwind CSS · Prisma (SQLite en local, PostgreSQL en production) · Three.js / React Three Fiber · GSAP + Lenis · Zod · Tiptap · Playwright.
 
 ---
 
@@ -12,157 +12,117 @@ Prérequis : Node.js 20+.
 
 ```bash
 npm install
-cp .env.example .env        # puis éditer (voir §3)
-npm run db:setup            # crée la base SQLite + jeu de données + compte propriétaire
-npm run dev                 # http://localhost:3000
+cp .env.example .env        # puis éditer (voir §4)
+npm run db:setup            # crée la base SQLite + données d'exemple + compte propriétaire
+npm run dev                 # http://localhost:3000  (administration : /admin)
 ```
 
-Le compte propriétaire est créé avec `ADMIN_EMAIL` / `ADMIN_PASSWORD` du fichier `.env`. **Le mot de passe doit être changé à la première connexion** (l'administration l'impose).
-
-Scripts utiles :
+Le compte propriétaire est créé avec `ADMIN_EMAIL` / `ADMIN_PASSWORD` du fichier `.env` ; le mot de passe est à changer à la première connexion.
 
 | Commande | Rôle |
 |---|---|
 | `npm run build` / `npm start` | Build de production / serveur |
 | `npm run typecheck` · `npm run lint` | Contrôles de types et de style |
-| `npm run test:e2e` | Tests Playwright (devis, admin, pages publiques, mobile) |
+| `npm run test:e2e` | Tests Playwright |
+| `npm run db:push` | Applique `prisma/schema.prisma` à la base |
 | `npm run db:seed` | Remplit les tables **vides** (idempotent) |
 | `npm run assets` | Régénère les variantes du logo depuis `public/logo-original.png` |
+
+Après une modification du schéma Prisma : arrêter `npm run dev`, lancer `npm run db:push`, relancer (sous Windows, le serveur verrouille le moteur Prisma).
 
 ## 2. Structure
 
 ```
-src/app/(site)/          pages publiques (accueil, services, réalisations, tarifs, méthode, à propos, blog, faq, contact, légales, 404)
-src/app/admin/           back-office (login, tableau de bord, ressources, demandes, pages, médiathèque, SEO, paramètres, utilisateurs, compte, sauvegarde)
-src/app/(site)/compte/   espace client (inscription, vérification email, suivi, documents, messagerie, droits RGPD)
-src/app/api/             /api/devis · /api/admin/* (upload, documents clients, export) · /api/compte/* (export, documents)
-worker/                  worker de capture autonome (Docker) pour déployer la capture hors Vercel
-src/components/          UI publique ; scene/ = 3D ; admin/ = UI du back-office
-src/lib/                 db, auth (JWT + bcrypt), totp (2FA), seo (JSON-LD), content (lecture mise en cache), validators, legal, email
-prisma/                  schema.prisma + seed.ts
-tests/e2e/               tests Playwright
-scripts/                 génération du logo, des visuels d'exemple, purge des comptes inactifs
-public/models/           modèle 3D du portable (macbook.fbx)
+src/app/(site)/          pages publiques : accueil, services, réalisations, boutique, catalogue, tarifs, méthode,
+                         à propos, blog, faq, contact/devis, rendez-vous, pages libres, textes légaux
+src/app/(site)/compte/   espace client (inscription, suivi de projet, demandes, messagerie, documents, factures, RGPD)
+src/app/(site)/boutique/ boutique : liste, fiche article, panier, commande, confirmation
+src/app/admin/           back-office (+ /admin/preview : aperçu des pages libres)
+src/app/api/             devis, chat, rendez-vous, admin (upload, export…), compte
+src/components/          UI publique ; scene/ = 3D ; shop/ = boutique ; admin/ = back-office
+src/lib/                 db, auth, content (lecture en cache), chatbot, shop, legal, overrides, sections, seo, email…
+prisma/                  schema.prisma + seed.ts (+ plans des réalisations d'exemple)
+worker/                  worker de capture autonome (Docker) pour la capture de sites hors Vercel
+scripts/                 logo, visuels d'exemple, purge des comptes inactifs, rappels de rendez-vous
+public/models/           modèle 3D du portable (macbook.fbx) ; public/seed/ captures des réalisations d'exemple
 docs/                    checklist de lancement, guide du back-office, plan éditorial
-_prototype/              première maquette HTML (archive, ignorée par le build)
+tests/e2e/               tests Playwright
 ```
 
-### Réalisations et vue éclatée
-- Une réalisation = des **plans** (navigation, accueil, sections, pied de page, tablette, mobile). Un clic sur une réalisation ouvre la **visionneuse** (sans rechargement) : plans empilés en 3D, curseur *Assembler / Éclater*, rotation, zoom, légende au clic, plaques Référencement / Performance / Technologies, boutons *Visiter le site*, *Projet suivant*, *Fermer*. **Vue classique** = galerie simple, utilisée par défaut sans WebGL, sur appareil faible ou avec « réduire les animations ».
-- Trois façons d'ajouter une réalisation (back-office) : **A** coller l'URL (capture Playwright : sections détectées par `header` / `section` / `footer`, tablette et mobile, métadonnées SEO, technologies détectées, scores PageSpeed Insights réels) ; **B** importer des images ; **C** créer les plans à la main. Protection SSRF : adresses privées, locales ou internes refusées avant la navigation **et** pour chaque requête du navigateur (`src/lib/ssrf.ts`).
-- Aucune donnée inventée : scores et technologies viennent de la capture ; un projet client ne se publie qu'avec la case « J'ai l'autorisation du client » ; les projets réalisés sans client portent le badge « Projet concept ».
-- Mode ZIP de site statique avec aperçu iframe isolé (`apercu.qs2h.fr`) : **non implémenté** (optionnel au cahier des charges).
+## 3. Fonctionnalités
 
-### Identité et animation
-- Palette : noir encre `#1C1C1C`, bleu QS2H `#2A5587` (survol `#1E4068`), bleu clair `#7FA9D9` pour les fonds sombres, fond `#F8F8F7`. Tout passe par des variables CSS (`--accent`, `--accent-hi`, `--accent-hover`) pilotées par Paramètres > Apparence ; `npx tsx --env-file=.env scripts/migrate-accent.ts` convertit un ancien accent bordeaux enregistré en base.
-- Logo : `public/logo.png` (noir + bleu) et `logo-light.png` (ivoire + bleu clair) sont générés depuis `public/logo-original.png` par `npm run assets` (le bordeaux d'origine est recoloré en bleu). Pour utiliser le fichier officiel, remplacez `logo-original.png` puis relancez la commande.
-- Typographie : Archivo (titres, graisses 700-800, axe de largeur) + Inter (texte), auto-hébergées via `next/font`. Aucune serif ni italique de titre.
-- Animation (`src/components/Motion.tsx`, `src/app/motion.css`, `scenes.css`) : préchargeur à la première visite, transition de page (View Transitions API, repli en fondu), curseur contextuel, barre de progression, fond « atelier lumineux », cadres d'angle, texte vivant. Uniquement transform / opacité, 0,4 à 0,9 s, easing `cubic-bezier(0.22, 1, 0.36, 1)`, tout est réduit avec `prefers-reduced-motion`.
-- Scènes par page (CSS 3D) : `Scenes.tsx` (services, tarifs, méthode, contact, blog, espace client) ; mode bureau des réalisations : `ProjectsDesk.tsx`.
+### Accueil
+- **Hero** : titre qui apparaît mot à mot, ordinateur 3D (MacBook `public/models/macbook.fbx`) qui monte et s'ouvre, s'incline selon la souris. L'écran fait défiler des pages de sites entières puis passe au suivant en fondu. Fond sobre (`HeroBackdrop.tsx`, `app/hero-backdrop.css`) : voile de lumière, lignes fines, plaque de verre dépoli. Fichiers : `HomeStage.tsx`, `scene/StageCanvas.tsx`.
+- **Écran de l'ordinateur** : Admin > Pages et textes > Accueil > « Écran du portable : sites affichés » (une capture de page entière par ligne). Vide = captures des réalisations. **Fond du hero** : image ou vidéo + voile, même page.
+- **Sous le capot** (section épinglée) : les pages sortent de l'écran (5 couches), l'ordinateur part vers la gauche en fondu, puis la scène s'efface lentement.
+- Ensuite : présentation, expertises, bloc « Visitez notre boutique » (articles du moment), démonstrations, « Pourquoi QS2H ? », appel final. Textes : Admin > Pages et textes > Accueil.
+- Repli statique sans WebGL / appareil faible / `prefers-reduced-motion` ; rendu en pause hors écran ; pixel ratio plafonné à 2.
 
-### Visuels image / vidéo (admin)
-- **Admin > Pages et textes** (Accueil, Méthode, À propos) : champ « Visuels pleine largeur ». Chaque ligne crée un grand visuel 16:9 entre deux sections (image JPEG, PNG, WebP, AVIF, GIF — ou vidéo MP4, WebM, MOV, 80 Mo max). Aucune ligne = aucun visuel. Sur l'accueil, les 3 premiers prennent place après les services, après la scène « site en construction » et avant les avis ; les suivants s'ajoutent avant l'appel final.
-- Les vidéos jouent en boucle, muettes, uniquement quand elles sont visibles (et pas du tout avec « réduire les animations »). Le type est contrôlé sur le contenu réel du fichier. Composants : `MediaBand.tsx`, `MediaPicker.tsx`.
+### Boutique (`/boutique`)
+- Articles gérés dans **Admin > Boutique (articles)** : prix TTC, prix barré, stock (-1 = sur commande), pastille, image + galerie, **zones de présentation image + texte**, points forts, caractéristiques, « article du moment » (affiché sur l'accueil).
+- Filtres, recherche, tri, ajout rapide au survol, panier (conservé dans le navigateur), fiche article avec données structurées Product.
+- **Commande sans paiement en ligne** : coordonnées, livraison ou retrait à La Rochelle, acceptation obligatoire des **CGV boutique** (version enregistrée avec la commande). Prix et stock revérifiés côté serveur, stock décrémenté, email au client et à `MAIL_TO`. Suivi : **Admin > Commandes boutique** (statuts).
+- **CGV boutique** (`/cgv-boutique`, modifiables et versionnées dans Admin > Textes légaux) : modèle à compléter (passages entre crochets) et **à faire valider par un juriste avant ouverture**.
+- Le **Catalogue** (`/catalogue`, licences et produits sur devis) reste séparé : bouton « Demander ce produit » vers le formulaire de devis.
 
-### Assistant (chatbot)
-- Bouton flottant sobre (bulle de discussion) → fenêtre de discussion : réponses sur les services, formules, délais, FAQ et horaires **tirées de la base** (rien d'inventé), boutons de réponse rapide, liens vers les pages, formulaire « laisser mes coordonnées » (consentement obligatoire) qui crée une demande dans **Demandes reçues** (source « chatbot ») et envoie un email.
-- **Admin > Pages et textes > Assistant (chatbot)** : activer/désactiver, message d'accueil, réponse par défaut, **réponses sur mesure** (mots-clés → réponse, prioritaires). **Admin > Assistant (conversations)** : historique lisible.
-- Fonctionne sans clé d'API (moteur à règles). Avec `ANTHROPIC_API_KEY` (et `CHATBOT_MODEL` en option), les réponses libres passent par Claude, limité à la base de connaissances du site.
-- RGPD : conversations conservées 90 jours (purge dans `scripts/purge-inactive.ts`), aucune IP stockée, mention affichée dans la fenêtre. Pensez à citer l'assistant dans la politique de confidentialité.
+### Assistant QS2H (chatbot)
+- Fenêtre de discussion flottante. Réponses tirées **uniquement des données du site** (rien d'inventé) : services, prix et délais, formules et options, FAQ, boutique (articles, prix, stock), commande, paiement, livraison, espace client, propriété du site, hébergement, maintenance, SEO, marketing, automatisation, méthode, engagements, RGPD, zone d'intervention, rendez-vous. Code : `src/lib/chatbot.ts`.
+- Ordre : réponses sur mesure de l'admin (prioritaires) → salutations / contact / devis / rendez-vous → base de connaissances du site → prix → délais → services → FAQ → réponse par défaut.
+- **Admin > Pages et textes > Assistant (chatbot)** : activer/désactiver, nom, message d'accueil, réponse par défaut, réponses sur mesure (mots-clés → réponse). **Admin > Assistant (conversations)** : historique.
+- Sans clé : moteur à règles. Avec `ANTHROPIC_API_KEY` (et `CHATBOT_MODEL` facultatif), réponses rédigées par Claude, limitées à la même base de connaissances.
+- Formulaire « laisser mes coordonnées » (consentement obligatoire) → Demandes reçues + email. Conversations conservées 90 jours (`scripts/purge-inactive.ts`), aucune IP stockée.
 
-### Rendez-vous et méga-menu
-- **/rendez-vous** : réservation en 3 étapes (appel découverte 20 min, visio 45 min, sur place 1 h), calendrier et créneaux réels en heure de Paris, confirmation par email avec fichier .ics, lien d'annulation sécurisé, contact créé dans « Demandes reçues » (source « rendez-vous »). Un créneau déjà pris est refusé même en cas de réservations simultanées.
-- **Admin > Rendez-vous** : liste, plages horaires par jour, pause entre rendez-vous, maximum par jour, délai minimum, horizon, jours de congé. Rappel 24 h avant : planifier `npx tsx --env-file=.env scripts/send-reminders.ts` toutes les heures. Les rendez-vous de plus d'un an sont purgés par `purge-inactive.ts`.
-- **En-tête** : méga-menus « Services » (liste issue de l'admin) et « Ressources » (blog, FAQ, rendez-vous, à propos, contact), ouverture au survol avec délai ou au clic, fermeture par Échap.
+### Éditeur visuel « Modifier l'apparence » (toutes les pages)
+Bouton visible uniquement pour un administrateur connecté (ou via Admin > Apparence des pages).
+- **Sections** : fond (couleur, dégradé, image, vidéo, bandes), voile, animation du fond, animation d'apparition, thème, espacements, masquer.
+- **Textes et images** : double-clic sur un texte pour le réécrire ; clic sur une image ou une vidéo pour la remplacer ; « Annuler mes modifications » remet la page d'origine (`src/lib/overrides.ts`). Les textes composés (mots en couleur, titres animés) se modifient dans Pages et textes.
+- **Emplacements d'image** : photos d'équipe, pastilles d'avis, visuels des formules (`ImgSlot.tsx`).
 
-### Scène 3D
-- `components/scene/StageCanvas.tsx` : portable MacBook chargé depuis `public/models/macbook.fbx` (FBXLoader ; modèle normalisé : écran de 2,9 unités de large, base posée sur y = 0), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables. Les pages devant la couche active s'effacent (fondu court) et le portable reste visible jusqu'au bout. Les sources du modèle (`.blend`, `.obj`, textures) sont dans `3d-model/`, ignoré par git.
-- `components/scene/GalleryCanvas.tsx` : galerie d'écrans suspendus (drag, flèches, relief, clic → page projet).
-- Chargement **différé** après le premier rendu (le H1 est le LCP), **repli statique** (`public/hero-fallback.webp`) sans WebGL / appareil faible / `prefers-reduced-motion`, rendu **mis en pause** hors écran et onglet masqué, pixel ratio plafonné à 1,5 sur mobile.
+### Autres
+- **Réalisations** : plans par réalisation, visionneuse 3D éclatée, capture automatique depuis une URL (Playwright, protection SSRF), autorisation client obligatoire avant publication.
+- **Services** : bloc « problème → solution » animé, glyphes propres à chaque service. **Contact/devis** : formulaire en 4 étapes, « Nous trouver » avec carte (La Rochelle).
+- **À propos** : zone verticale modifiable (image ou vidéo de fond, voile, textes) à côté de « Notre histoire ».
+- **Pages libres** : éditeur par sections avec aperçu réel ordinateur / tablette / mobile.
+- **Rendez-vous** : créneaux réels, .ics, annulation, rappels (`scripts/send-reminders.ts`).
+- **Thème clair / sombre** : suit le navigateur, bouton soleil / lune, choix mémorisé (`app/theme.css`).
 
-## 3. Variables d'environnement
+## 4. Variables d'environnement
 
-Voir `.env.example`. Obligatoires en production : `DATABASE_URL`, `AUTH_SECRET` (≥ 32 caractères aléatoires), `NEXT_PUBLIC_SITE_URL`.
-Optionnelles : `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO` (emails de devis) ; `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` (anti-spam Cloudflare).
+Voir `.env.example`.
+- Obligatoires en production : `DATABASE_URL`, `AUTH_SECRET` (≥ 32 caractères aléatoires), `NEXT_PUBLIC_SITE_URL`.
+- Emails : `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO` (devis, commandes, rendez-vous, messages).
+- Facultatives : Turnstile (anti-spam), `CAPTURE_WORKER_URL` / `CAPTURE_WORKER_TOKEN` / `PSI_API_KEY` (capture des réalisations), `ANTHROPIC_API_KEY` / `CHATBOT_MODEL` (assistant), `ADMIN_REQUIRE_2FA`.
 
-## 4. Mise en ligne (Vercel + Neon)
+## 5. Mise en ligne (GitHub + Vercel + Neon)
 
-1. **Base PostgreSQL** : créez un projet Neon (ou Supabase) et copiez l'URL de connexion.
-2. Dans `prisma/schema.prisma`, remplacez `provider = "sqlite"` par `provider = "postgresql"`.
-3. Poussez le dépôt sur GitHub, importez-le dans Vercel, renseignez les variables d'environnement (§3) avec l'URL Postgres.
-4. Dans un terminal local pointant sur la base de production : `DATABASE_URL="postgresql://…" npx prisma db push` puis `npm run db:seed` (crée aussi le compte propriétaire).
-5. Domaine : ajoutez `qs2h.fr` dans Vercel (HTTPS automatique), puis `NEXT_PUBLIC_SITE_URL=https://qs2h.fr`.
-6. **Images** : en local elles sont écrites dans `public/uploads` (système de fichiers). Vercel étant en lecture seule, branchez un stockage objet (Cloudflare R2 ou Supabase Storage) : seule la fonction d'écriture de `src/app/api/admin/upload/route.ts` est à adapter (le reste du site ne manipule que des URLs).
-7. Resend : vérifiez le domaine d'envoi, ajoutez `RESEND_API_KEY`.
-8. Search Console : ajoutez la propriété, vérifiez par DNS, soumettez `https://qs2h.fr/sitemap.xml`.
+1. **Base PostgreSQL** (Neon ou Supabase) ; dans `prisma/schema.prisma`, `provider = "postgresql"`.
+2. Pousser le dépôt sur GitHub, l'importer dans Vercel, renseigner les variables (§4).
+3. Depuis un terminal pointant sur la base de production : `npx prisma db push` puis `npm run db:seed`.
+4. Domaine `qs2h.fr` dans Vercel, puis `NEXT_PUBLIC_SITE_URL=https://qs2h.fr`.
+5. **Fichiers envoyés** : en local ils vont dans `public/uploads` et `storage/` (documents clients). Vercel est en lecture seule : brancher un stockage objet (Cloudflare R2 ou Supabase Storage) dans `src/app/api/admin/upload/route.ts`.
+6. Resend : vérifier le domaine d'envoi. Search Console : soumettre `https://qs2h.fr/sitemap.xml`.
+7. Limiteur de débit en mémoire : en multi-instances (Vercel), le remplacer par Upstash Redis (`src/lib/rate-limit.ts`).
 
-## 5. Sécurité (déjà en place)
+Ne jamais committer `.env`, la base locale (`prisma/*.db`), `public/uploads/` ni `storage/` (déjà dans `.gitignore`).
 
-- Sessions JWT signées (HS256) dans un cookie `HttpOnly`, `SameSite=Lax`, `Secure` en production (admin 8 h, client 7 jours, clés distinctes, « se déconnecter partout »).
-- Mots de passe hashés en **argon2id**, 12 caractères minimum, contrôle contre les fuites connues (Have I Been Pwned, k-anonymité), messages d'erreur génériques, jetons de vérification et de réinitialisation à usage unique et hashés en base.
-- **2FA du propriétaire** : activable depuis « Mon compte ». Elle n'est plus obligatoire par défaut ; pour l'imposer (recommandé en production), définir `ADMIN_REQUIRE_2FA=true` : tant qu'elle n'est pas activée, seule la page « Mon compte » est accessible.
-- Anti brute-force : limite par IP (10 / 15 min) + verrouillage du compte après 5 échecs / 15 min, journal des connexions.
-- **2FA TOTP** optionnelle (RFC 6238) activable depuis « Mon compte ».
-- Protection CSRF native des Server Actions ; `middleware` protégeant tout `/admin` ; `X-Robots-Tag: noindex` sur l'administration.
-- Validation **Zod côté client et serveur** ; HTML des articles assaini (liste blanche) à l'enregistrement et à l'affichage ; CSV protégé contre l'injection de formules.
-- Formulaire de devis : honeypot, limite de débit (5 / h / IP), Cloudflare Turnstile si configuré.
-- En-têtes : CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.
-- Journal d'audit des actions d'administration (table `AuditLog`).
+## 6. Sécurité
 
-> Limiteur de débit en mémoire : suffisant pour une instance. En multi-instances (Vercel serverless), remplacez `src/lib/rate-limit.ts` par Upstash Redis.
+- Sessions JWT signées dans un cookie `HttpOnly`, `SameSite=Lax`, `Secure` en production (admin 8 h, client 7 jours, clés distinctes, « se déconnecter partout »).
+- Mots de passe **argon2id**, contrôle contre les fuites connues, jetons à usage unique hashés en base. 2FA TOTP (imposable avec `ADMIN_REQUIRE_2FA=true`).
+- Anti brute-force admin : limite par IP + verrouillage après 5 échecs en 15 min, **actif en production** (désactivé en développement local uniquement, voir `loginAction` dans `src/app/admin/actions.ts`).
+- Server Actions (CSRF natif), `middleware` sur `/admin`, validation Zod client et serveur, HTML assaini, CSV protégé.
+- En-têtes : CSP, HSTS, X-Frame-Options (seul `/admin/preview` est affichable en cadre, par le site lui-même), nosniff, Referrer-Policy, Permissions-Policy. Journal d'audit (`AuditLog`).
 
-## 6. Espace client et conformité RGPD
+## 7. Espace client et RGPD
 
-- Inscription (cases CGU / confidentialité et majorité obligatoires et non précochées, newsletter facultative en **double opt-in**), vérification d'email obligatoire, preuves de consentement (date, version du document, IP tronquée).
-- Espace : suivi de projet par étapes, documents (stockés **hors du dossier public**, servis à leur seul propriétaire), validation de maquettes, messagerie, journal des connexions.
-- « Mes données et mes droits » : export JSON / CSV, rectification, retrait de consentement, **suppression** confirmée par email (les factures sont dissociées du compte et conservées 10 ans).
-- Comptes inactifs : `npx tsx --env-file=.env scripts/purge-inactive.ts` (avertissement à 35 mois, suppression à 36 mois), à planifier une fois par jour.
-- Textes légaux **versionnés** (back-office > Textes légaux) : chaque version est datée, les anciennes restent consultables (`?version=n`), un changement majeur prévient les clients par email.
+- Inscription avec accès **immédiat** ; l'adresse email peut être confirmée plus tard (rappel dans l'espace, renvoi du lien). Consentements prouvés (date, version, IP tronquée), newsletter en double opt-in.
+- Suivi de projet, demandes de modification, messagerie, documents (hors dossier public), devis et factures, rendez-vous.
+- « Mes données et mes droits » : export, rectification, retrait de consentement, suppression (factures conservées 10 ans). Comptes inactifs : `scripts/purge-inactive.ts` (quotidien).
+- Textes légaux versionnés (mentions, confidentialité, CGU, CGV prestations, **CGV boutique**, cookies).
 
-## 7. Qualité mesurée
+## 8. Avant le lancement
 
-Lighthouse (mobile, throttling Lighthouse) sur la version de production locale : Accessibilité **100**, Bonnes pratiques **100**, SEO **100**, Performance **85–100** (accueil 85 avec la 3D, autres pages 90–100). LCP **observé** : 0,39 s sur l'accueil. CLS 0.
-
-Tests Playwright : 61 tests (pages publiques desktop + mobile, vue éclatée, devis en 4 étapes, anti-spam, accès admin protégé avec 2FA, autorisation obligatoire avant publication d'un projet client, édition → mise à jour du site public, espace client : inscription, export, suppression avec conservation des factures).
-
-## 8. À compléter avant lancement
-
-Voir `docs/CHECKLIST-LANCEMENT.md`. Les identifiants légaux (SIREN, adresse, téléphone…) sont à saisir dans **/admin > Paramètres entreprise** : les mentions légales, la politique de confidentialité, les CGV et les données structurées s'en nourrissent.
-
-### Accueil : une seule fois chaque information
-L'accueil présente (hero 3D + vue éclatée, engagements, services avec image de fond modifiable, visuels, avis réels, appel final) et renvoie vers les pages détaillées : réalisations, méthode, FAQ et tarifs ne sont plus répétés. Images et vidéos modifiables dans Admin > Pages et textes : Accueil (fond de « Ce que nous construisons » + visuels pleine largeur), Services, Tarifs, Méthode, À propos.
-
-### Catalogue (licences, logiciels, produits)
-- **Admin > Catalogue (produits)** : nom, catégorie, prix affiché, image, présentation, éléments inclus, SEO. Aucun produit publié = aucune trace sur le site. Dès qu'un produit est publié : page **/catalogue** (regroupée par catégorie), fiche **/catalogue/<produit>**, lien dans le menu et le plan du site, mention sur la page Services, et l'assistant le connaît.
-- Le bouton « Demander ce produit » ouvre le formulaire de devis pré-rempli. Visuels de la page : Admin > Pages et textes > Page Catalogue. **Pas de paiement en ligne ni de suivi de commande pour l'instant** : à ajouter plus tard (panier, paiement, statuts de commande) au-dessus de ce modèle.
-
-### Pages libres (éditeur par sections)
-- **Admin > Pages libres** : créez de nouvelles pages sans code (offre, promotion, page partenaire…) en assemblant des sections : bandeau d'introduction, texte, image ou vidéo 16:9, colonnes, questions fréquentes, appel à l'action. Ajout, duplication, suppression, **glisser-déposer** ou boutons ↑ ↓ pour réordonner, fond clair ou sombre par section, annulation (Ctrl+Z), **aperçu ordinateur / tablette / mobile**, brouillon ou publication, adresse et description Google modifiables.
-- Une page publiée est servie à `/<adresse>` et ajoutée au plan du site. Les adresses déjà utilisées par le site (services, tarifs, blog…) sont refusées. Les liens de boutons n'acceptent que les chemins internes, https et mailto ; le contenu est nettoyé côté serveur (types et champs connus uniquement).
-- Limite actuelle : pas d'historique de versions pour les pages libres (contrairement aux pages « Pages et textes »).
-
-### Visuels d'en-tête
-Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image ou une vidéo dans leur bandeau d'en-tête (Admin > Pages et textes > champ « Image ou vidéo du bandeau d'en-tête »). Sans visuel, le bandeau reste texte seul.
-
-### Éditeur d'apparence (toutes les pages)
-- **Admin > Apparence des pages** : ouvre n'importe quelle page du site en mode édition. Bouton bleu « Modifier l'apparence » (visible uniquement une fois connecté) : cliquez sur une section, réglez-la dans le panneau, le résultat s'affiche en direct, « Enregistrer » publie.
-- **Fond** : couleur, dégradé (angle, 2 couleurs), image ou vidéo (médiathèque), opacité, flou, voile noir ou blanc, ajustement et position ; **emplacement** : toute la section, bande verticale à gauche ou à droite, bande horizontale en haut ou en bas (taille en % et coins arrondis). **Animation du fond** : zoom lent, panoramique, parallaxe, fond fixe, dégradé animé.
-- **Apparition** : fondu, montée, descente, glissement gauche ou droite, zoom, flou vers net (durée et délai réglables, bouton « Rejouer »). **Thème** clair ou sombre, espace en haut et en bas, hauteur minimale, afficher ou masquer la section.
-- Les réglages sont rattachés à l'**ordre des sections** de chaque page. Exclus : la scène 3D d'ouverture de l'accueil. Les animations sont désactivées avec « réduire les animations ». Pour réordonner des sections, utilisez une **page libre**.
-
-### Refonte « Modern editorial × digital craft » (master prompt)
-- **Accueil** : hero 3D (ordinateur conservé) → présentation éditoriale → 5 expertises (liste typographique qui s'ouvre) → démonstrations interactives par solution (maquettes illustratives, onglets accessibles au clavier, défilement automatique mis en pause au survol) → réalisations en grands visuels révélés par masque → méthode dont la ligne avance au défilement → « Pourquoi QS2H ? » → FAQ animée → appel final. Tous les textes : Admin > Pages et textes > Accueil. Fichiers : `HomeSections.tsx`, `HomeInteractive.tsx`, `app/home.css`.
-- **Réalisations** : grille éditoriale à grands visuels par défaut (recadrage et invitation « Voir le projet » au survol, visible au toucher) ; le mode bureau reste disponible en option sur ordinateur.
-- **Services** : section « Au-delà du site web » (marketing, automatisation, chatbots, matrices).
-- **Pied de page** : phrase de clôture, email en grand, expertises, services, navigation, coordonnées, mentions.
-- **Menu mobile** : plein écran, liens numérotés, devis, rendez-vous, espace client, email.
-- Transitions de page : View Transitions API (fondu court, sans flash), repli en fondu.
-
-### Où est quoi (aucun doublon entre l'accueil et les pages dédiées)
-- **Accueil** : hero 3D, présentation (fond modifiable : image, vidéo ou dessin animé par défaut), expertises, démonstrations, « Pourquoi QS2H ? », appel final.
-- **Réalisations** : projets récents en grands visuels, puis exploration par secteur et par service. **Méthode** : vue d'ensemble en 5 phases (Admin > Pages et textes > Méthode) puis étapes détaillées. **FAQ** : accordéon animé, tout le contenu de Admin > FAQ.
-- **Un seul appel à l'action en bas de chaque page** ; le pied de page ne répète plus le bouton « Parler de mon projet ».
-
-### Thème clair / sombre
-- Par défaut le site suit le thème du navigateur du visiteur (`prefers-color-scheme`). Le bouton soleil / lune de l'en-tête (et du menu mobile) permet de choisir ; le choix est mémorisé (`localStorage`, clé `qs2h-theme`) et posé avant le premier affichage, sans flash.
-- En sombre, toutes les sections du site public sont sombres ; en clair, toutes sont claires. Sections qui gardent un fond précis : celles avec image de fond, la formule mise en avant des tarifs, et celles où l'éditeur d'apparence impose « fond clair » ou « fond sombre ». Feuille : `src/app/theme.css`. L'administration n'est pas concernée.
+Voir `docs/CHECKLIST-LANCEMENT.md`. En particulier :
+- Admin > Paramètres entreprise : SIREN, adresse, téléphone, médiateur… (alimentent mentions légales, CGV et données structurées).
+- Remplacer les contenus d'exemple : équipe (« [Prénom Nom] »), réalisations « concept », articles de boutique « Exemple », avis.
+- Compléter et faire valider les **CGV boutique** avant d'accepter des commandes.

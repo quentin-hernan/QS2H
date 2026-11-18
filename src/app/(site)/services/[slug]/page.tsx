@@ -7,6 +7,7 @@ import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { Reveal } from "@/components/Reveal";
 import { ServiceArt } from "@/components/ServiceArt";
+import { ProblemSolution } from "@/components/ProblemSolution";
 import { ProjectCard } from "@/components/ProjectCard";
 import { getProjects, getService, getServices } from "@/lib/content";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -33,7 +34,7 @@ export default async function ServicePage({ params }: P) {
     <>
       <JsonLd data={serviceJsonLd(s)} />
       {s.faq.length > 0 && <JsonLd data={faqJsonLd(s.faq)} />}
-      <PageHero eyebrow="" art={<ServiceArt slug={s.slug} />} title={s.title} lead={s.tagline}
+      <PageHero eyebrow="" image={s.image || ""} art={s.image ? undefined : <ServiceArt slug={s.slug} />} title={s.title} lead={s.tagline}
         after={(
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <Link href="/contact" className="btn btn-primary btn-fill btn-arrow"><span>Demander un devis</span><span aria-hidden="true" className="arr">→</span></Link>
@@ -43,12 +44,7 @@ export default async function ServicePage({ params }: P) {
         <Breadcrumbs items={[{ name: "Services", path: "/services" }, { name: s.title, path: `/services/${s.slug}` }]} />
       </PageHero>
 
-      <section className="light-section py-20 md:py-32">
-        <div className="container grid gap-16 lg:grid-cols-12">
-          <Reveal className="lg:col-span-5"><p className="eyebrow mb-6">Le problème</p><p className="font-serif text-[clamp(1.6rem,2.6vw,2.4rem)] leading-[1.2]">{s.problem}</p></Reveal>
-          <Reveal delay={0.1} className="lg:col-span-6 lg:col-start-7"><p className="eyebrow mb-6">Notre solution</p><p className="prose-qs">{s.solution}</p></Reveal>
-        </div>
-      </section>
+      <ProblemSolution slug={s.slug} problem={s.problem} solution={s.solution} />
 
       <section className="bg-ivory-200 py-20 text-ink-900 md:py-32">
         <div className="container grid gap-12 lg:grid-cols-12">

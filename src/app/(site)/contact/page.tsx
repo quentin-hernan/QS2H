@@ -1,14 +1,13 @@
 import { QuoteForm } from "@/components/QuoteForm";
-import { MapEmbed } from "@/components/MapEmbed";
-import { ContactLaptop } from "@/components/Scenes";
+import { ContactFind } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getSettings } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { isPlaceholder } from "@/lib/utils";
 
 export const metadata = buildMetadata({
-  title: "Contact et devis gratuit : création de site web à Bordeaux",
-  description: "Demandez votre devis gratuit pour un site web : formulaire en quatre étapes, réponse sous 24 h ouvrées. Agence à Bordeaux, clients partout en France.",
+  title: "Contact et devis gratuit : création de site web à La Rochelle",
+  description: "Demandez votre devis gratuit pour un site web : formulaire en quatre étapes, réponse sous 24 h ouvrées. Agence à La Rochelle, clients partout en France.",
   path: "/contact",
 });
 
@@ -30,11 +29,10 @@ export default async function Contact({ searchParams }: { searchParams: Promise<
             <div><dt className="label">Zone d&apos;intervention</dt><dd className="max-w-sm leading-relaxed">{c.area}</dd></div>
             {s.integrations.calendlyUrl && <div><dt className="label">Rendez-vous</dt><dd><a className="btn btn-ghost mt-1" href={s.integrations.calendlyUrl} target="_blank" rel="noopener noreferrer">Réserver un créneau ↗</a></dd></div>}
           </dl>
-          <ContactLaptop />
-          <div className="light-section mt-12 chamfer"><MapEmbed city={c.city} /></div>
         </div>
         <div className="min-w-0 lg:col-span-7"><QuoteForm presetPlan={formule} /></div>
       </div>
+      <div className="container mt-24 md:mt-32"><ContactFind city={c.city} area={c.area} /></div>
     </section>
   );
 }

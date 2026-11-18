@@ -25,7 +25,7 @@ const services = [
       { q: "Puis-je modifier le site moi-même ?", a: "Oui. Les textes, images et réalisations se modifient depuis une interface simple. Une formation d'une heure est incluse." },
       { q: "Le nom de domaine est-il inclus ?", a: "Nous vous aidons à le réserver à votre nom. Il reste votre propriété, avec un coût annuel d'environ 10 à 15 € payé directement au registrar." },
     ],
-    seoTitle: "Création de site vitrine à Bordeaux et partout en France | QS2H",
+    seoTitle: "Création de site vitrine à La Rochelle et partout en France | QS2H",
     seoDescription: "Site vitrine sur mesure pour TPE, PME et indépendants : design soigné, rapide, adapté au mobile et référencé. Devis gratuit sous 24 h ouvrées.",
   },
   {
@@ -58,7 +58,7 @@ const services = [
       { q: "Peut-on conserver mon nom de domaine ?", a: "Oui, c'est même recommandé : il porte l'ancienneté de votre site aux yeux de Google." },
     ],
     seoTitle: "Refonte de site internet : moderniser sans perdre son référencement | QS2H",
-    seoDescription: "Refonte de site web avec audit, nouveau design et redirections 301 pour conserver votre positionnement Google. Agence à Bordeaux, clients partout en France.",
+    seoDescription: "Refonte de site web avec audit, nouveau design et redirections 301 pour conserver votre positionnement Google. Agence à La Rochelle, clients partout en France.",
   },
   {
     slug: "e-commerce",
@@ -79,7 +79,7 @@ const services = [
   {
     slug: "referencement-seo",
     title: "Référencement SEO",
-    tagline: "Être trouvé par les clients qui vous cherchent, à Bordeaux ou partout en France.",
+    tagline: "Être trouvé par les clients qui vous cherchent, à La Rochelle ou partout en France.",
     problem: "Un beau site que personne ne trouve ne sert à rien. Le référencement n'est ni de la magie ni un mot-clé glissé partout : c'est une suite de choix techniques et éditoriaux, mesurables.",
     solution: "Nous commençons par un audit : ce qui bloque, ce que font vos concurrents, ce que vos clients tapent réellement. Puis nous corrigeons la technique, optimisons vos pages, travaillons votre fiche Google et vos contenus, avec un rapport clair chaque mois.",
     deliverables: ["Audit technique et sémantique", "Optimisation des pages et des balises", "Données structurées (schema.org)", "Fiche Google Business Profile", "Plan éditorial et rédaction d'articles", "Rapport mensuel avec positions et visites"],
@@ -89,7 +89,7 @@ const services = [
       { q: "En combien de temps voit-on des résultats ?", a: "Les corrections techniques produisent un effet en quelques semaines. Le gain de positions sur des requêtes concurrentielles demande généralement 3 à 6 mois." },
       { q: "Garantissez-vous la première place ?", a: "Non, et méfiez-vous de ceux qui le font. Nous nous engageons sur des actions précises et un suivi chiffré." },
     ],
-    seoTitle: "Référencement SEO local et national à Bordeaux | QS2H",
+    seoTitle: "Référencement SEO local et national à La Rochelle | QS2H",
     seoDescription: "Audit SEO, optimisation technique, fiche Google et contenus : améliorez votre visibilité locale et nationale avec un suivi mensuel chiffré.",
   },
   {
@@ -154,7 +154,7 @@ const plans = [
 const options = [
   { name: "Maintenance et hébergement", price: "49 € HT / mois", description: "Sauvegardes, mises à jour, surveillance, 2 h de modifications par mois." },
   { name: "Rédaction des contenus", price: "90 € HT / page", description: "Textes rédigés à partir d'un entretien, orientés clients et référencement." },
-  { name: "Photographies professionnelles", price: "dès 290 € HT", description: "Demi-journée de prises de vue sur site (Bordeaux et alentours)." },
+  { name: "Photographies professionnelles", price: "dès 290 € HT", description: "Demi-journée de prises de vue sur site (La Rochelle et alentours)." },
   { name: "Pack référencement local", price: "450 € HT", description: "Audit, fiche Google, citations locales, premier rapport de positions." },
 ];
 
@@ -163,7 +163,7 @@ const faqs = [
   { question: "Combien de temps faut-il pour avoir mon site ?", answer: "En moyenne 3 à 4 semaines pour un site vitrine, 5 à 8 pour une boutique en ligne. Le délai exact figure dans le devis. Il dépend aussi de la rapidité avec laquelle vous nous transmettez vos contenus." },
   { question: "Le site m'appartient-il ?", answer: "Oui, entièrement. À la livraison, nous vous remettons le code, les contenus, les accès à l'hébergement et au nom de domaine. Vous pouvez à tout moment confier le site à quelqu'un d'autre." },
   { question: "Pourrai-je modifier mon site moi-même ?", answer: "Oui. Les textes, images, prix et réalisations se modifient depuis une interface simple. Nous vous formons lors de la livraison, et nous restons disponibles en cas de besoin." },
-  { question: "Travaillez-vous uniquement à Bordeaux ?", answer: "Non. Nous sommes installés à Bordeaux et pouvons nous déplacer en Gironde, mais la grande majorité des projets se déroulent à distance, avec des points en visioconférence." },
+  { question: "Travaillez-vous uniquement à La Rochelle ?", answer: "Non. Nous sommes installés à La Rochelle et pouvons nous déplacer en Charente-Maritime, mais la grande majorité des projets se déroulent à distance, avec des points en visioconférence." },
   { question: "Comment se passe le paiement ?", answer: "En deux fois pour les projets standard : 40 % à la signature du devis, le solde à la livraison. Pour les projets plus longs, un échéancier par étape est prévu dans le devis." },
   { question: "Mon site sera-t-il visible sur Google ?", answer: "Il sera conçu pour l'être : structure, vitesse, balises, données structurées, fiche Google. Personne ne peut honnêtement garantir une position, mais nous mesurons et rendons compte des résultats." },
   { question: "Que se passe-t-il après la mise en ligne ?", answer: "Nous faisons un point un mois après le lancement. Vous pouvez ensuite souscrire une maintenance mensuelle, ou nous solliciter ponctuellement pour des évolutions." },
@@ -215,12 +215,12 @@ const posts = [
 <p>Si vous répondez non aux trois premières questions, un site vitrine bien conçu suffit largement. Dans le doute, commencez simple : un site bien construit peut évoluer.</p>`,
   },
   {
-    slug: "referencement-local-bordeaux",
-    title: "Référencement local à Bordeaux : six actions qui comptent",
+    slug: "referencement-local-la-rochelle",
+    title: "Référencement local à La Rochelle : six actions qui comptent",
     excerpt: "Fiche Google, pages locales, avis, cohérence des informations : par où commencer pour apparaître auprès des clients proches.",
     category: "SEO", author: "QS2H", publishedAt: new Date("2026-11-04T08:00:00Z"),
-    seoTitle: "Référencement local à Bordeaux : 6 actions pour apparaître sur Google", seoDescription: "Fiche Google, pages locales, avis clients, cohérence NAP : les six actions de référencement local qui comptent vraiment pour une entreprise à Bordeaux.",
-    content: `<p>Quand quelqu'un tape « plombier Bordeaux » ou « avocat Chartrons », Google affiche d'abord une carte avec quelques adresses, puis les résultats classiques. Apparaître dans cette carte change beaucoup de choses pour une entreprise locale.</p>
+    seoTitle: "Référencement local à La Rochelle : 6 actions pour apparaître sur Google", seoDescription: "Fiche Google, pages locales, avis clients, cohérence NAP : les six actions de référencement local qui comptent vraiment pour une entreprise à La Rochelle.",
+    content: `<p>Quand quelqu'un tape « plombier La Rochelle » ou « avocat Vieux-Port », Google affiche d'abord une carte avec quelques adresses, puis les résultats classiques. Apparaître dans cette carte change beaucoup de choses pour une entreprise locale.</p>
 <h2>1. Compléter votre fiche Google</h2>
 <p>Catégorie principale, horaires, zone de service, description, photos, services proposés. Une fiche complète est mieux classée et rassure.</p>
 <h2>2. Recueillir des avis</h2>

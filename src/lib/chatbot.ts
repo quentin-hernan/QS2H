@@ -1,5 +1,6 @@
 import "server-only";
-import { getFaqs, getPage, getPlans, getProducts, getServices, getSettings } from "./content";
+import { getFaqs, getPage, getPlans, getProducts, getServices, getSettings, getShopItems } from "./content";
+import { money } from "./shop";
 
 export type ChatTurn = { role: "user" | "bot"; text: string };
 export type ChatReply = { reply: string; quick: string[]; links: { label: string; href: string }[]; form: boolean };
@@ -11,8 +12,14 @@ const has = (m: string, re: RegExp) => re.test(m);
 
 type Knowledge = Awaited<ReturnType<typeof loadKnowledge>>;
 async function loadKnowledge() {
-  const [s, services, plans, faqs, bot, products] = await Promise.all([getSettings(), getServices(), getPlans(), getFaqs(), getPage("chatbot"), getProducts()]);
-  return { s, services, products, plans: plans.plans, faqs, bot: bot as { enabled: string; name: string; welcome: string; fallback: string; qa: { keywords: string; answer: string }[] } };
+  const [s, services, plans, faqs, bot, products, shop, home, method, about] = await Promise.all([getSettings(), getServices(), getPlans(), getFaqs(), getPage("chatbot"), getProducts(), getShopItems(), getPage("home"), getPage("method"), getPage("about")]);
+  return {
+    s, services, products, shop, plans: plans.plans, options: plans.options, faqs,
+    expertises: ((home.expertises ?? []) as { title: string; text: string; href?: string }[]),
+    steps: ((method.steps ?? []) as { title: string; duration?: string; text: string }[]),
+    commitments: ((about.commitments ?? []) as { title: string; text: string }[]),
+    bot: bot as { enabled: string; name: string; welcome: string; fallback: string; qa: { keywords: string; answer: string }[] },
+  };
 }
 
 export async function getChatConfig() {
@@ -20,7 +27,6 @@ export async function getChatConfig() {
   return { enabled: norm(bot.enabled || "oui") !== "non", name: bot.name || "Assistant QS2H", welcome: bot.welcome, email: s.company.email };
 }
 
-const euro = (n: number) => `${n.toLocaleString("fr-FR")} €`;
 
 function serviceLine(k: Knowledge, slug?: string) {
   const sv = slug ? k.services.find((x) => x.slug === slug) : undefined;
@@ -35,6 +41,12 @@ export function knowledgeText(k: Knowledge) {
     "Services :",
     ...k.services.map((x) => `- ${x.title} : ${x.tagline}. ${x.solution}${x.priceFrom ? ` Prix à partir de ${x.priceFrom.toLocaleString("fr-FR")} ${x.priceUnit}.` : ""}${x.duration ? ` Délai : ${x.duration}.` : ""}`),
     ...(k.products.length ? ["Catalogue :", ...k.products.map((p) => `- ${p.title} (${p.category || "produit"}) : ${p.tagline} Prix : ${p.price} ${p.priceNote}.`)] : []),
+    ...(k.shop.length ? ["Boutique en ligne (/boutique) : commande sans paiement en ligne, facture envoyée après confirmation, livraison ou retrait à " + c.city + ".", ...k.shop.map((p) => `- ${p.title} (${p.category || "article"}) : ${p.tagline} Prix : ${money(p.price)} TTC.${p.stock === 0 ? " Rupture de stock." : p.stock < 0 ? " Sur commande." : ""}`)] : []),
+    ...(k.expertises.length ? ["Expertises :", ...k.expertises.map((x) => `- ${x.title} : ${x.text}`)] : []),
+    ...(k.steps.length ? ["Méthode :", ...k.steps.map((x, i) => `${i + 1}. ${x.title}${x.duration ? ` (${x.duration})` : ""} : ${x.text}`)] : []),
+    ...(k.commitments.length ? ["Engagements :", ...k.commitments.map((x) => `- ${x.title} : ${x.text}`)] : []),
+    ...(k.options.length ? ["Options :", ...k.options.map((o) => `- ${o.name} : ${o.price}. ${o.description}`)] : []),
+    "Espace client (/compte) : suivi des projets, demandes de modification, messagerie, documents, devis et factures, rendez-vous.",
     "Formules :",
     ...k.plans.map((p) => `- ${p.name} : ${p.price} € ${p.priceNote}. ${p.description} Inclus : ${p.features.join(", ")}.`),
     "FAQ :",
@@ -65,7 +77,10 @@ async function ruleAnswer(message: string, k: Knowledge): Promise<ChatReply> {
   if (has(m, /\b(rendez vous|rdv|reserver|creneau|planifier)\b/)) return out("Vous pouvez réserver directement un créneau (appel découverte de 20 minutes, visio ou rendez-vous sur place), avec confirmation par email.", ["Demander un devis"], false, [{ label: "Prendre rendez-vous", href: "/rendez-vous" }]);
   if (has(m, /\b(laisser mes coordonnees|rappel|rappeler|contacter|contact|joindre|telephone|appel|mail|email)\b/)) return out(`Vous pouvez nous écrire à ${c.email}${c.phone && !c.phone.startsWith("[") ? ` ou appeler le ${c.phone}` : ""}. Horaires : ${c.hours}. Ou laissez vos coordonnées ci-dessous, nous vous répondons sous 24 heures ouvrées.`, [], true, [{ label: "Page contact", href: "/contact" }]);
   if (has(m, /\b(horaires?|ouverts?|disponibles?)\b/)) return out(`Nous sommes joignables : ${c.hours}.`);
-  // 3. prix
+  // 3. base de connaissances du site (réponses tirées des données réelles)
+  const kb = siteKnowledge(m, k);
+  if (kb) return out(kb.reply, kb.quick ?? QUICK_MAIN, kb.form ?? false, kb.links ?? []);
+  // 4. prix
   const svHit = k.services.find((x) => words(x.title).some((w) => w.length > 3 && m.includes(w)) || m.includes(norm(x.slug).replace(/-/g, " ")));
   if (has(m, /\b(prix|tarif|tarifs|combien|cout|coute|budget|cher)\b/)) {
     if (svHit) return out(serviceLine(k, svHit.slug) || `Le prix de « ${svHit.title} » dépend de votre projet : demandez un devis gratuit.`, ["Demander un devis", "Voir les formules"], false, [{ label: svHit.title, href: `/services/${svHit.slug}` }]);
@@ -87,7 +102,7 @@ async function ruleAnswer(message: string, k: Knowledge): Promise<ChatReply> {
   if (svHit) return out(`${serviceLine(k, svHit.slug)} ${svHit.solution}`.trim(), ["Combien ça coûte ?", "Demander un devis"], false, [{ label: `En savoir plus : ${svHit.title}`, href: `/services/${svHit.slug}` }]);
   if (has(m, /\b(formules?|offres?)\b/)) return out(`Nos formules : ${k.plans.map((p) => p.name).join(", ")}.`, ["Combien coûte un site ?"], false, [{ label: "Voir les tarifs", href: "/tarifs" }]);
   if (has(m, /\b(realisations?|exemples?|portfolio|projets?)\b/)) return out("Vous pouvez parcourir nos projets, ouverts comme des fenêtres de travail.", QUICK_MAIN, false, [{ label: "Nos réalisations", href: "/realisations" }]);
-  if (has(m, /\b(qui etes vous|vous etes qui|qui es tu|qui est qs2h|agence|equipe|a propos|ou etes vous|bordeaux)\b/)) return out(`${c.name} est une agence web à ${c.city}. ${k.s.footerText}`, QUICK_MAIN, false, [{ label: "À propos", href: "/a-propos" }]);
+  if (has(m, /\b(qui etes vous|vous etes qui|qui es tu|qui est qs2h|agence|equipe|a propos|ou etes vous|la rochelle|rochelle)\b/)) return out(`${c.name} est une agence web à ${c.city}. ${k.s.footerText}`, QUICK_MAIN, false, [{ label: "À propos", href: "/a-propos" }]);
   // 6. FAQ : recouvrement de mots
   const mw = new Set(words(message));
   let best: { f: (typeof k.faqs)[number]; n: number } | null = null;
@@ -131,4 +146,74 @@ export async function answerChat(history: ChatTurn[]): Promise<ChatReply> {
   const k = await loadKnowledge();
   const last = history[history.length - 1]?.text ?? "";
   return (await llmAnswer(history, k)) ?? (await ruleAnswer(last, k));
+}
+
+/* ------------------------------------------------------------------ Base de connaissances du site
+   Chaque sujet répond uniquement avec ce que le site affirme déjà (services, méthode, engagements, boutique, espace client…). */
+type KbHit = { reply: string; links?: { label: string; href: string }[]; quick?: string[]; form?: boolean };
+function siteKnowledge(m: string, k: Knowledge): KbHit | null {
+  const c = k.s.company;
+  const sv = (slug: string) => k.services.find((x) => x.slug === slug);
+  const svLine = (slug: string, fallback: string) => { const x = sv(slug); return x ? `${x.title} : ${x.tagline} ${x.solution}${x.priceFrom ? ` À partir de ${x.priceFrom.toLocaleString("fr-FR")} ${x.priceUnit}.` : ""}${x.duration ? ` Délai indicatif : ${x.duration}.` : ""}` : fallback; };
+  const svLink = (slug: string) => (sv(slug) ? [{ label: sv(slug)!.title, href: `/services/${slug}` }] : [{ label: "Nos services", href: "/services" }]);
+  const exp = (re: RegExp) => k.expertises.find((x) => re.test(norm(x.title)));
+  const commit = (re: RegExp) => k.commitments.find((x) => re.test(norm(x.title + " " + x.text)));
+
+  // Boutique : un article précis
+  const GENERIC = new Set(["site", "sites", "pack", "main", "mois", "pro", "web", "offre"]);
+  const item = k.shop.find((p) => words(p.title).filter((w) => w.length > 3 && !GENERIC.has(w)).some((w) => m.includes(w)) && /\b(prix|combien|stock|dispo|disponible|acheter|commander|commande|boutique|article)\b/.test(m));
+  if (item) return { reply: `${item.title} : ${item.tagline} Prix : ${money(item.price)} TTC${item.comparePrice > item.price ? ` (au lieu de ${money(item.comparePrice)})` : ""}. ${item.stock === 0 ? "Il est actuellement en rupture de stock." : item.stock < 0 ? "Il est disponible sur commande." : "Il est en stock."} La commande se fait sans paiement en ligne : nous confirmons puis envoyons la facture.`, links: [{ label: "Voir l'article", href: `/boutique/${item.slug}` }], quick: ["Comment se passe une commande ?", "Livraison ou retrait ?"] };
+  // Créer une boutique pour le client (service) — avant la boutique QS2H
+  if (/\b(vendre en ligne|e commerce|ecommerce|site marchand|boutique en ligne pour|creer une boutique|ma boutique)\b/.test(m)) return { reply: svLine("e-commerce", "Nous créons des boutiques en ligne adaptées à votre catalogue."), links: svLink("e-commerce"), quick: ["Combien ça coûte ?", "Demander un devis"] };
+  // Boutique QS2H
+  if (/\b(boutique|acheter|achat|panier|materiel|ordinateur|ecran|licence|logiciel|microsoft|office)\b/.test(m)) {
+    const top = (k.shop.filter((p) => p.featured).length ? k.shop.filter((p) => p.featured) : k.shop).slice(0, 4);
+    return { reply: `Notre boutique propose du matériel, des logiciels et des solutions clés en main, choisis et installés par nos soins.${top.length ? ` En ce moment : ${top.map((p) => `${p.title} (${money(p.price)})`).join(", ")}.` : ""} Vous commandez en ligne sans payer : nous confirmons la disponibilité puis envoyons la facture.`, links: [{ label: "Visiter la boutique", href: "/boutique" }], quick: ["Comment se passe une commande ?", "Livraison ou retrait ?", "Moyens de paiement"] };
+  }
+  if (/\b(commande|commander|suivi de commande|numero de commande)\b/.test(m)) return { reply: "Ajoutez vos articles au panier puis cliquez sur « Commander » : vous indiquez vos coordonnées et choisissez livraison ou retrait. Vous recevez aussitôt un email récapitulatif avec votre numéro de commande ; nous vérifions la disponibilité et revenons vers vous avec la confirmation et la facture.", links: [{ label: "La boutique", href: "/boutique" }], quick: ["Livraison ou retrait ?", "Moyens de paiement"] };
+  if (/\b(paiement|payer|paye|paie|paient|carte bancaire|cb|virement|facture|facturation|acompte|regler|reglement)\b/.test(m)) return { reply: "Sur la boutique, aucun paiement n'est demandé en ligne : nous vous envoyons la facture après avoir confirmé la commande. Pour la création de site, les modalités de paiement sont écrites dans le devis, avant tout démarrage. Les factures sont aussi disponibles dans votre espace client.", links: [{ label: "Espace client", href: "/compte" }], quick: ["Demander un devis", "Comment se passe une commande ?"] };
+  if (/\b(livraison|livrer|livrez|retrait|retirer|expedition|envoi|frais de port)\b/.test(m) && !/\b(site|delai|semaines|projet)\b/.test(m)) return { reply: `Pour la boutique, vous choisissez la livraison (frais confirmés avec la facture) ou le retrait gratuit à ${c.city}, sur rendez-vous.`, links: [{ label: "La boutique", href: "/boutique" }] };
+  // Espace client
+  if (/\b(espace client|mon compte|compte client|connexion|me connecter|identifiant|mot de passe|inscription|creer un compte)\b/.test(m)) {
+    if (/mot de passe|oubli/.test(m)) return { reply: "Pas de souci : utilisez « Mot de passe oublié » sur la page de connexion, vous recevrez un lien pour en choisir un nouveau.", links: [{ label: "Mot de passe oublié", href: "/compte/mot-de-passe-oublie" }] };
+    return { reply: "Votre espace client regroupe tout votre projet : avancement des étapes, demandes de modification avec réponses, messagerie avec l'équipe, documents et maquettes à valider, devis et factures, et vos rendez-vous. L'inscription est immédiate ; vous pourrez confirmer votre adresse email plus tard.", links: [{ label: "Espace client", href: "/compte" }, { label: "Créer un compte", href: "/compte/inscription" }] };
+  }
+  if (/\b(autonome|moi meme|administrer|back office|gerer mon site)\b/.test(m)) return { reply: "Vous gardez la main : le site est livré avec une interface simple pour modifier vos textes et images, et nous vous montrons comment l'utiliser. Vous pouvez aussi nous confier les modifications depuis votre espace client.", links: [{ label: "Espace client", href: "/compte" }] };
+  if (/\b(etes ou|ou etes|ou vous trouver|adresse|situes?|localisation|bureaux?|locaux)\b/.test(m)) return { reply: `Nous sommes basés à ${c.city}. ${c.area}`, links: [{ label: "Prendre rendez-vous", href: "/rendez-vous" }, { label: "Contact", href: "/contact" }] };
+  if (/\b(modification|modifier|changement|evolution|mise a jour de mon site|ajouter une page)\b/.test(m)) return { reply: "Une fois le site en ligne, vous pouvez demander une modification depuis votre espace client (« Demandes de modification ») : vous suivez son traitement et nos réponses au même endroit. Les petites modifications sont incluses dans la maintenance.", links: [{ label: "Espace client", href: "/compte" }, ...svLink("maintenance-hebergement")] };
+  // Propriété, domaine, hébergement
+  if (/\b(proprietaire|propriete|appartient|appartiendra|code source|nom de domaine|domaine|acces|droits)\b/.test(m)) { const x = commit(/propriet|appartien/); return { reply: x ? `${x.title}. ${x.text}` : "Le site vous appartient : nom de domaine, code, contenus et accès vous sont remis à la livraison.", links: [{ label: "Nos engagements", href: "/a-propos" }] }; }
+  if (/\b(hebergement|heberger|heberge|serveur|hebergeur)\b/.test(m)) return { reply: svLine("maintenance-hebergement", "Nous pouvons héberger et entretenir votre site."), links: svLink("maintenance-hebergement") };
+  if (/\b(maintenance|mise a jour|mises a jour|securite|securise|sauvegarde|piratage|panne|certificat|ssl|https)\b/.test(m)) return { reply: svLine("maintenance-hebergement", "Nous assurons la maintenance : mises à jour, sauvegardes, surveillance."), links: svLink("maintenance-hebergement"), quick: ["Combien ça coûte ?", "Demander un devis"] };
+  // Visibilité
+  if (/\b(seo|referencement|google|visible|visibilite|premiere page|trouve|moteur de recherche|fiche google|google business)\b/.test(m)) return { reply: svLine("referencement-seo", "Nous travaillons le référencement : structure, contenus, fiche Google."), links: [...svLink("referencement-seo"), { label: "Article : référencement local", href: "/blog" }], quick: ["Combien ça coûte ?", "Quel est le délai ?"] };
+  if (/\b(marketing|reseaux sociaux|instagram|facebook|linkedin|publicite|ads|campagne|newsletter|emailing)\b/.test(m)) { const x = exp(/marketing/); return { reply: x ? `${x.title} : ${x.text}` : "Nous vous aidons à attirer les bons clients : visibilité, campagnes et suivi des résultats.", links: [{ label: "Nos expertises", href: "/#expertises" }], quick: ["Demander un devis"] }; }
+  if (/\b(chatbots?|assistants?|intelligence artificielle|ia|bots?)\b/.test(m)) { const x = exp(/chatbot|assistant/); return { reply: x ? `${x.title} : ${x.text} D'ailleurs, je suis un exemple de ce que nous construisons.` : "Nous créons des assistants comme moi, qui répondent à vos clients à toute heure et transmettent les demandes à l'équipe.", quick: ["Demander un devis"] }; }
+  if (/\bautomati|\b(crm|zapier|workflow|relances?|taches? repetitives?)\b/.test(m)) { const x = exp(/automatis/); return { reply: x ? `${x.title} : ${x.text}` : "Nous automatisons les tâches répétitives : formulaires reliés à votre CRM, devis, relances, emails de suivi.", quick: ["Demander un devis"] }; }
+  if (/\b(matrice|excel|tableur|tableau de bord|outil sur mesure|outil interne)\b/.test(m)) { const x = exp(/matrice|outil/); return { reply: x ? `${x.title} : ${x.text}` : "Nous créons des outils sur mesure : tableaux de suivi, matrices, interfaces internes.", links: svLink("site-sur-mesure") }; }
+  if (/\b(sur mesure|application|appli|intranet|plateforme|reservation en ligne)\b/.test(m)) return { reply: svLine("site-sur-mesure", "Nous développons des sites et applications sur mesure."), links: svLink("site-sur-mesure") };
+  if (/\b(refonte|refaire|ancien site|moderniser|redesign|site vieillissant)\b/.test(m)) return { reply: svLine("refonte-de-site", "Nous refaisons les sites existants sans perdre votre référencement."), links: svLink("refonte-de-site") };
+  if (/\b(site vitrine|vitrine|presenter mon activite|premier site|creer un site|creation de site)\b/.test(m)) return { reply: svLine("site-vitrine", "Nous créons des sites vitrines rapides et clairs."), links: svLink("site-vitrine"), quick: ["Combien ça coûte ?", "Quel est le délai ?"] };
+  // Qualité
+  if (/\b(mobile|responsive|smartphone|tablette|adapte au telephone)\b/.test(m)) return { reply: "Oui : chaque site est conçu d'abord pour le téléphone, puis adapté à la tablette et à l'ordinateur. Nous le testons sur ces trois écrans avant la mise en ligne.", links: [{ label: "Notre méthode", href: "/methode" }] };
+  if (/\b(rapide|vitesse|performance|lent|chargement)\b/.test(m)) return { reply: "La vitesse fait partie de chaque projet : images optimisées, chargement différé, code sans extension superflue. Un site rapide est mieux classé par Google et convertit davantage.", links: [{ label: "Notre méthode", href: "/methode" }] };
+  if (/\b(accessibilite|accessible|handicap|malvoyant)\b/.test(m)) return { reply: "Nous vérifions l'accessibilité pendant la recette : contrastes, navigation au clavier, textes alternatifs des images, titres structurés.", links: [{ label: "Notre méthode", href: "/methode" }] };
+  if (/\b(autonome|moi meme|administrer|back office|interface d administration|gerer mon site|formation)\b/.test(m)) return { reply: "Vous gardez la main : le site est livré avec une interface simple pour modifier vos textes et images, et nous vous montrons comment l'utiliser. Vous pouvez aussi nous confier les modifications.", quick: ["Demander un devis"] };
+  if (/\b(wordpress|shopify|wix|technologie|cms|framework|langage)\b/.test(m)) return { reply: "Nous choisissons la solution adaptée à votre projet et à votre budget, avec un code propre et documenté. Dans tous les cas, le site et ses accès vous appartiennent.", quick: ["Demander un devis"] };
+  if (/\b(texte|textes|redaction|rediger|contenu|contenus)\b/.test(m)) return { reply: "Les textes sont rédigés avec vous : chaque page répond à une question que vos clients se posent, en langage clair et pensé pour Google.", quick: ["Demander un devis"] };
+  if (/\b(photo|photos|photographe|images|visuels)\b/.test(m)) { const o = k.options.find((x) => /photo/i.test(x.name)); return { reply: o ? `${o.name} : ${o.description} Tarif : ${o.price}.` : "Nous pouvons intégrer vos photos ou vous orienter vers des visuels adaptés ; à préciser dans le devis.", links: [{ label: "Options tarifaires", href: "/tarifs" }] }; }
+  if (/\b(logo|identite visuelle|charte graphique|couleurs)\b/.test(m)) return { reply: "Nous partons de votre identité existante (logo, couleurs) ou vous accompagnons pour la faire évoluer. Ce qui est inclus est précisé dans le devis.", quick: ["Demander un devis"] };
+  if (/\b(multilingue|anglais|traduction|plusieurs langues)\b/.test(m)) return { reply: "Un site en plusieurs langues est possible. Indiquez-le dans votre demande : nous le chiffrons dans le devis.", quick: ["Demander un devis"] };
+  // Méthode et engagements
+  if (/\b(methode|etapes|comment ca se passe|deroulement|process|processus|comment travaillez)\b/.test(m) && k.steps.length) return { reply: `Chaque projet suit ${k.steps.length} étapes : ${k.steps.map((x) => x.title + (x.duration ? ` (${x.duration})` : "")).join(", ")}. Vous savez toujours où en est votre projet, notamment depuis votre espace client.`, links: [{ label: "Notre méthode", href: "/methode" }] };
+  if (/\b(garantie|engagement|engagements|confiance|serieux|retard)\b/.test(m) && k.commitments.length) return { reply: k.commitments.map((x) => `${x.title} : ${x.text}`).join(" "), links: [{ label: "À propos", href: "/a-propos" }] };
+  if (/\b(rgpd|donnees personnelles|confidentialite|cookies|vie privee)\b/.test(m)) return { reply: "Vos données ne servent qu'à traiter votre demande et ne sont jamais revendues. La mesure d'audience n'est activée qu'avec votre accord. Les détails sont dans nos politiques de confidentialité et de cookies.", links: [{ label: "Confidentialité", href: "/politique-de-confidentialite" }, { label: "Cookies", href: "/politique-de-cookies" }] };
+  if (/\b(zone|deplacez|deplacement|distance|visio|a distance|partout en france|charente)\b/.test(m)) return { reply: `${c.area}`, links: [{ label: "Prendre rendez-vous", href: "/rendez-vous" }] };
+  if (/\b(temps de reponse|repondez|reponse sous|reactivite)\b/.test(m)) return { reply: `Nous répondons sous 24 heures ouvrées (${c.hours}).`, quick: ["Demander un devis", "Laisser mes coordonnées"] };
+  if (/\b(avis|temoignages?|clients satisfaits|references)\b/.test(m)) return { reply: "Vous pouvez parcourir nos réalisations, présentées en détail avec leur contexte et leurs résultats.", links: [{ label: "Nos réalisations", href: "/realisations" }] };
+  if (/\b(blog|conseils|articles|guide)\b/.test(m)) return { reply: "Notre blog publie des conseils concrets : prix d'un site, référencement local, bonnes pratiques.", links: [{ label: "Le blog", href: "/blog" }] };
+  if (/\b(recrutement|stage|alternance|emploi|candidature|recrutez)\b/.test(m)) return { reply: `Merci de votre intérêt ! Envoyez votre candidature à ${c.email}.` };
+  if (/\b(annuler|annulation|deplacer mon rendez vous|modifier mon rendez vous)\b/.test(m)) return { reply: "Le lien pour annuler ou déplacer votre rendez-vous se trouve dans l'email de confirmation. Vous pouvez aussi nous écrire.", links: [{ label: "Prendre rendez-vous", href: "/rendez-vous" }] };
+  if (/\b(option|options)\b/.test(m) && k.options.length) return { reply: `Options disponibles : ${k.options.map((o) => `${o.name} (${o.price})`).join(" · ")}.`, links: [{ label: "Tarifs et options", href: "/tarifs" }] };
+  return null;
 }

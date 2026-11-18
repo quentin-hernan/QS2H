@@ -81,6 +81,7 @@ model Service {
   faq            String  @default("[]") // JSON {q,a}[]
   seoTitle       String  @default("")
   seoDescription String  @default("")
+  image          String  @default("")
   order          Int     @default(0)
   published      Boolean @default(true)
 }
@@ -128,6 +129,7 @@ model Plan {
   features    String  @default("[]") // JSON string[]
   highlighted Boolean @default(false)
   cta         String  @default("Demander ce devis")
+  image       String  @default("")
   order       Int     @default(0)
 }
 
@@ -155,6 +157,7 @@ model Review {
   text      String
   visible   Boolean @default(true)
   isExample Boolean @default(false)
+  photo     String  @default("")
   order     Int     @default(0)
 }
 
@@ -399,4 +402,52 @@ model ClientRequest {
   updatedAt DateTime @updatedAt
 
   @@index([clientId, status])
+}
+
+/// Boutique : articles vendus en ligne (matériel, logiciels, prestations packagées…)
+model ShopItem {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  tagline        String   @default("")
+  description    String   @default("")
+  category       String   @default("")
+  brand          String   @default("")
+  price          Float    @default(0) // € TTC
+  comparePrice   Float    @default(0) // prix barré (0 = aucun)
+  stock          Int      @default(0) // -1 = sur commande / illimité
+  badge          String   @default("") // ex. Nouveau, Promo, Coup de cœur
+  image          String   @default("")
+  images         String   @default("[]") // JSON string[]
+  features       String   @default("[]") // JSON string[]
+  blocks         String   @default("[]") // JSON {image,title,text}[] : zones image + texte de la fiche
+  specs          String   @default("[]") // JSON {label,value}[]
+  featured       Boolean  @default(false) // « du moment » : mis en avant sur l'accueil
+  isExample      Boolean  @default(false)
+  published      Boolean  @default(false)
+  seoTitle       String   @default("")
+  seoDescription String   @default("")
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+/// Boutique : commandes passées sur le site (sans paiement en ligne : facturation ensuite)
+model ShopOrder {
+  id        String   @id @default(cuid())
+  number    String   @unique
+  status    String   @default("nouvelle") // nouvelle, confirmée, expédiée, terminée, annulée
+  name      String
+  email     String
+  phone     String   @default("")
+  company   String   @default("")
+  address   String   @default("")
+  zip       String   @default("")
+  city      String   @default("")
+  delivery  String   @default("livraison") // livraison, retrait
+  note      String   @default("")
+  items     String   @default("[]") // JSON {slug,title,price,qty}[] (prix figés au moment de la commande)
+  total     Float    @default(0)
+  cgvVersion Int     @default(0) // version des CGV boutique acceptée à la commande
+  createdAt DateTime @default(now())
 }

@@ -21,14 +21,14 @@ export async function destroyClientSession() {
   (await cookies()).delete(COOKIE);
 }
 
-/** Client connecté, compte vérifié, session non révoquée (« se déconnecter partout »). */
+/** Client connecté, session non révoquée (« se déconnecter partout »). L'adresse email peut être confirmée plus tard (`emailVerifiedAt` renseigné à la confirmation). */
 export async function getClient() {
   const t = (await cookies()).get(COOKIE)?.value;
   if (!t) return null;
   try {
     const { payload } = await jwtVerify(t, key());
     const c = await db.client.findUnique({ where: { id: String(payload.cid) } });
-    if (!c || !c.emailVerifiedAt || c.sessionVersion !== payload.sv) return null;
+    if (!c || c.sessionVersion !== payload.sv) return null;
     return c;
   } catch {
     return null;

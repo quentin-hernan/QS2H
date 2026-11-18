@@ -26,8 +26,8 @@ export function Timeline({ steps }: { steps: Step[] }) {
       <span aria-hidden="true" className="absolute bottom-2 left-[19px] top-2 w-px bg-current opacity-15" />
       <span ref={line} aria-hidden="true" className="acc-bg absolute bottom-2 left-[19px] top-2 w-px origin-top" style={{ transform: "scaleY(0)" }} />
       {steps.map((s, i) => (
-        <li key={s.title} className="group relative grid grid-cols-[40px_1fr] gap-6 pb-14 last:pb-0 md:grid-cols-[40px_1fr_auto]">
-          <span className="relative z-[1] mt-1 flex h-10 w-10 items-center justify-center rounded-full border bg-ivory text-[0.8rem] tabular-nums transition-colors duration-500 group-[.on]:border-transparent group-[.on]:text-ivory hair group-[.on]:acc-bg">{String(i + 1).padStart(2, "0")}</span>
+        <li key={s.title} className="group tl-li relative grid grid-cols-[40px_1fr] gap-6 pb-14 last:pb-0 md:grid-cols-[40px_1fr_auto]">
+          <span className="tl-num relative z-[1] mt-1 flex h-10 w-10 items-center justify-center rounded-full text-[0.8rem] font-semibold tabular-nums">{String(i + 1).padStart(2, "0")}</span>
           <div className="opacity-35 transition-opacity duration-500 group-[.on]:opacity-100">
             <h3 className="text-h3 font-medium">{s.title}</h3>
             <p className="muted mt-2 max-w-[56ch] leading-relaxed">{s.text}</p>

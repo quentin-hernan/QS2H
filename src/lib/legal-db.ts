@@ -1,14 +1,15 @@
 import "server-only";
 import { db } from "./db";
-import { cgu, cgv, confidentialite, cookies, mentionsLegales, type LegalSection } from "./legal";
+import { cgu, cgv, cgvVente, confidentialite, cookies, mentionsLegales, type LegalSection } from "./legal";
 import type { Company } from "./defaults";
 
-export type DocKey = "mentions" | "confidentialite" | "cgu" | "cgv" | "cookies";
+export type DocKey = "mentions" | "confidentialite" | "cgu" | "cgv" | "vente" | "cookies";
 export const LEGAL_DOCS: Record<DocKey, { title: string; path: string; description: string; template: (c: Company) => LegalSection[] }> = {
   mentions: { title: "Mentions légales", path: "/mentions-legales", description: "Mentions légales (LCEN) de QS2H : éditeur, hébergeur, contact.", template: mentionsLegales },
   confidentialite: { title: "Politique de confidentialité", path: "/politique-de-confidentialite", description: "Comment QS2H collecte, utilise et protège vos données personnelles, et comment exercer vos droits.", template: confidentialite },
   cgu: { title: "Conditions générales d'utilisation", path: "/cgu", description: "Conditions d'utilisation de l'espace client QS2H.", template: cgu },
   cgv: { title: "Conditions générales de vente", path: "/cgv", description: "Conditions générales de vente des prestations de création, refonte et maintenance de sites web de QS2H.", template: cgv },
+  vente: { title: "Conditions générales de vente — Boutique", path: "/cgv-boutique", description: "Conditions de vente de la boutique en ligne QS2H : commande, prix, livraison, droit de rétractation, garanties.", template: cgvVente },
   cookies: { title: "Politique de cookies", path: "/politique-de-cookies", description: "Les cookies et traceurs utilisés par le site QS2H, et comment gérer votre consentement.", template: () => cookies() },
 };
 

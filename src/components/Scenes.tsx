@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { WordReveal } from "./Motion";
+import { MapEmbed } from "./MapEmbed";
 
 /* Scènes contextuelles par page : objets en CSS 3D (transform / opacity), légers, sans WebGL supplémentaire.
    Rôle de chacune : illustrer ce que la page explique et réagir à l'action du visiteur. */
@@ -126,20 +128,6 @@ export function MethodDevice({ target }: { target: string }) {
   );
 }
 
-/** Page Contact : le portable s'ouvre quand on commence le formulaire. */
-export function ContactLaptop() {
-  const [open, setOpen] = useState(0.15);
-  useEffect(() => {
-    const f = () => setOpen(1);
-    const form = document.querySelector('form[aria-label="Demande de devis"]');
-    form?.addEventListener("focusin", f);
-    return () => form?.removeEventListener("focusin", f);
-  }, []);
-  return (
-    <div className="mt-12 hidden max-w-sm lg:block"><Laptop open={open}><div className="sc"><p className="sc-t">Votre demande</p><Bar w="70%" h={10} c="acc" /><Bar w="50%" d={150} /><Bar w="60%" d={300} /></div></Laptop></div>
-  );
-}
-
 /** Confirmation d'envoi : coche animée sur l'écran. */
 export function SentLaptop() {
   return (
@@ -152,12 +140,40 @@ export function SheetStack() {
   return (<div className="sheets hidden md:block" aria-hidden="true">{[0, 1, 2, 3].map((i) => (<i key={i} style={{ ["--i" as string]: i }} />))}</div>);
 }
 
-/** Espace client : l'objet se construit selon l'étape en cours (une couche par étape terminée). */
-export function ProjectObject({ done, total, current }: { done: number; total: number; current?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+/** Bas de la page Contact : un portable qui s'ouvre sur une carte animée (rues, Garonne, épingle) et la carte OpenStreetMap, le tout centré sous le formulaire. */
+export function ContactFind({ city, area }: { city: string; area: string }) {
+  const root = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setOn(true); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <div ref={ref} className="pobj" role="img" aria-label={`Avancement : ${done} étape(s) terminée(s) sur ${total}${current ? `, en cours : ${current}` : ""}`}>
-      {Array.from({ length: total }, (_, i) => (<i key={i} className={i < done ? "on" : i === done ? "cur" : ""} style={{ ["--i" as string]: i, animationDelay: `${i * 120}ms` }} />))}
+    <div ref={root} className={`cf ${on ? "cf-on" : ""}`}>
+      <p className="eyebrow cf-eyebrow"><i className="cf-rule" aria-hidden="true" />Nous trouver</p>
+      <h2 className="cf-title text-h1 font-medium"><WordReveal text={`${city}, et partout en France.`} immediate={on} auto={false} step={80} className={on ? "in" : ""} /></h2>
+      <p className="muted cf-lead">{area}</p>
+      <div className="cf-grid">
+        <div className="cf-laptop">
+          <Laptop open={on ? 1 : 0.12} label={`Carte animée : ${city}`}>
+            <div className="cm">
+              <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="320" height="200" fill="rgb(var(--accent) / 0.06)" />
+                <path className="cm-river" d="M-10 150C50 130 90 170 150 140S250 100 335 120" pathLength="1" />
+                {["M20 20L120 60L300 30", "M40 100L160 80L310 90", "M70 10L90 190", "M170 0L150 200", "M250 10L270 190", "M10 170L300 180"].map((d, i) => (<path key={i} className="cm-street" d={d} pathLength="1" style={{ ["--i" as string]: i }} />))}
+                <path className="cm-route" d="M40 170L90 130L150 112L200 78" pathLength="1" />
+                <g className="cm-pin"><circle className="cm-wave" cx="200" cy="78" r="8" /><circle className="cm-wave cm-wave2" cx="200" cy="78" r="8" /><path d="M200 78c-9-12-14-18-14-26a14 14 0 0 1 28 0c0 8-5 14-14 26z" transform="translate(0 -8)" className="cm-drop" /><circle cx="200" cy="44" r="5" fill="#fff" /></g>
+              </svg>
+              <span className="cm-tag">{city}</span>
+            </div>
+          </Laptop>
+        </div>
+        <div className="cf-map"><MapEmbed city={city} /></div>
+      </div>
     </div>
   );
 }

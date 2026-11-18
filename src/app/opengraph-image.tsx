@@ -19,7 +19,7 @@ export default async function OG() {
           {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
           <img src={`data:image/png;base64,${logo}`} width={620} height={195} />
           <div style={{ display: "flex", marginTop: 48, fontSize: 38, color: "#5A5F66" }}>Des sites web qui travaillent pour vous.</div>
-          <div style={{ display: "flex", marginTop: 14, fontSize: 26, color: "#5A5F66" }}>Création de sites web · Bordeaux et toute la France</div>
+          <div style={{ display: "flex", marginTop: 14, fontSize: 26, color: "#5A5F66" }}>Création de sites web · La Rochelle et toute la France</div>
         </div>
       </div>
     ),

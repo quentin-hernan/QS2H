@@ -84,7 +84,7 @@ const draws: Record<string, Draw> = {
   Référencement: (g, w, h, a) => {
     g.fillStyle = IVORY; g.font = "26px Inter, system-ui, Arial, sans-serif";
     g.fillStyle = MUTE; g.fillText("www.votre-site.fr › services", 56, 226);
-    g.fillStyle = a; g.font = "600 34px Inter, system-ui, Arial, sans-serif"; g.fillText("Création de site web à Bordeaux", 56, 274);
+    g.fillStyle = a; g.font = "600 34px Inter, system-ui, Arial, sans-serif"; g.fillText("Création de site web à La Rochelle", 56, 274);
     g.fillStyle = "rgba(242,239,233,.3)"; g.fillRect(56, 304, 760, 12); g.fillRect(56, 330, 620, 12);
     g.fillStyle = IVORY; g.font = "600 24px Inter, system-ui, Arial, sans-serif"; g.fillText("Positions", 56, 430);
     [60, 95, 90, 150, 190, 175, 240].forEach((v, i) => { g.fillStyle = i === 6 ? a : "rgba(242,239,233,.55)"; g.fillRect(56 + i * 70, 640 - v, 46, v); });

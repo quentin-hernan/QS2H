@@ -1,22 +1,27 @@
 /* ================================================================== Assistant : sobre, sans effets */
-.qchat { position: fixed; right: 20px; bottom: 20px; z-index: 80; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; font-family: var(--font-sans), system-ui, sans-serif; color: #1C1C1C; }
+.qchat {
+  --q-panel: #FFFFFF; --q-head: #FFFFFF; --q-head-fg: #1C1C1C; --q-sub: #5A5F66; --q-log: #F8F8F7; --q-bubble: #FFFFFF; --q-fg: #1C1C1C;
+  --q-line: rgb(28 28 28 / 0.1); --q-me: #1C1C1C; --q-me-fg: #FFFFFF; --q-field: #F8F8F7; --q-chip-h: #EFEFED; --q-icon: #5A5F66; --q-icon-h: rgb(28 28 28 / 0.07);
+  position: fixed; right: 20px; bottom: 20px; z-index: 80; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; font-family: var(--font-sans), system-ui, sans-serif; color: var(--q-fg); }
 .qchat-launch { width: 56px; height: 56px; border-radius: 50%; border: 0; background: rgb(var(--accent)); color: #fff; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 20px -6px rgb(0 0 0 / 0.45); transition: transform 0.3s var(--ease), background-color 0.3s; }
 .qchat-launch:hover { transform: scale(1.06); background: rgb(var(--accent-hover)); }
-.qchat-panel { width: min(380px, calc(100vw - 24px)); height: min(580px, calc(100dvh - 110px)); display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: #fff; border: 1px solid rgb(28 28 28 / 0.12); box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.4); animation: qPanel 0.35s var(--ease) both; transform-origin: 100% 100%; }
+.qchat-panel { width: min(380px, calc(100vw - 24px)); height: min(580px, calc(100dvh - 110px)); display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--q-panel); border: 1px solid var(--q-line); box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.4); animation: qPanel 0.35s var(--ease) both; transform-origin: 100% 100%; }
 @keyframes qPanel { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.qchat-head { display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 16px; background: #1C1C1C; color: #F8F8F7; }
-.qchat-avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: rgb(var(--accent)); color: #fff; flex: none; }
+.qchat-head { display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 16px; background: var(--q-head); color: var(--q-head-fg); border-bottom: 1px solid var(--q-line); }
+.qchat-avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #FFFFFF; box-shadow: inset 0 0 0 1px rgb(28 28 28 / 0.1); flex: none; overflow: hidden; }
+.qchat-avatar img { width: 34px; height: 34px; }
+.qchat-launch-img { width: 40px; height: 40px; border-radius: 50%; background: #FFFFFF; padding: 3px; }
 .qchat-mono { font: 700 0.9rem/1 var(--font-serif), system-ui, sans-serif; }
-.qchat-sub { display: block; font-size: 0.74rem; color: #A9AEB5; }
-.qchat-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #A9AEB5; background: transparent; border: 0; cursor: pointer; transition: background 0.3s, color 0.3s; }
-.qchat-icon:hover { background: rgb(248 248 247 / 0.12); color: #fff; }
-.qchat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #F8F8F7; overscroll-behavior: contain; }
+.qchat-sub { display: block; font-size: 0.74rem; color: var(--q-sub); }
+.qchat-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--q-icon); background: transparent; border: 0; cursor: pointer; transition: background 0.3s, color 0.3s; }
+.qchat-icon:hover { background: var(--q-icon-h); color: var(--q-head-fg); }
+.qchat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--q-log); overscroll-behavior: contain; }
 .qchat-row { display: flex; gap: 8px; align-items: flex-end; animation: qIn 0.3s var(--ease) both; }
 .qchat-row.user { justify-content: flex-end; }
 @keyframes qIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.qchat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.93rem; line-height: 1.5; background: #fff; border: 1px solid rgb(28 28 28 / 0.1); border-bottom-left-radius: 4px; overflow-wrap: anywhere; }
+.qchat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.93rem; line-height: 1.5; background: var(--q-bubble); color: var(--q-fg); border: 1px solid var(--q-line); border-bottom-left-radius: 4px; overflow-wrap: anywhere; }
 .qchat-bubble p { margin: 0; white-space: pre-wrap; }
-.qchat-row.user .qchat-bubble { background: #1C1C1C; border-color: transparent; color: #fff; border-radius: 16px; border-bottom-right-radius: 4px; }
+.qchat-row.user .qchat-bubble { background: var(--q-me); border-color: transparent; color: var(--q-me-fg); border-radius: 16px; border-bottom-right-radius: 4px; }
 .qchat-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .qchat-link { font-size: 0.82rem; font-weight: 600; color: rgb(var(--accent)); text-decoration: none; border: 1px solid rgb(var(--accent) / 0.4); border-radius: 999px; padding: 4px 11px; transition: background 0.3s; }
 .qchat-link:hover { background: rgb(var(--accent) / 0.08); }
@@ -24,19 +29,19 @@
 .qchat-typing i { width: 6px; height: 6px; border-radius: 50%; background: #8C9096; animation: qDot 1.1s ease-in-out infinite; }
 .qchat-typing i:nth-child(2) { animation-delay: 0.15s; } .qchat-typing i:nth-child(3) { animation-delay: 0.3s; }
 @keyframes qDot { 0%, 80%, 100% { opacity: 0.35; } 40% { opacity: 1; } }
-.qchat-quick { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 16px 10px; background: #F8F8F7; }
-.qchat-quick button { font-size: 0.82rem; color: #1C1C1C; background: #fff; border: 1px solid rgb(28 28 28 / 0.18); border-radius: 999px; padding: 7px 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s; min-height: 34px; }
-.qchat-quick button:hover { background: #EFEFED; border-color: rgb(28 28 28 / 0.4); }
-.qchat-input { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid rgb(28 28 28 / 0.1); background: #fff; }
-.qchat-input input { flex: 1; min-width: 0; background: #F8F8F7; border: 1px solid rgb(28 28 28 / 0.14); border-radius: 999px; padding: 11px 16px; color: #1C1C1C; font-size: 16px; }
+.qchat-quick { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 16px 10px; background: var(--q-log); }
+.qchat-quick button { font-size: 0.82rem; color: var(--q-fg); background: var(--q-bubble); border: 1px solid var(--q-line); border-radius: 999px; padding: 7px 13px; cursor: pointer; transition: background 0.3s, border-color 0.3s; min-height: 34px; }
+.qchat-quick button:hover { background: var(--q-chip-h); }
+.qchat-input { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--q-line); background: var(--q-panel); }
+.qchat-input input { flex: 1; min-width: 0; background: var(--q-field); border: 1px solid var(--q-line); border-radius: 999px; padding: 11px 16px; color: var(--q-fg); font-size: 16px; }
 .qchat-input input:focus { outline: none; border-color: rgb(var(--accent)); box-shadow: 0 0 0 3px rgb(var(--accent) / 0.18); }
-.qchat-input button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1C1C1C; color: #fff; display: grid; place-items: center; cursor: pointer; transition: background 0.3s, opacity 0.3s; }
+.qchat-input button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--q-me); color: var(--q-me-fg); display: grid; place-items: center; cursor: pointer; transition: background 0.3s, opacity 0.3s; }
 .qchat-input button:hover:not(:disabled) { background: rgb(var(--accent)); }
 .qchat-input button:disabled { opacity: 0.35; cursor: default; }
-.qchat-note { margin: 0; padding: 0 14px 10px; font-size: 0.68rem; line-height: 1.4; color: #5A5F66; background: #fff; }
-.qchat-form { display: grid; gap: 9px; padding: 14px; border-radius: 14px; background: #fff; border: 1px solid rgb(28 28 28 / 0.12); }
-.qchat-form label { display: grid; gap: 4px; font-size: 0.78rem; color: #5A5F66; }
-.qchat-form input:not([type="checkbox"]), .qchat-form textarea { background: #F8F8F7; border: 1px solid rgb(28 28 28 / 0.18); border-radius: 10px; padding: 9px 12px; color: #1C1C1C; font-size: 16px; font-family: inherit; resize: vertical; }
+.qchat-note { margin: 0; padding: 0 14px 10px; font-size: 0.68rem; line-height: 1.4; color: var(--q-sub); background: var(--q-panel); }
+.qchat-form { display: grid; gap: 9px; padding: 14px; border-radius: 14px; background: var(--q-bubble); border: 1px solid var(--q-line); }
+.qchat-form label { display: grid; gap: 4px; font-size: 0.78rem; color: var(--q-sub); }
+.qchat-form input:not([type="checkbox"]), .qchat-form textarea { background: var(--q-field); border: 1px solid var(--q-line); border-radius: 10px; padding: 9px 12px; color: var(--q-fg); font-size: 16px; font-family: inherit; resize: vertical; }
 .qchat-form input:focus, .qchat-form textarea:focus { outline: none; border-color: rgb(var(--accent)); }
 .qchat-check { display: flex !important; gap: 8px; align-items: flex-start; font-size: 0.72rem !important; line-height: 1.4; }
 .qchat-check input { margin-top: 2px; accent-color: rgb(var(--accent)); }
@@ -46,3 +51,10 @@
 .qchat-launch:focus-visible, .qchat-quick button:focus-visible, .qchat-icon:focus-visible, .qchat-send:focus-visible { outline: 2px solid rgb(var(--accent)); outline-offset: 3px; }
 @media (max-width: 480px) { .qchat { right: 12px; bottom: 12px; } .qchat-panel { height: min(78dvh, 580px); } }
 @media (prefers-reduced-motion: reduce) { .qchat-typing i, .qchat-panel, .qchat-row { animation: none !important; } .qchat-launch { transition: none; } }
+
+html[data-theme="dark"] .qchat {
+  --q-panel: #1F1F1F; --q-head: #1C1C1C; --q-head-fg: #F8F8F7; --q-sub: #A9AEB5; --q-log: #181818; --q-bubble: #262626; --q-fg: #F8F8F7;
+  --q-line: rgb(248 248 247 / 0.12); --q-me: #F8F8F7; --q-me-fg: #1C1C1C; --q-field: #262626; --q-chip-h: #2E2E2E; --q-icon: #A9AEB5; --q-icon-h: rgb(248 248 247 / 0.12);
+}
+html[data-theme="dark"] .qchat-link { color: rgb(var(--accent-hi)); border-color: rgb(var(--accent-hi) / 0.45); }
+html[data-theme="dark"] .qchat-err { color: #ff8a80; }

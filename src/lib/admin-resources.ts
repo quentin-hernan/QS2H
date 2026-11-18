@@ -7,18 +7,20 @@ export type Field = {
   type: FieldType;
   required?: boolean;
   options?: Option[] | "services";
-  itemFields?: { name: string; label: string; type: "text" | "textarea" }[];
+  itemFields?: { name: string; label: string; type: "text" | "textarea" | "image" }[];
   hint?: string;
   rows?: number;
   from?: string; // champ source pour générer un slug
   max?: number;
   half?: boolean;
+  decimal?: boolean; // nombre à virgule (prix)
+  min?: number;
 };
 export type Resource = {
   key: string; // segment d'URL /admin/<key>
   label: string;
   singular: string;
-  model: "project" | "service" | "product" | "plan" | "planOption" | "faq" | "review" | "post" | "teamMember" | "redirect";
+  model: "project" | "service" | "product" | "plan" | "planOption" | "faq" | "review" | "post" | "teamMember" | "redirect" | "shopItem";
   titleField: string;
   columns: { name: string; label: string }[];
   fields: Field[];
@@ -77,6 +79,7 @@ export const resources: Resource[] = [
       { name: "slug", label: "Adresse (slug)", type: "slug", from: "title", required: true, half: true },
       { name: "published", label: "Publié", type: "boolean", half: true },
       { name: "tagline", label: "Accroche", type: "textarea", required: true, rows: 2 },
+      { name: "image", label: "Image ou illustration du service (remplace l'animation par défaut ; 16:9 conseillé)", type: "image" },
       { name: "problem", label: "Le problème du client", type: "textarea", required: true, rows: 4 },
       { name: "solution", label: "Notre solution", type: "textarea", required: true, rows: 4 },
       { name: "deliverables", label: "Livrables", type: "list", hint: "Un par ligne." },
@@ -110,6 +113,35 @@ export const resources: Resource[] = [
     ],
   },
   {
+    key: "boutique", label: "Boutique (articles)", singular: "article", model: "shopItem", titleField: "title", orderable: true, duplicable: true,
+    statusField: { name: "published", bool: true },
+    json: ["images", "features", "specs", "blocks"],
+    columns: [{ name: "title", label: "Article" }, { name: "category", label: "Catégorie" }, { name: "price", label: "Prix TTC (€)" }, { name: "stock", label: "Stock" }, { name: "published", label: "En ligne" }],
+    help: "Tout ce que vous vendez : matériel, logiciels, prestations packagées… Les articles « du moment » apparaissent sur l'accueil (« Visitez notre boutique »). Les commandes arrivent dans Commandes boutique et par email ; aucun paiement en ligne n'est demandé, vous facturez ensuite.",
+    fields: [
+      { name: "title", label: "Nom de l'article", type: "text", required: true },
+      { name: "slug", label: "Adresse (slug)", type: "slug", from: "title", required: true, half: true },
+      { name: "published", label: "En ligne", type: "boolean", half: true },
+      { name: "category", label: "Catégorie", type: "text", half: true, hint: "Ex. Matériel, Logiciels, Prestations, Accessoires… Sert aux filtres de la boutique." },
+      { name: "brand", label: "Marque", type: "text", half: true },
+      { name: "price", label: "Prix TTC (€)", type: "number", decimal: true, required: true, half: true, hint: "Ex. 49.90" },
+      { name: "comparePrice", label: "Ancien prix barré (€, 0 = aucun)", type: "number", decimal: true, half: true },
+      { name: "stock", label: "Stock (-1 = sur commande)", type: "number", min: -1, half: true },
+      { name: "badge", label: "Pastille", type: "text", half: true, hint: "Ex. Nouveau, Promo, Coup de cœur. Vide = aucune." },
+      { name: "featured", label: "Article du moment (affiché sur l'accueil)", type: "boolean" },
+      { name: "tagline", label: "Accroche (une ligne)", type: "text", max: 160 },
+      { name: "image", label: "Image principale (carrée ou 4:3 conseillée)", type: "image" },
+      { name: "images", label: "Autres images (galerie)", type: "images" },
+      { name: "description", label: "Description", type: "textarea", rows: 6 },
+      { name: "features", label: "Points forts", type: "list", hint: "Un par ligne." },
+      { name: "blocks", label: "Zones de présentation (image + texte, affichées en alternance sur la fiche)", type: "objlist", itemFields: [{ name: "image", label: "Image", type: "image" }, { name: "title", label: "Titre", type: "text" }, { name: "text", label: "Texte", type: "textarea" }] },
+      { name: "specs", label: "Caractéristiques", type: "objlist", itemFields: [{ name: "label", label: "Caractéristique (ex. Écran)", type: "text" }, { name: "value", label: "Valeur (ex. 13,6 pouces)", type: "text" }] },
+      { name: "isExample", label: "Article d'exemple (à remplacer)", type: "boolean" },
+      { name: "seoTitle", label: "Titre SEO", type: "text", max: 70 },
+      { name: "seoDescription", label: "Meta description", type: "textarea", rows: 2, max: 170 },
+    ],
+  },
+  {
     key: "tarifs", label: "Formules tarifaires", singular: "formule", model: "plan", titleField: "name", orderable: true, duplicable: true,
     json: ["features"],
     columns: [{ name: "name", label: "Nom" }, { name: "price", label: "Prix" }, { name: "highlighted", label: "Mise en avant" }],
@@ -119,6 +151,7 @@ export const resources: Resource[] = [
       { name: "priceNote", label: "Mention (HT…)", type: "text", half: true },
       { name: "cta", label: "Texte du bouton", type: "text", half: true },
       { name: "description", label: "Description", type: "textarea", rows: 2 },
+      { name: "image", label: "Image de la formule (facultatif, 16:9)", type: "image" },
       { name: "features", label: "Contenu de la formule", type: "list", hint: "Une ligne par élément." },
       { name: "highlighted", label: "Mettre en avant (« Le plus demandé »)", type: "boolean" },
     ],
@@ -153,6 +186,7 @@ export const resources: Resource[] = [
       { name: "rating", label: "Note (1 à 5)", type: "number", required: true, half: true },
       { name: "role", label: "Fonction", type: "text", half: true },
       { name: "company", label: "Entreprise", type: "text", half: true },
+      { name: "photo", label: "Photo de l'auteur (la pastille affiche l'initiale tant qu'il n'y en a pas)", type: "image" },
       { name: "text", label: "Avis", type: "textarea", required: true, rows: 4 },
       { name: "visible", label: "Afficher sur le site", type: "boolean", half: true },
       { name: "isExample", label: "Avis d'exemple (à remplacer)", type: "boolean", half: true },

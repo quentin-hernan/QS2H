@@ -100,7 +100,8 @@ export function Chatbot() {
       {open && (
         <section role="dialog" aria-label={cfg.name} aria-modal="false" className="qchat-panel">
           <header className="qchat-head">
-            <span className="qchat-avatar"><span className="qchat-mono">Q</span></span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <span className="qchat-avatar"><img src="/assistant-avatar.webp" alt="" width={36} height={36} /></span>
             <span className="min-w-0 flex-1"><strong className="block truncate">{cfg.name}</strong><span className="qchat-sub">Assistant automatique</span></span>
             <button type="button" onClick={reset} className="qchat-icon" aria-label="Recommencer la conversation" title="Recommencer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg></button>
             <button type="button" onClick={() => { setOpen(false); launcher.current?.focus(); }} className="qchat-icon" aria-label="Fermer l'assistant"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
@@ -144,7 +145,7 @@ export function Chatbot() {
       )}
 
             <button ref={launcher} type="button" className="qchat-launch" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}>
-        {open ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg> : <BotIcon size={26} />}
+        {open ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg> : /* eslint-disable-next-line @next/next/no-img-element */ <img src="/assistant-avatar.webp" alt="" width={40} height={40} className="qchat-launch-img" />}
       </button>
     </div>
   );

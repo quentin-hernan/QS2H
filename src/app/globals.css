@@ -219,11 +219,11 @@ h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *, h4 * { font-style: normal !important; 
 .es-steps { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .es-steps li { display: grid; gap: 4px; padding: 14px; border-radius: 14px; background: #F3F3F1; }
 .es-steps li[data-s="termine"] { background: rgb(var(--accent) / 0.08); }
-.es-steps li[data-s="en-cours"] { background: #1C1C1C; color: #fff; }
-.es-steps li[data-s="en-cours"] .muted { color: #A9AEB5; }
+.es-steps li[data-s="en-cours"] { background: rgb(var(--accent) / 0.12); color: #1C1C1C; box-shadow: inset 0 0 0 1.5px rgb(var(--accent) / 0.55); }
+.es-steps li[data-s="en-cours"] .muted { color: #4A5059; }
 .es-dot { width: 10px; height: 10px; border-radius: 50%; background: rgb(28 28 28 / 0.2); }
 [data-s="termine"] .es-dot { background: rgb(var(--accent)); }
-[data-s="en-cours"] .es-dot { background: #7FA9D9; box-shadow: 0 0 0 4px rgb(127 169 217 / 0.25); }
+[data-s="en-cours"] .es-dot { background: rgb(var(--accent)); box-shadow: 0 0 0 4px rgb(var(--accent) / 0.25); }
 .es-timeline { display: grid; gap: 0; border-left: 2px solid rgb(28 28 28 / 0.1); margin-left: 5px; }
 .es-timeline li { position: relative; padding: 0 0 22px 22px; }
 .es-timeline li .es-dot { position: absolute; left: -6px; top: 6px; }
@@ -240,3 +240,32 @@ h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *, h4 * { font-style: normal !important; 
 .es-status[data-s="en cours"] { background: rgb(var(--accent) / 0.12); color: rgb(var(--accent)); }
 .es-status[data-s="terminée"] { background: #E3F1E8; color: #1F6B3A; }
 .es-reply { border-left: 3px solid rgb(var(--accent)); padding: 10px 14px; background: #F3F3F1; border-radius: 0 12px 12px 0; }
+
+/* Texte mot à mot (WordReveal) */
+.wr { display: inline; }
+.wr-m { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.wr-i { display: inline-block; transform: translateY(115%); opacity: 0; transition: transform 0.9s cubic-bezier(.2,.9,.2,1), opacity 0.7s ease; transition-delay: calc(var(--d, 0s) + var(--i) * var(--st, 50ms)); }
+.wr.in .wr-i { transform: none; opacity: 1; filter: none; }
+.wr-auto .wr-i { transition: none; animation: wrIn 0.95s cubic-bezier(.2,.9,.2,1) both; animation-delay: calc(var(--d, 0s) + var(--i) * var(--st, 70ms)); }
+@keyframes wrIn { from { transform: translateY(115%); opacity: 0; } to { transform: none; opacity: 1; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .wr-i { transform: none !important; opacity: 1 !important; filter: none !important; transition: none !important; animation: none !important; } }
+
+/* Aperçu admin des pages libres (cadre iframe) : tout est visible d'emblée, sans attendre le défilement */
+.pv .reveal { opacity: 1 !important; transform: none !important; }
+.pv .ln > span, .pv .wr-i { transform: none !important; opacity: 1 !important; filter: none !important; }
+
+/* Pastille d'avis et emplacements d'image modifiables */
+.avatar { display: inline-grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 50%; overflow: hidden; background: rgb(var(--accent)); color: #fff; font-weight: 700; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.slot { position: relative; }
+.slot-empty, .slot-badge { display: none; }
+.slot-hint { display: grid; place-items: center; height: 100%; font-size: 0.85rem; opacity: 0.7; }
+.sx-editing .slot { outline: 2px dashed rgb(127 169 217 / 0.9); outline-offset: 2px; cursor: pointer; }
+.sx-editing .slot-empty { display: block; min-height: 120px; background: rgb(127 169 217 / 0.08); }
+.sx-editing .slot-badge { display: block; position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: #2A5587; color: #fff; font: 600 0.68rem/1.4 var(--font-sans), sans-serif; font-style: normal; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 3; }
+.sx-editing .slot:hover .slot-badge { opacity: 1; }
+
+/* Édition directe : repères au survol */
+.sx-editing [data-ov]:hover { outline: 1.5px dashed rgb(127 169 217 / 0.95); outline-offset: 3px; cursor: text; }
+.sx-editing [data-ov="m"]:hover { cursor: pointer; }
+.sx-typing { outline: 2px solid #7FA9D9 !important; outline-offset: 4px; background: rgb(127 169 217 / 0.12); cursor: text; }

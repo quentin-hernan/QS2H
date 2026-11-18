@@ -3,6 +3,7 @@ import { Reveal, Lines } from "./Reveal";
 import { CountUp } from "./CountUp";
 import { FrameDraw } from "./Motion";
 import { euro } from "@/lib/utils";
+import { ImgSlot } from "./ImgSlot";
 
 export function TrustBar({ items }: { items: { value: string; label: string }[] }) {
   return (
@@ -62,7 +63,15 @@ export function ServicesList({ services, title, lead, theme = "light", bg = "" }
   );
 }
 
-type Rv = { id: string; author: string; role: string; company: string; rating: number; text: string; isExample: boolean };
+type Rv = { id: string; author: string; role: string; company: string; rating: number; text: string; isExample: boolean; photo?: string };
+/** Pastille d'auteur : photo si elle est renseignée dans l'admin, sinon initiale. */
+function Avatar({ id, name, photo }: { id: string; name: string; photo?: string }) {
+  return (
+    <ImgSlot id={`rv-${id}`} src={photo} className="avatar" >
+      <b>{name.replace(/[\[\]]/g, "").trim().slice(0, 1).toUpperCase()}</b>
+    </ImgSlot>
+  );
+}
 export function Reviews({ reviews }: { reviews: Rv[] }) {
   if (!reviews.length) return null;
   const [first, ...rest] = reviews;
@@ -75,6 +84,7 @@ export function Reviews({ reviews }: { reviews: Rv[] }) {
           <figure className="max-w-5xl">
             <blockquote className="font-serif text-[clamp(1.9rem,4vw,3.6rem)] leading-[1.1] tracking-tight">« {first.text} »</blockquote>
             <figcaption className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.95rem]">
+              <Avatar id={first.id} name={first.author} photo={first.photo} />
               <span className="font-medium">{first.author}</span>
               <span className="muted">{[first.role, first.company].filter(Boolean).join(" · ")}</span>
               <Stars n={first.rating} />
@@ -89,7 +99,7 @@ export function Reviews({ reviews }: { reviews: Rv[] }) {
                 <figure>
                   <Stars n={r.rating} />
                   <blockquote className="mt-4 leading-relaxed">« {r.text} »</blockquote>
-                  <figcaption className="muted mt-4 text-[0.9rem]"><span className="font-medium text-ink-900">{r.author}</span> — {[r.role, r.company].filter(Boolean).join(", ")}{r.isExample ? " · exemple" : ""}</figcaption>
+                  <figcaption className="muted mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.9rem]"><Avatar id={r.id} name={r.author} photo={r.photo} /><span><span className="font-medium text-ink-900">{r.author}</span> — {[r.role, r.company].filter(Boolean).join(", ")}{r.isExample ? " · exemple" : ""}</span></figcaption>
                 </figure>
               </Reveal>
             ))}

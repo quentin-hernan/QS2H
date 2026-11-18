@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { MediaField } from "./Misc";
-import { Sections } from "@/components/Sections";
 import { SECTION_DEFS, defOf, newSection, type FieldDef, type Item, type Section, type SectionType } from "@/lib/sections";
 import { deleteCustomPage, saveCustomPage } from "@/app/admin/page-actions";
 
@@ -61,6 +60,14 @@ export function PageBuilder({ id, initial }: { id: string; initial: { title: str
   });
 
   const width = device === "desktop" ? "100%" : device === "tablet" ? "768px" : "390px";
+  const frame = useRef<HTMLIFrameElement>(null);
+  const sendPreview = useCallback(() => { frame.current?.contentWindow?.postMessage({ type: "qs2h-preview", sections, title }, location.origin); }, [sections, title]);
+  useEffect(() => { if (view === "preview") sendPreview(); }, [view, sendPreview]);
+  useEffect(() => {
+    const on = (e: MessageEvent) => { if (e.origin === location.origin && e.data?.type === "qs2h-preview-ready") sendPreview(); };
+    addEventListener("message", on);
+    return () => removeEventListener("message", on);
+  }, [sendPreview]);
 
   return (
     <div className="space-y-8">
@@ -78,12 +85,8 @@ export function PageBuilder({ id, initial }: { id: string; initial: { title: str
       </div>
 
       {view === "preview" ? (
-        <div className="overflow-auto rounded-2xl border" style={{ ...ring, maxHeight: "75vh", background: "#F8F8F7" }}>
-          <div className="mx-auto" style={{ width, maxWidth: "100%", transition: "width .4s" }}>
-            <div className="pointer-events-none" style={{ zoom: device === "desktop" ? 0.62 : 1 }}>
-              <Sections sections={sections} title={title} />
-            </div>
-          </div>
+        <div className="rounded-2xl border p-3" style={{ ...ring, background: "rgb(128 128 128 / .12)" }}>
+          <iframe ref={frame} title="Aperçu de la page" src="/admin/preview" onLoad={sendPreview} className="mx-auto block rounded-xl bg-white" style={{ width, maxWidth: "100%", height: "74vh", border: 0, transition: "width .4s" }} />
         </div>
       ) : (
         <>

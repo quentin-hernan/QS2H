@@ -46,6 +46,7 @@ export async function Footer() {
             <li><Link className="link-u" href="/mentions-legales">Mentions légales</Link></li>
             <li><Link className="link-u" href="/politique-de-confidentialite">Confidentialité</Link></li>
             <li><Link className="link-u" href="/cgv">CGV</Link></li>
+            <li><Link className="link-u" href="/cgv-boutique">CGV boutique</Link></li>
             <li><Link className="link-u" href="/cgu">CGU</Link></li>
             <li><Link className="link-u" href="/politique-de-cookies">Cookies</Link></li>
             <li><ManageCookies /></li>

@@ -32,9 +32,11 @@ export async function loginAction(_: LoginState, fd: FormData): Promise<LoginSta
   const password = String(fd.get("password") || "");
   const code = String(fd.get("code") || "");
   const ip = await clientIp();
-  const rl = rateLimit(`login:${ip}`, 10, 15 * 60 * 1000);
+  // Verrouillage désactivé hors production (temporaire) ; actif en production.
+  const lockout = process.env.NODE_ENV === "production";
+  const rl = lockout ? rateLimit(`login:${ip}`, 10, 15 * 60 * 1000) : { ok: true, retryAfter: 0 };
   if (!rl.ok) return { error: `Trop de tentatives. Réessayez dans ${Math.ceil(rl.retryAfter / 60)} min.` };
-  const fails = await db.loginLog.count({ where: { email, success: false, createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) } } });
+  const fails = lockout ? await db.loginLog.count({ where: { email, success: false, createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) } } }) : 0;
   if (fails >= 5) return { error: "Compte verrouillé quelques minutes après trop d'échecs. Réessayez dans 15 minutes." };
 
   const user = await db.user.findUnique({ where: { email } });
@@ -153,7 +155,7 @@ function buildSchema(r: Resource, serviceSlugs: string[]) {
         s = t; break;
       }
       case "slug": s = z.string().trim().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Adresse invalide : minuscules, chiffres et tirets uniquement."); break;
-      case "number": s = f.name === "rating" ? z.coerce.number().int().min(1, "Note de 1 à 5.").max(5, "Note de 1 à 5.") : z.coerce.number().int().min(0).max(1_000_000); break;
+      case "number": s = f.name === "rating" ? z.coerce.number().int().min(1, "Note de 1 à 5.").max(5, "Note de 1 à 5.") : f.decimal ? z.coerce.number().min(0, `${f.label} : valeur positive attendue.`).max(1_000_000) : z.coerce.number().int().min(f.min ?? 0).max(1_000_000); break;
       case "boolean": s = z.boolean(); break;
       case "select": s = z.enum((f.options as { value: string }[]).map((o) => o.value) as [string, ...string[]]); break;
       case "image": s = z.string().max(500); break;
@@ -409,7 +411,7 @@ export async function saveLegal(doc: string, html: string, major: boolean, note:
   const version = (last?.version ?? 1) + 1; // 1 = modèle généré, la première version enregistrée porte le n° 2
   await db.legalVersion.create({ data: { doc, version, html: clean, major, note: note.slice(0, 300), author: s.email } });
   let notified = 0;
-  if (major && ["cgu", "confidentialite", "cgv"].includes(doc)) {
+  if (major && ["cgu", "confidentialite", "cgv", "vente"].includes(doc)) {
     const clients = await db.client.findMany({ where: { emailVerifiedAt: { not: null } }, select: { email: true, firstName: true } });
     const info = LEGAL_DOCS[doc as keyof typeof LEGAL_DOCS];
     for (const c of clients) {

@@ -5,6 +5,8 @@ import { MediaPicker } from "@/components/admin/MediaPicker";
 import { applyStyle, listSections } from "./sectionDom";
 import { BG_ANIMS, BG_TYPES, BG_ZONES, ENTER_ANIMS, cleanStyle, isEmptyStyle, isVideoUrl, type SectionStyle, type StyleMap } from "@/lib/section-style";
 import { resetSectionStyle, saveSectionStyle } from "@/app/admin/section-actions";
+import { InlineEdit } from "@/components/InlineEdit";
+import type { OverridesMap } from "@/lib/overrides";
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (<label className="mb-3 block text-[0.82rem]"><span className="muted mb-1 block">{label}</span>{children}</label>);
 const Sel = <T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) => (
@@ -15,7 +17,7 @@ const Range = ({ value, min, max, step = 1, onChange, unit = "" }: { value: numb
 );
 
 /** Éditeur visuel : choisir une section de la page, régler son fond, son placement et ses animations, voir le résultat en direct. */
-export function SectionEditor({ styles }: { styles: StyleMap }) {
+export function SectionEditor({ styles, overrides = {} }: { styles: StyleMap; overrides?: OverridesMap }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [secs, setSecs] = useState<{ el: HTMLElement; label: string }[]>([]);
@@ -51,7 +53,7 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
     refresh();
     const click = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("#sx-panel, #sx-toggle, dialog")) return;
+      if (t.closest("#sx-panel, #sx-toggle, dialog, .slot, [data-ov='m']")) return;
       const list = listSections();
       const i = list.findIndex((s) => s.el.contains(t));
       if (i < 0) return;
@@ -93,14 +95,15 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
 
   return (
     <>
-      <button id="sx-toggle" type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="fixed bottom-20 left-5 z-[85] rounded-full bg-[#2A5587] px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-[#1E4068]">
+      <button id="sx-toggle" type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="fixed bottom-4 left-16 z-[85] rounded-full bg-[#2A5587]/90 px-3 py-1.5 text-[0.72rem] font-semibold text-white shadow-md hover:bg-[#1E4068]" title="Visible uniquement par les administrateurs">
         {open ? "Fermer l'éditeur" : "Modifier l'apparence"}
       </button>
 
       {open && (
-        <aside id="sx-panel" aria-label="Éditeur d'apparence de la page" className="dark-section fixed bottom-0 right-0 top-0 z-[86] w-[min(380px,100vw)] overflow-y-auto border-l p-5 text-[0.9rem] shadow-2xl" style={{ borderColor: "rgb(248 248 247 / .18)" }}>
-          <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-semibold">Apparence de la page</h2><button type="button" onClick={() => setOpen(false)} className="rounded-full px-3 py-1 hover:bg-white/10" aria-label="Fermer">✕</button></div>
+        <aside id="sx-panel" aria-label="Éditeur d'apparence de la page" className="dark-section fixed bottom-0 right-0 top-0 z-[86] w-[min(380px,100vw)] overflow-y-auto border-l p-5 text-[0.9rem] shadow-2xl" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .18))" }}>
+          <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-semibold">Apparence de la page</h2><button type="button" onClick={() => setOpen(false)} className="rounded-full px-3 py-1 hover:bg-[color-mix(in_srgb,currentColor_10%,transparent)]" aria-label="Fermer">✕</button></div>
           <p className="muted mb-4 text-[0.8rem]">Page : <code>{path}</code>. Cliquez sur une section de la page, ou choisissez-la ici.</p>
+          <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .16))" }}><legend className="px-2 font-semibold">Textes et images</legend><InlineEdit path={path} local={overrides[path]} /></fieldset>
           <Row label="Section à modifier">
             <select className="field !py-2" value={sel} onChange={(e) => select(Number(e.target.value))}>
               <option value={-1}>— Choisir —</option>
@@ -112,7 +115,7 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
             <div>
               <label className="mb-4 flex items-center gap-2"><input type="checkbox" checked={!draft.hidden} onChange={(e) => update({ hidden: e.target.checked ? undefined : true })} /> Afficher cette section</label>
 
-              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "rgb(248 248 247 / .16)" }}>
+              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .16))" }}>
                 <legend className="px-2 font-semibold">Fond</legend>
                 <Row label="Type de fond"><Sel value={bg.type} onChange={(v) => setBg({ type: v })} options={BG_TYPES} /></Row>
                 {(bg.type === "color" || bg.type === "gradient") && (
@@ -153,7 +156,7 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
                 )}
               </fieldset>
 
-              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "rgb(248 248 247 / .16)" }}>
+              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .16))" }}>
                 <legend className="px-2 font-semibold">Animation d&apos;apparition</legend>
                 <Row label="Effet à l'arrivée dans l'écran"><Sel value={enter.type} onChange={(v) => update({ enter: { ...enter, type: v } }, true)} options={ENTER_ANIMS} /></Row>
                 {enter.type !== "none" && (
@@ -165,7 +168,7 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
                 )}
               </fieldset>
 
-              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "rgb(248 248 247 / .16)" }}>
+              <fieldset className="mb-5 rounded-xl border p-4" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .16))" }}>
                 <legend className="px-2 font-semibold">Thème et espacement</legend>
                 <Row label="Couleur du texte"><Sel value={draft.tone ?? ""} onChange={(v) => update({ tone: v || undefined })} options={[{ value: "", label: "Automatique" }, { value: "light", label: "Fond clair, texte sombre" }, { value: "dark", label: "Fond sombre, texte clair" }]} /></Row>
                 <Row label="Espace en haut"><Range value={draft.padTop ?? 0} min={0} max={400} step={8} unit=" px" onChange={(v) => update({ padTop: v })} /></Row>
@@ -174,7 +177,7 @@ export function SectionEditor({ styles }: { styles: StyleMap }) {
                 <p className="muted text-xs">Espaces à 0 et hauteur à 0 % : valeurs d&apos;origine du site. Touchez au curseur pour les changer.</p>
               </fieldset>
 
-              <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-3 border-t px-5 py-4 backdrop-blur" style={{ borderColor: "rgb(248 248 247 / .16)", background: "rgb(28 28 28 / .92)" }}>
+              <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-3 border-t px-5 py-4 backdrop-blur" style={{ borderColor: "var(--s-line, rgb(248 248 247 / .16))", background: "color-mix(in srgb, var(--s-bg, #1C1C1C) 94%, transparent)" }}>
                 <button type="button" className="btn btn-primary !min-h-[44px] !px-5 !py-2.5" disabled={pending} onClick={save}>{pending ? "Enregistrement…" : "Enregistrer"}</button>
                 <button type="button" className="btn btn-ghost !min-h-[44px] !px-4 !py-2.5" onClick={reset}>Réinitialiser</button>
                 {msg && <p role="status" className={`w-full text-[0.82rem] ${msg.ok ? "acc" : "err"}`}>{msg.text}</p>}

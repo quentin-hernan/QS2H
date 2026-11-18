@@ -6,6 +6,10 @@ export const stage = {
   mx: 0, // pointeur normalisé -1..1
   my: 0,
   covers: [] as string[],
+  settle: 0, // 0 : ordinateur plein cadre (écran QS2H) ; 1 : dézoomé et posé à gauche
+  logo: false, // écran « logo QS2H » (désactivé : l'écran montre directement les réalisations)
+  auto: false, // pas de souris (mobile) : mouvement automatique doux
+  zoom: 0, // (non utilisé : zoom caméra retiré)
 };
 
 export const smooth = (a: number, b: number, x: number) => {

@@ -8,7 +8,7 @@ import { formatDate, readingMinutes } from "@/lib/utils";
 
 export const metadata = buildMetadata({
   title: "Blog : conseils création de site web et référencement",
-  description: "Prix d'un site, vitrine ou sur mesure, SEO local à Bordeaux : les conseils de QS2H pour réussir votre présence en ligne.",
+  description: "Prix d'un site, vitrine ou sur mesure, SEO local à La Rochelle : les conseils de QS2H pour réussir votre présence en ligne.",
   path: "/blog",
 });
 

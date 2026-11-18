@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Prendre rendez-vous : appel, visio ou sur place",
-  description: "Réservez un créneau avec QS2H : appel découverte de 20 minutes, visio ou rendez-vous à Bordeaux. Confirmation par email avec fichier agenda.",
+  description: "Réservez un créneau avec QS2H : appel découverte de 20 minutes, visio ou rendez-vous à La Rochelle. Confirmation par email avec fichier agenda.",
   path: "/rendez-vous",
 });
 

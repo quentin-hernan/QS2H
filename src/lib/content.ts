@@ -112,3 +112,16 @@ export const getProducts = cached(loadProducts, "products");
 export async function getProduct(slug: string) {
   return (await getProducts()).find((p) => p.slug === slug) ?? null;
 }
+
+/* ------------------------------------------------------------------ Boutique */
+export type Spec = { label: string; value: string };
+export type ShopBlock = { image: string; title: string; text: string };
+async function loadShop() {
+  const rows = await db.shopItem.findMany({ where: { published: true }, orderBy: [{ order: "asc" }, { createdAt: "desc" }] });
+  return rows.map((p) => ({ ...p, images: parseJson<string[]>(p.images, []).filter(Boolean), features: parseJson<string[]>(p.features, []).filter(Boolean), specs: parseJson<Spec[]>(p.specs, []).filter((x) => x?.label), blocks: parseJson<ShopBlock[]>(p.blocks, []).filter((x) => x && (x.image || x.title || x.text)), createdAt: undefined, updatedAt: undefined }));
+}
+export const getShopItems = cached(loadShop, "shop");
+export type ShopItemT = Awaited<ReturnType<typeof loadShop>>[number];
+export async function getShopItem(slug: string) {
+  return (await getShopItems()).find((p) => p.slug === slug) ?? null;
+}

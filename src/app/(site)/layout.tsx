@@ -9,6 +9,8 @@ import { LightDriver, PageTransitions, Preloader, ScrollUI } from "@/components/
 import { JsonLd } from "@/components/JsonLd";
 import { getProjects, getProducts, getReviews, getServices, getSettings } from "@/lib/content";
 import { ViewerProvider } from "@/components/ProjectViewer";
+import { SlotsProvider } from "@/components/ImgSlot";
+import { CartProvider } from "@/components/shop/Cart";
 import { orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +21,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const rating = real.length ? { value: Math.round((real.reduce((a, r) => a + r.rating, 0) / real.length) * 10) / 10, count: real.length } : null;
   return (
     <>
+    <CartProvider>
     <div className="site-shell">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
       <JsonLd data={[orgJsonLd(s, rating), websiteJsonLd()]} />
@@ -29,14 +32,17 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <LightDriver />
       <ScrollUI />
       <Header email={s.company.email} hasCatalogue={products.length > 0} services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline }))} />
+      <SlotsProvider slots={s.slots ?? {}}>
       <ViewerProvider projects={vp}>
         <main id="contenu">{children}</main>
       </ViewerProvider>
+      </SlotsProvider>
       <Footer />
       <Chatbot />
-      <SiteAppearance styles={s.sectionStyles ?? {}} />
+      <SiteAppearance styles={s.sectionStyles ?? {}} overrides={s.overrides ?? {}} />
       <CookieBanner plausibleDomain={s.integrations.plausibleDomain} />
     </div>
+    </CartProvider>
     </>
   );
 }

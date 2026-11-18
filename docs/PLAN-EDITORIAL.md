@@ -6,7 +6,7 @@ Objectif : capter des recherches à intention commerciale ou informationnelle av
 |---|---|---|---|---|---|
 | 1 | Combien coûte un site web pour une entreprise ? | prix création site web | Informationnelle / comparaison | Ce qui fait varier le prix · fourchettes · coûts annexes · lire un devis · conseil | /tarifs |
 | 2 | Site vitrine ou site sur mesure : comment choisir ? | site vitrine ou sur mesure | Comparaison | Définitions · 5 questions pour décider | /services/site-vitrine, /services/site-sur-mesure |
-| 3 | Référencement local à Bordeaux : six actions qui comptent | référencement local Bordeaux | Informationnelle locale | Fiche Google · avis · NAP · pages locales · technique · liens locaux | /services/referencement-seo |
+| 3 | Référencement local à La Rochelle : six actions qui comptent | référencement local La Rochelle | Informationnelle locale | Fiche Google · avis · NAP · pages locales · technique · liens locaux | /services/referencement-seo |
 | 4 | Refonte de site : comment ne pas perdre son référencement | refonte site internet SEO | Informationnelle / problème | Audit · cartographie des URL · redirections 301 · suivi des positions · erreurs fréquentes | /services/refonte-de-site |
 | 5 | Création de site e-commerce : ce qu'il faut prévoir avant de se lancer | créer boutique en ligne | Informationnelle / achat | Catalogue · paiement · livraison · TVA · CGV · logistique · budget | /services/e-commerce |
 | 6 | Mentions légales d'un site professionnel : ce qui est obligatoire | mentions légales site internet | Informationnelle pratique | Éditeur · hébergeur · RGPD · cookies · CGV · sanctions | /mentions-legales |

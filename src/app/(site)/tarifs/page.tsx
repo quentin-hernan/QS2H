@@ -3,6 +3,7 @@ import { PlanDevices } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/Reveal";
+import { ImgSlot } from "@/components/ImgSlot";
 import { Faq } from "@/components/Faq";
 import { JsonLd } from "@/components/JsonLd";
 import { MediaBand, type MediaItemT } from "@/components/MediaBand";
@@ -32,6 +33,7 @@ export default async function Tarifs() {
             {plans.map((p, i) => (
               <Reveal key={p.id} delay={i * 0.08}>
                 <article data-plan={i} className={`plan flex h-full flex-col rounded-[2rem] border p-8 md:p-10 ${p.highlighted ? "plan-hot dark-section border-transparent shadow-[0_40px_80px_-40px_rgba(12,14,17,.7)]" : "hair"}`}>
+                  <ImgSlot id={`plan-${p.id}`} src={p.image} ghost className="mb-6 block aspect-video w-full overflow-hidden rounded-2xl" />
                   <p className="acc mb-3 min-h-[1.2em] text-[0.75rem] font-medium uppercase tracking-[0.16em]">{p.highlighted ? "Le plus demandé" : ""}</p>
                   <h2 className="text-h3 font-medium">{p.name}</h2>
                   <p className="muted mt-2 min-h-[3em] text-[0.95rem] leading-snug">{p.description}</p>

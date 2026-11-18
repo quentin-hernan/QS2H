@@ -13,7 +13,7 @@ import { eraseClient } from "@/lib/client-data";
 
 export type S = { error?: string; ok?: string } | undefined;
 const btn = (href: string, label: string) => `<p><a href="${href}" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;text-decoration:none">${esc(label)}</a></p><p style="font-size:13px;color:#5F5F5F;word-break:break-all">${esc(href)}</p>`;
-const GENERIC_LOGIN = "Identifiants incorrects, ou adresse email pas encore vérifiée.";
+const GENERIC_LOGIN = "Identifiants incorrects.";
 
 /* ------------------------------------------------------------------ Inscription */
 const registerSchema = z.object({
@@ -61,7 +61,20 @@ export async function registerAction(_: S, fd: FormData): Promise<S> {
   });
   await sendMail({ to: d.email, subject: "Confirmez votre adresse email", html: layout("Activez votre compte", `<p style="line-height:1.6">Bonjour ${esc(d.firstName)}, confirmez votre adresse pour activer votre espace client QS2H.</p>${btn(`${SITE_URL}/compte/verification/${t}`, "Vérifier mon adresse")}`) });
   if (d.newsletter === "on") await sendNewsletterConfirmation(client.id, d.email, d.firstName);
-  return generic;
+  // accès immédiat à l'espace client : l'adresse email sera confirmée plus tard (rappel affiché dans l'espace)
+  await createClientSession(client.id, client.sessionVersion);
+  redirect("/compte");
+}
+
+/** Renvoie le lien de confirmation de l'adresse email (depuis l'espace client). */
+export async function resendVerification(): Promise<{ ok?: string; error?: string }> {
+  const c = await requireClient();
+  if (c.emailVerifiedAt) return { ok: "Votre adresse est déjà confirmée." };
+  if (!rateLimit(`verif:${c.id}`, 3, 60 * 60 * 1000).ok) return { error: "Trop de demandes. Réessayez plus tard." };
+  const t = token();
+  await db.client.update({ where: { id: c.id }, data: { verifyTokenHash: sha256(t), verifyExpires: new Date(Date.now() + 24 * 3600e3) } });
+  await sendMail({ to: c.email, subject: "Confirmez votre adresse email", html: layout("Confirmez votre adresse", `<p style="line-height:1.6">Bonjour ${esc(c.firstName)}, confirmez votre adresse email pour sécuriser votre espace client QS2H.</p>${btn(`${SITE_URL}/compte/verification/${t}`, "Confirmer mon adresse")}`) });
+  return { ok: "Email envoyé : vérifiez votre boîte de réception." };
 }
 
 async function sendNewsletterConfirmation(clientId: string, email: string, firstName: string) {
@@ -83,7 +96,7 @@ export async function loginClient(_: S, fd: FormData): Promise<S> {
   const dummy = "$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHRzb21lc2FsdA$Jl3UvNn0uV2oG2rQmM3o8XJm3VQp0g2m0b0x0v6x0jM";
   const ok = await verifyPassword(password, c?.passwordHash ?? dummy);
   const log = (success: boolean) => db.clientLogin.create({ data: { clientId: c?.id ?? null, email, ipTruncated: "", agent: "", success } }).catch(() => null);
-  if (!c || !ok || !c.emailVerifiedAt) { await log(false); return { error: GENERIC_LOGIN }; }
+  if (!c || !ok) { await log(false); return { error: GENERIC_LOGIN }; }
   await db.clientLogin.create({ data: { clientId: c.id, email, ipTruncated: await truncatedIp(), agent: await userAgent(), success: true } });
   await db.client.update({ where: { id: c.id }, data: { lastLoginAt: new Date(), inactivityWarnedAt: null, ...(needsRehash(c.passwordHash) ? { passwordHash: await hashPassword(password) } : {}) } });
   await createClientSession(c.id, c.sessionVersion);

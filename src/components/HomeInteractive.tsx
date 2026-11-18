@@ -16,7 +16,7 @@ export function Expertises({ items, title, lead, bg = "" }: { items: Item[]; tit
       <div className="container relative z-10">
         <div className="mb-14 grid gap-6 md:grid-cols-12">
           <h2 id="exp-h" className="text-display font-medium md:col-span-7">{title}</h2>
-          <p className="muted self-end text-[1.1rem] leading-relaxed md:col-span-4 md:col-start-9">{lead}</p>
+          <p className="muted self-end text-[1rem] leading-relaxed md:col-span-4 md:col-start-9">{lead}</p>
         </div>
         <ol className="xp-list">
           {items.map((it, i) => (
@@ -28,7 +28,7 @@ export function Expertises({ items, title, lead, bg = "" }: { items: Item[]; tit
               </button>
               <div id={`xp-${i}`} className="xp-body" role="region" aria-label={it.title}>
                 <div>
-                  <p className="max-w-xl text-[1.1rem] leading-relaxed">{it.text}</p>
+                  <p className="max-w-xl text-[1rem] leading-relaxed">{it.text}</p>
                   {it.href && <Link href={it.href} className="xp-link mt-5 inline-flex">En savoir plus <span aria-hidden="true">→</span></Link>}
                 </div>
               </div>
@@ -152,37 +152,6 @@ export function ProductDemo({ title, text }: { title: string; text: string }) {
   );
 }
 
-/* ================================================================== 06 · Méthode : une ligne qui avance avec la lecture */
-export function MethodLine({ steps, title, hideLink = false }: { steps: Item[]; title: string; hideLink?: boolean }) {
-  const root = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.style.setProperty("--m", "1"); return; }
-    gsap.registerPlugin(ScrollTrigger);
-    const st = ScrollTrigger.create({ trigger: el, start: "top 70%", end: "bottom 60%", scrub: 0.6, onUpdate: (s) => el.style.setProperty("--m", s.progress.toFixed(3)) });
-    return () => st.kill();
-  }, []);
-  return (
-    <section ref={root} className="light-section ml-sec py-24 md:py-36" aria-labelledby="ml-h" style={{ ["--m" as string]: 0 }}>
-      <div className="container">
-        <div className="mb-16 flex flex-wrap items-end justify-between gap-6"><h2 id="ml-h" className="text-h1 font-medium">{title}</h2>{!hideLink && <Link href="/methode" className="xp-link">La méthode en détail <span aria-hidden="true">→</span></Link>}</div>
-        <ol className="ml-track" style={{ ["--n" as string]: steps.length }}>
-          <span className="ml-line" aria-hidden="true"><span /></span>
-          {steps.map((s, i) => (
-            <li key={i} className="ml-step" style={{ ["--i" as string]: i }}>
-              <span className="ml-dot" aria-hidden="true" />
-              <p className="ml-k">{String(i + 1).padStart(2, "0")}</p>
-              <h3 className="text-h3 font-medium">{s.title}</h3>
-              <p className="muted mt-2 leading-relaxed">{s.text}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
 /* ================================================================== 08 · FAQ : accordéon animé, une question ouverte à la fois */
 export function HomeFaq({ items, title = "Questions fréquentes", aside }: { items: { q: string; a: string }[]; title?: string; aside?: React.ReactNode }) {
   const [open, setOpen] = useState<number | null>(0);
@@ -214,7 +183,10 @@ export function IntroArt() {
     if (!el) return;
     const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }, { threshold: 0.25 });
     io.observe(el);
-    return () => io.disconnect();
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return () => io.disconnect();
+    gsap.registerPlugin(ScrollTrigger);
+    const tw = gsap.fromTo(el, { y: 46 }, { y: -46, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: 0.6 } }); // légère parallaxe au défilement
+    return () => { io.disconnect(); tw.scrollTrigger?.kill(); tw.kill(); };
   }, []);
   const d = (i: number) => ({ style: { ["--i" as string]: i } });
   return (

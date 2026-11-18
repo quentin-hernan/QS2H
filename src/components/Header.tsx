@@ -4,15 +4,17 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import { CartButton } from "./shop/Cart";
 
 const links = [
   { href: "/services", label: "Services", hint: "Site vitrine, sur mesure, refonte, e-commerce, SEO, maintenance." },
   { href: "/realisations", label: "Réalisations", hint: "Nos projets, ouverts comme des fenêtres de travail." },
+  { href: "/boutique", label: "Boutique", hint: "Matériel, logiciels et solutions clés en main." },
   { href: "/tarifs", label: "Tarifs", hint: "Trois formules claires, prix fixes, devis sous 24 h ouvrées." },
   { href: "/methode", label: "Méthode", hint: "De l'audit à la mise en ligne, étape par étape." },
   { href: "/blog", label: "Blog", hint: "Conseils concrets pour votre site et votre référencement." },
   { href: "/a-propos", label: "À propos", hint: "Qui nous sommes, nos engagements." },
-  { href: "/rendez-vous", label: "Rendez-vous", hint: "Réservez un appel, une visio ou une rencontre à Bordeaux." },
+  { href: "/rendez-vous", label: "Rendez-vous", hint: "Réservez un appel, une visio ou une rencontre à La Rochelle." },
 ];
 
 type Svc = { slug: string; title: string; tagline: string };
@@ -38,7 +40,7 @@ function isDarkAt(el: Element | null) {
 
 /** Barre d'en-tête : transparente en haut, floutée au scroll, claire ou sombre selon la section dessous, masquée en descendant. */
 export function Header({ services = [], hasCatalogue = false, email = "" }: { services?: Svc[]; hasCatalogue?: boolean; email?: string }) {
-  const menu = hasCatalogue ? [...links.slice(0, 3), { href: "/catalogue", label: "Catalogue", hint: "Licences, logiciels et produits numériques." }, ...links.slice(3)] : links;
+  const menu = hasCatalogue ? [...links.slice(0, 4), { href: "/catalogue", label: "Catalogue", hint: "Licences, logiciels et produits numériques." }, ...links.slice(4)] : links;
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -52,6 +54,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
   const openMega = (k: "services" | "ressources" | null, delay = 0) => { if (timer.current) clearTimeout(timer.current); if (delay) timer.current = setTimeout(() => setMega(k), delay); else setMega(k); };
   const btn = useRef<HTMLButtonElement>(null);
   const last = useRef(0);
+  const tickRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -66,12 +69,13 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
       }
       last.current = y;
       // section sous la barre : sombre ou claire
-      const el = document.elementFromPoint(window.innerWidth / 2, (y > 24 ? 60 : 76) + 6); // section juste sous la barre
+      const el = document.elementFromPoint(window.innerWidth / 2, (y > 24 ? 70 : 86) + 6); // section juste sous la barre
       const sec = el?.closest("section, header, footer, main > div, [data-tone]") as HTMLElement | null;
       const tone = sec?.closest("[data-tone]")?.getAttribute("data-tone");
       if (!megaRef.current) setDark(tone ? tone === "dark" : isDarkAt(el));
     };
     const on = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    tickRef.current = tick;
     tick();
     const t1 = setTimeout(tick, 500), t2 = setTimeout(tick, 1800); // après le préchargeur (première visite) qui recouvre l'en-tête
     window.addEventListener("scroll", on, { passive: true });
@@ -96,6 +100,13 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
 
   const [themeDark, setThemeDark] = useState(false);
   useEffect(() => { const u = () => setThemeDark(document.documentElement.dataset.theme === "dark"); u(); const mo = new MutationObserver(u); mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] }); return () => mo.disconnect(); }, []);
+  // changement de thème : le logo et les textes se recalculent aussitôt (puis une fois la transition de fond terminée)
+  useEffect(() => {
+    const run = () => tickRef.current?.();
+    run();
+    const a = setTimeout(run, 60), b = setTimeout(run, 480);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, [themeDark]);
   const light = open ? themeDark : dark; // texte et logo clairs
   const bg = scrolled && !open ? (dark ? "bg-ink-900/80 border-b" : "bg-ivory/85 border-b") : "border-b border-transparent";
   const line = dark ? "rgb(248 248 247 / .14)" : "rgb(28 28 28 / .1)";
@@ -104,12 +115,12 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
     <>
       <header className={`fixed inset-x-0 top-0 z-50 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${hidden && !open ? "-translate-y-full" : "translate-y-0"}`} data-header>
         <div className={`${bg} backdrop-blur-md transition-[background-color,border-color,backdrop-filter] duration-300`} style={{ borderColor: scrolled && !open ? line : "transparent", color: light ? "#F8F8F7" : "#1C1C1C", ["--acc-ctx" as string]: light ? "var(--accent-hi)" : "var(--accent)" }}>
-          <div className={`container flex max-w-[1440px] items-center justify-between transition-[height] duration-300 ease-out ${scrolled ? "h-[54px]" : "h-[64px]"}`}>
+          <div className={`container flex max-w-[1440px] items-center justify-between transition-[height] duration-300 ease-out ${scrolled ? "h-[64px]" : "h-[80px]"}`}>
             <Link href="/" aria-label="QS2H — accueil" className="relative z-[60] block shrink-0">
-              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="160px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-7" : "h-8"}`} />
+              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="220px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-10" : "h-12"}`} />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex" data-mega onMouseLeave={() => openMega(null, 160)}>
-              {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/tarifs", label: "Tarifs" }, ...(hasCatalogue ? [{ href: "/catalogue", label: "Catalogue" }] : []), { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
+              {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/boutique", label: "Boutique" }, { href: "/tarifs", label: "Tarifs" }, ...(hasCatalogue ? [{ href: "/catalogue", label: "Catalogue" }] : []), { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
                 const active = path === l.href || path.startsWith(l.href + "/") || (l.k === "ressources" && ["/blog", "/faq", "/rendez-vous", "/a-propos", "/contact"].some((p) => path.startsWith(p)));
                 if (l.k) {
                   const k = l.k;
@@ -131,6 +142,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
             </nav>
             <div className="relative z-[60] flex items-center gap-3">
               <ThemeToggle />
+              <CartButton />
               <Link href="/compte" className="btn btn-outline hidden !min-h-[44px] !px-5 !py-2.5 text-[0.88rem] xl:inline-flex">Espace client</Link>
               <Link href="/contact" className="btn btn-primary btn-fill !min-h-[44px] !px-5 !py-2.5 text-[0.9rem]"><span className="sm:hidden">Devis</span><span className="hidden sm:inline">Demander un devis</span></Link>
               <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem] lg:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>

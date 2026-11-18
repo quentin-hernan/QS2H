@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -134,11 +134,6 @@ export function LightDriver() {
   return null;
 }
 
-/** Ancien fond à plans flottants : supprimé (rendu trop décoratif). Conservé pour ne pas casser les imports. */
-export function AtelierBg(_props: { tone?: "dark" | "light" }) {
-  return null;
-}
-
 /* ------------------------------------------------------------------ Cadre d'angle qui se dessine à l'entrée de section */
 export function FrameDraw({ children, className = "" }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -167,5 +162,30 @@ export function ScrollWords({ text, className = "" }: { text: string; className?
     <p ref={ref} className={className}>
       {text.split(" ").map((w, i) => (<span key={i} style={{ display: "inline-block", marginRight: "0.28em" }}>{w}</span>))}
     </p>
+  );
+}
+
+/* ------------------------------------------------------------------ Texte mot à mot
+   Chaque mot monte depuis un masque, l'un après l'autre, pour reconstituer la phrase.
+   `auto` : animation CSS dès le rendu (sans JS, utile pour le titre du hero) ; sinon déclenchée à l'entrée dans l'écran.
+   `immediate` : déclenchée au montage (changer la `key` pour rejouer). `step` : délai entre deux mots, en ms. */
+export function WordReveal({ text, className = "", delay = 0, step, auto = false, immediate = false, as: Tag = "span" }: { text: string; className?: string; delay?: number; step?: number; auto?: boolean; immediate?: boolean; as?: React.ElementType }) {
+  const ref = useRef<HTMLElement>(null);
+  const words = text.split(/\s+/).filter(Boolean);
+  const st = step ?? Math.max(28, Math.min(70, 1800 / Math.max(1, words.length)));
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || auto) return;
+    if (immediate) { const r = requestAnimationFrame(() => el.classList.add("in")); return () => cancelAnimationFrame(r); }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }, { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [auto, immediate]);
+  return (
+    <Tag ref={ref} className={`wr ${auto ? "wr-auto" : ""} ${className}`} style={{ ["--d" as string]: `${delay}s`, ["--st" as string]: `${st}ms` }}>
+      {words.map((w, i) => (
+        <Fragment key={i}>{i > 0 ? " " : null}<span className="wr-m"><span className="wr-i" style={{ ["--i" as string]: i }}>{w}</span></span></Fragment>
+      ))}
+    </Tag>
   );
 }

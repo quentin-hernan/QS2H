@@ -1,5 +1,5 @@
 import { MediaBand } from "@/components/MediaBand";
-import Image from "next/image";
+import { ImgSlot } from "@/components/ImgSlot";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tilt } from "@/components/BlogList";
@@ -8,8 +8,8 @@ import { getPage, getTeam } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "À propos : une agence web à taille humaine à Bordeaux",
-  description: "QS2H, agence de création de sites web installée à Bordeaux : notre histoire, nos valeurs, notre équipe et nos engagements de délais, de propriété et de transparence.",
+  title: "À propos : une agence web à taille humaine à La Rochelle",
+  description: "QS2H, agence de création de sites web installée à La Rochelle : notre histoire, nos valeurs, notre équipe et nos engagements de délais, de propriété et de transparence.",
   path: "/a-propos",
 });
 
@@ -21,9 +21,28 @@ export default async function About() {
       <PageHero image={a.heroImage || ""} eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
 
       <section className="light-section py-20 md:py-32">
-        <div className="container grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4"><p className="eyebrow mb-6">Notre histoire</p></div>
-          <div className="space-y-6 lg:col-span-7">{paras.map((p, i) => (<Reveal key={i}><p className={i === 0 ? "font-serif text-[clamp(1.5rem,2.5vw,2.2rem)] leading-[1.25]" : "prose-qs"}>{p}</p></Reveal>))}</div>
+        <div className="container">
+        <p className="eyebrow mb-8">Notre histoire</p>
+        <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-4">
+            <Reveal className="lg:sticky lg:top-28">
+              <div className="story-panel">
+                {a.storyPanel ? (/\.(mp4|webm|mov|ogv)(\?|$)/i.test(a.storyPanel)
+                  ? <video src={a.storyPanel} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
+                  : /* eslint-disable-next-line @next/next/no-img-element */ <img src={a.storyPanel} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />) : <span className="story-panel-bg" aria-hidden="true" />}
+                <span className="absolute inset-0 bg-[#0E1013]" style={{ opacity: Math.min(90, Math.max(0, Number(a.storyPanelDim) || 0)) / 100 }} aria-hidden="true" />
+                <div className="relative flex h-full flex-col justify-between p-7">
+                  {a.storyPanelKicker && <p className="text-[0.75rem] font-semibold uppercase tracking-[0.16em] opacity-80">{a.storyPanelKicker}</p>}
+                  <div>
+                    {a.storyPanelTitle && <p className="font-serif text-[clamp(1.5rem,2.2vw,2rem)] leading-[1.1]">{a.storyPanelTitle}</p>}
+                    {a.storyPanelText && <p className="mt-3 text-[0.95rem] leading-relaxed opacity-80">{a.storyPanelText}</p>}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+          <div className="space-y-6 lg:col-span-7 lg:col-start-6">{paras.map((p, i) => (<Reveal key={i}><p className={i === 0 ? "-mt-[0.18em] font-serif text-[clamp(1.5rem,2.5vw,2.2rem)] leading-[1.25]" : "prose-qs"}>{p}</p></Reveal>))}</div>
+        </div>
         </div>
       </section>
 
@@ -44,7 +63,7 @@ export default async function About() {
           <ul className="grid gap-8 sm:grid-cols-2 lg:col-span-8">
             {team.map((m, i) => (
               <Reveal as="li" key={m.id} delay={i * 0.08}>
-                <Tilt><div className="relative mb-5 aspect-[4/5] overflow-hidden chamfer bg-ivory-200 shadow-[0_30px_40px_-30px_rgba(28,28,28,.5)]">{m.photo ? <Image src={m.photo} alt={`Portrait de ${m.name}`} fill sizes="(min-width:640px) 30vw, 90vw" className="object-cover" /> : <div className="flex h-full items-center justify-center font-serif text-7xl muted">{m.name.replace(/[\[\]]/g, "").slice(0, 1)}</div>}</div></Tilt>
+                <Tilt><ImgSlot id={`team-${m.id}`} src={m.photo} alt={`Portrait de ${m.name}`} className="relative mb-5 block aspect-[4/5] overflow-hidden chamfer bg-ivory-200 shadow-[0_30px_40px_-30px_rgba(28,28,28,.5)]"><span className="flex h-full items-center justify-center font-serif text-7xl muted">{m.name.replace(/[\[\]]/g, "").slice(0, 1)}</span></ImgSlot></Tilt>
                 <h3 className="text-h3 font-medium">{m.name}</h3><p className="acc text-[0.9rem]">{m.role}</p><p className="muted mt-3 leading-relaxed">{m.bio}</p>
               </Reveal>
             ))}

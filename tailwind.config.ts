@@ -16,9 +16,10 @@ const config: Config = {
         serif: ["var(--font-serif)", "system-ui", "Arial", "sans-serif"], // alias historique : « serif » désigne ici Archivo (titres), jamais une serif
       },
       fontSize: {
-        display: ["clamp(1.9rem, 5.2vw, 5.2rem)", { lineHeight: "1", letterSpacing: "-0.025em" }],
-        h1: ["clamp(1.8rem, 4.6vw, 4.2rem)", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
-        h2: ["clamp(1.55rem, 3.5vw, 3.3rem)", { lineHeight: "1.06", letterSpacing: "-0.02em" }],
+        hero: ["clamp(1.9rem, 5.2vw, 5.2rem)", { lineHeight: "1", letterSpacing: "-0.025em" }],
+        display: ["clamp(1.7rem, 3.7vw, 3.5rem)", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
+        h1: ["clamp(1.7rem, 3.9vw, 3.5rem)", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
+        h2: ["clamp(1.4rem, 2.7vw, 2.4rem)", { lineHeight: "1.06", letterSpacing: "-0.02em" }],
         h3: ["clamp(1.25rem, 1.7vw, 1.6rem)", { lineHeight: "1.18", letterSpacing: "-0.01em" }],
         body: ["1.0625rem", { lineHeight: "1.6" }],
       },

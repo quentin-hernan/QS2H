@@ -1,18 +1,41 @@
+# dépendances et builds
 node_modules
 .next
 out
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+coverage
+
+# secrets et environnement (seul .env.example est versionné)
 .env
 .env.local
+.env.*.local
+.env.production
+
+# base locale et fichiers envoyés par l'administration / les clients
 prisma/*.db
 prisma/*.db-journal
 public/uploads/*
 !public/uploads/.gitkeep
-*.tsbuildinfo
-next-env.d.ts
+storage
+
+# tests et captures
 test-results
 playwright-report
-
 shots
 lh
-storage
+
+# sources lourdes du modèle 3D (le modèle utilisé est public/models/macbook.fbx)
 3d-model
+
+# fichiers personnels à la racine (captures, notes de travail)
+/*.png
+/*.jpg
+/prompt-*.md
+
+# systèmes et éditeurs
+.DS_Store
+Thumbs.db
+*.log
+.claude/settings.local.json

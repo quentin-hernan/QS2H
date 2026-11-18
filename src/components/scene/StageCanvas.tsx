@@ -1,7 +1,7 @@
 "use client";
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { roundedBox, roundedPlane } from "./geometry";
@@ -11,70 +11,83 @@ import { smooth, stage } from "./store";
 const D = THREE.MathUtils;
 type Props = { layers: { title: string }[]; accent: string; lowPower: boolean; running: boolean; onReady: () => void };
 
-/** Texture temps réel de l'écran : défile les captures des réalisations (fondu de profondeur). */
+/** Écran du portable : chaque « site » (une capture de page entière, ou plusieurs captures empilées) défile
+ *  doucement de haut en bas comme si on le parcourait, puis un fondu passe au site suivant. */
 function useScreenTexture(accent: string) {
   return useMemo(() => {
+    const W = 1280, H = 800;
     const c = document.createElement("canvas");
-    c.width = 1280;
-    c.height = 800;
+    c.width = W; c.height = H;
     const g = c.getContext("2d")!;
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
-    const imgs: HTMLImageElement[] = [];
+    const pages: HTMLCanvasElement[] = []; // une page longue par site, pré-rendue à 1280 px de large
     let lastKey = "";
-    const cover = (im: HTMLImageElement, scale: number, alpha: number) => {
-      const r = Math.max(1280 / im.width, 800 / im.height) * scale;
-      const w = im.width * r, h = im.height * r;
-      g.globalAlpha = alpha;
-      g.drawImage(im, (1280 - w) / 2, (800 - h) / 2, w, h);
-      g.globalAlpha = 1;
+    const glare = () => {
+      const gr = g.createLinearGradient(0, 0, W, H);
+      gr.addColorStop(0, "rgba(255,255,255,0.09)"); gr.addColorStop(0.35, "rgba(255,255,255,0.025)"); gr.addColorStop(0.36, "rgba(255,255,255,0)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
     };
     const placeholder = () => {
-      const gr = g.createLinearGradient(0, 0, 1280, 800);
-      gr.addColorStop(0, "#242424");
-      gr.addColorStop(1, "#1C1C1C");
-      g.fillStyle = gr;
-      g.fillRect(0, 0, 1280, 800);
-      g.fillStyle = accent;
-      g.fillRect(80, 360, 120, 6);
-      g.fillStyle = "#F8F8F7";
-      g.font = `800 84px ${displayFont()}`;
-      g.fillText("Votre site ici.", 80, 330);
+      const gr = g.createLinearGradient(0, 0, W, H);
+      gr.addColorStop(0, "#242424"); gr.addColorStop(1, "#1C1C1C");
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = accent; g.fillRect(80, 360, 120, 6);
+      g.fillStyle = "#F8F8F7"; g.font = `800 84px ${displayFont()}`; g.fillText("Votre site ici.", 80, 330);
     };
-    const load = (urls: string[]) => {
-      urls.forEach((u) => {
-        const im = new Image();
-        im.crossOrigin = "anonymous";
-        im.onload = () => {
-          imgs.push(im);
-          lastKey = "";
-        };
-        im.src = u;
+    const build = (stack: HTMLImageElement[]) => {
+      const hs = stack.map((im) => Math.round(im.height * (W / im.width)));
+      const total = Math.min(6000, Math.max(H, hs.reduce((x, y) => x + y, 0)));
+      const p = document.createElement("canvas");
+      p.width = W; p.height = total;
+      const pg = p.getContext("2d")!;
+      pg.fillStyle = "#F8F8F7"; pg.fillRect(0, 0, W, total);
+      let y = 0;
+      stack.forEach((im, i) => { if (y < total) pg.drawImage(im, 0, y, W, hs[i]); y += hs[i]; });
+      pages.push(p);
+      lastKey = "";
+    };
+    const load = (entries: string[]) => {
+      entries.forEach((entry) => {
+        const urls = entry.split("|").filter(Boolean);
+        const stack: HTMLImageElement[] = [];
+        let left = urls.length;
+        const done = () => { if (--left === 0 && stack.some(Boolean)) build(stack.filter(Boolean)); };
+        urls.forEach((u, i) => {
+          const im = new Image();
+          im.crossOrigin = "anonymous";
+          im.onload = () => { stack[i] = im; done(); };
+          im.onerror = done;
+          im.src = u;
+        });
       });
     };
+    // durée passée sur un site : 1,2 s d'arrêt en haut, défilement à 110 px/s, 1 s d'arrêt en bas (4 s au minimum)
+    const SPEED = 110, HOLD = 1.2, FADE = 0.9;
+    const span = (p: HTMLCanvasElement) => Math.max(4, HOLD + (p.height - H) / SPEED + 1);
+    const offset = (p: HTMLCanvasElement, local: number) => Math.min(p.height - H, Math.max(0, (local - HOLD) * SPEED));
+    const draw = (p: HTMLCanvasElement, local: number, alpha = 1) => { g.globalAlpha = alpha; g.drawImage(p, 0, offset(p, local), W, H, 0, 0, W, H); g.globalAlpha = 1; };
+    let cur = 0, start = -1;
     const update = (t: number) => {
-      const n = imgs.length;
-      if (!n) {
-        if (lastKey !== "ph") { placeholder(); tex.needsUpdate = true; lastKey = "ph"; }
-        return;
-      }
-      const period = 5, trans = 1.2;
-      const cycle = Math.floor(t / period);
-      const local = t - cycle * period;
-      const cur = imgs[cycle % n];
-      if (n > 1 && local < trans && cycle > 0) {
-        const k = D.smootherstep(local / trans, 0, 1);
-        g.fillStyle = "#1C1C1C";
-        g.fillRect(0, 0, 1280, 800);
-        cover(imgs[(cycle - 1) % n], 1 - 0.07 * k, 1 - k);
-        cover(cur, 1.09 - 0.09 * k, k);
-        tex.needsUpdate = true;
-        lastKey = "x";
+      if (!pages.length) { if (lastKey !== "ph") { placeholder(); tex.needsUpdate = true; lastKey = "ph"; } return; }
+      if (start < 0) start = t;
+      let local = t - start;
+      let p = pages[cur % pages.length];
+      if (local > span(p) + FADE) { cur++; start = t - FADE; local = FADE; p = pages[cur % pages.length]; }
+      const prev = pages[(cur - 1 + pages.length) % pages.length];
+      if (cur > 0 && local < FADE && pages.length > 1) {
+        draw(prev, span(prev), 1);
+        draw(p, 0, D.smootherstep(local / FADE, 0, 1));
       } else {
-        const key = `c${cycle % n}`;
-        if (lastKey !== key) { cover(cur, 1, 1); tex.needsUpdate = true; lastKey = key; }
+        const key = `${cur}:${Math.round(offset(p, local))}`;
+        if (key === lastKey) return;
+        lastKey = key;
+        g.fillStyle = "#F8F8F7"; g.fillRect(0, 0, W, H);
+        draw(p, local);
       }
+      glare();
+      tex.needsUpdate = true;
     };
     return { tex, load, update };
   }, [accent]);
@@ -93,6 +106,15 @@ function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
   const pos = lid.geometry.attributes.position, idx = lid.geometry.index;
   for (const gr of lid.geometry.groups) if (gr.materialIndex === screenIdx) for (let i = gr.start; i < gr.start + gr.count; i++) { v.fromBufferAttribute(pos, idx ? idx.getX(i) : i).applyMatrix4(lid.matrixWorld); sb.expandByPoint(v); }
   const sc = sb.getCenter(new THREE.Vector3());
+  lid.geometry = lid.geometry.clone();
+  const uv = lid.geometry.attributes.uv as THREE.BufferAttribute | undefined;
+  if (uv) {
+    const ids = new Set<number>();
+    for (const gr of lid.geometry.groups) if (gr.materialIndex === screenIdx) for (let i = gr.start; i < gr.start + gr.count; i++) ids.add(idx ? idx.getX(i) : i);
+    let u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;
+    ids.forEach((i) => { const u = uv.getX(i), w = uv.getY(i); u0 = Math.min(u0, u); u1 = Math.max(u1, u); v0 = Math.min(v0, w); v1 = Math.max(v1, w); });
+    if (u1 - u0 > 1e-4 && v1 - v0 > 1e-4) { ids.forEach((i) => uv.setXY(i, (uv.getX(i) - u0) / (u1 - u0), (uv.getY(i) - v0) / (v1 - v0))); uv.needsUpdate = true; }
+  }
   const k = 2.9 / sb.getSize(new THREE.Vector3()).x;
   const bb = new THREE.Box3().setFromObject(base);
   const lb = new THREE.Box3().setFromObject(lid);
@@ -107,6 +129,8 @@ function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
     return new THREE.MeshStandardMaterial({ name: m.name, color: behind ? 0x050506 : alu ? 0x8e8f94 : m.color, metalness: alu ? 1 : 0.25, roughness: alu ? 0.4 : 0.5, envMapIntensity: alu ? 1.25 : 0.8, polygonOffset: behind, polygonOffsetFactor: behind ? 3 : 0, polygonOffsetUnits: behind ? 3 : 0 });
   };
   src.traverse((o) => { const me = o as THREE.Mesh; if (me.isMesh) me.material = Array.isArray(me.material) ? me.material.map((m) => tune(m as THREE.MeshPhongMaterial)) : tune(me.material as THREE.MeshPhongMaterial); });
+  const bodyMats: THREE.Material[] = [];
+  src.traverse((o) => { const me = o as THREE.Mesh; if (me.isMesh) (Array.isArray(me.material) ? me.material : [me.material]).forEach((m) => { if (m !== screenMat && !bodyMats.includes(m)) bodyMats.push(m); }); });
 
   // charnière : bord bas-arrière du capot
   const pivot = new THREE.Vector3((lb.min.x + lb.max.x) / 2, lb.min.y, lb.max.z);
@@ -124,7 +148,7 @@ function buildLaptop(src: THREE.Group, screenTex: THREE.Texture) {
   const screenCenter = sc.clone().sub(origin).multiplyScalar(k);
   const tilt = Math.atan2(lb.max.z - lb.min.z, lb.max.y - lb.min.y) * 0.9;
   const hingeRig = pivot.clone().sub(origin).multiplyScalar(k);
-  return { root, hinge, screenMat, screenCenter, tilt, hingeRig, wrap };
+  return { root, hinge, screenMat, screenCenter, tilt, hingeRig, wrap, bodyMats };
 }
 
 function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
@@ -162,6 +186,18 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
   useEffect(() => { screen.load(stage.covers); }, [screen]);
 
   const born = useRef<number | null>(null);
+  const camBase = useRef(new THREE.Vector3(0, 1.55, 9));
+  const fadeOn = useRef(false);
+  const shadow = useRef<THREE.Mesh>(null);
+  const shadowTex = useMemo(() => {
+    const c = document.createElement("canvas"); c.width = c.height = 256;
+    const g = c.getContext("2d")!;
+    const gr = g.createRadialGradient(128, 128, 8, 128, 128, 128);
+    gr.addColorStop(0, "rgba(0,0,0,0.55)"); gr.addColorStop(0.5, "rgba(0,0,0,0.22)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  }, []);
+  const [scrC, scrN, camZ, lookBase, lookTmp] = useMemo(() => [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()], []);
   useFrame((state, dt) => {
     dt = Math.min(dt, 0.05);
     const t = state.clock.elapsedTime;
@@ -169,14 +205,18 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     if (++frames.current === 3) onReady();
     screen.update(t);
 
-    const e = smooth(0.06, 0.2, stage.progress) * (1 - smooth(0.9, 1, stage.progress));
+    const e = smooth(0.06, 0.2, stage.progress); // les pages restent déployées jusqu'à la fin (la scène s'efface en fondu lent)
+    const mx = stage.auto ? Math.sin(t * 0.4) * 0.6 : stage.mx, my = stage.auto ? Math.cos(t * 0.33) * 0.4 : stage.my; // mobile : léger mouvement automatique
     const ho = stage.heroOut;
     const portrait = size.width < size.height * 0.95;
 
     // ouverture du capot à l'arrivée
     const age = t - born.current;
-    const arrive = smooth(0.05, 1.0, age); // arrivée : translation douce puis stabilisation
-    const open = smooth(0.1, 1.1, age); // le capot s'ouvre quand le portable est presque en place
+    const arrive = smooth(0, 0.6, age); // arrivée : monte légèrement depuis le bas
+    const open = smooth(0.05, 0.6, age); // et s'ouvre
+    const z = 0;
+    // « Sous le capot » : les pages sortent de l'écran pendant que l'ordinateur part vers la gauche en fondu (lent)
+    const out = smooth(0.02, 0.42, stage.progress);
     lap.hinge.rotation.x = D.lerp((Math.PI / 2 + lap.tilt) * 0.2, 0, open); // jamais complètement fermé : on ne voit pas « que le dessus »
     const opened = open > 0.995;
     // écran réel du portable tant que les couches ne sont pas déployées ; les couches apparaissent / disparaissent en fondu
@@ -191,24 +231,35 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     const pad = W >= 1280 ? 64 : W >= 768 ? 40 : 20;
     const cw = Math.min(W, 1440) - 2 * pad;
     const left = (W - Math.min(W, 1440)) / 2 + pad;
-    const regionL = left + cw * 0.46 + 80, regionR = left + cw;
-    const dist = camera.position.length();
+    const regionL = left + cw * 0.43 + 30, regionR = left + cw;
+    const dist = camBase.current.length();
     const pxu = size.height / (2 * dist * Math.tan(THREE.MathUtils.degToRad(30 / 2))); // pixels par unité monde au niveau de l'objet
     const BASE_W = 3.9; // largeur apparente du portable à l'échelle 1 (lacet inclus)
-    const heroS = THREE.MathUtils.clamp((regionR - regionL) / (BASE_W * pxu), 0.42, 0.7); // 0,7 = ~19 % de moins qu'avant
+    const heroS = THREE.MathUtils.clamp((regionR - regionL) / (BASE_W * pxu), 0.5, 0.95);
     const heroX = ((regionL + regionR) / 2 - W / 2) / pxu;
     const tx = portrait ? 0 : D.lerp(D.lerp(heroX, heroX * 0.4, ho), 1.75, e);
     const ty = portrait ? D.lerp(D.lerp(2.1, 0.35, ho), 1.3, e) : 0;
     const ts = (portrait ? D.lerp(0.4, 0.55, ho) : D.lerp(heroS, heroS + 0.04, ho)) * D.lerp(1, portrait ? 0.82 : 0.78, e);
     rig.current.position.x = D.damp(rig.current.position.x, tx, 3, dt);
-    rig.current.position.y = D.damp(rig.current.position.y, ty + Math.sin(t * 0.7) * 0.03 - (1 - arrive) * (portrait ? 0.7 : 1.1), 3, dt);
+    rig.current.position.y = D.damp(rig.current.position.y, ty + Math.sin(t * 0.7) * 0.03 * (1 - z) - (1 - arrive) * (portrait ? 0.5 : 0.6), 4, dt);
     rig.current.scale.setScalar(D.damp(rig.current.scale.x, ts * (0.9 + 0.1 * arrive), 3, dt));
-    rig.current.rotation.y = D.damp(rig.current.rotation.y, (-0.3 + stage.mx * 0.22) * (1 - e * 0.5), 3, dt);
-    rig.current.rotation.x = D.damp(rig.current.rotation.x, stage.my * 0.04, 3, dt);
+    // repos : inclinaison qui suit la souris (±8° en lacet, ±5° en tangage), lissée ; ramenée de face pendant le zoom
+    rig.current.rotation.y = D.damp(rig.current.rotation.y, (-0.3 + mx * 0.14 + Math.sin(t * 0.45) * 0.015) * (1 - e * 0.5) * (1 - z), 3, dt);
+    rig.current.rotation.x = D.damp(rig.current.rotation.x, my * 0.087 * (1 - z), 3, dt);
 
     // le portable s'efface vers le bas pendant l'éclatement
-    body.current.position.y = D.damp(body.current.position.y, (portrait ? -9 : -5.4) * e, 7, dt);
-    body.current.rotation.y = D.damp(body.current.rotation.y, e * 0.6, 3, dt);
+    body.current.position.x = D.damp(body.current.position.x, (portrait ? -6 : -8.5) * out, 4, dt);
+    body.current.position.y = D.damp(body.current.position.y, -0.6 * out, 4, dt);
+    body.current.rotation.y = D.damp(body.current.rotation.y, out * 0.5, 3, dt);
+    const op = 1 - smooth(0.15, 0.85, out);
+    const fading = op < 0.995;
+    if (fading !== fadeOn.current) { fadeOn.current = fading; lap.bodyMats.forEach((m) => { m.transparent = fading; m.needsUpdate = true; }); }
+    lap.bodyMats.forEach((m) => { m.opacity = op; });
+    if (shadow.current) { // ombre douce : elle naît avec l'ordinateur (jamais avant) et disparaît dès qu'il s'en va
+      const m = shadow.current.material as THREE.MeshBasicMaterial;
+      m.opacity = 0.42 * smooth(0.25, 1, arrive) * (1 - smooth(0, 0.05, Math.max(out, e)));
+      shadow.current.visible = m.opacity > 0.01;
+    }
 
     // couches : position repliée (plan de l'écran) → vue éclatée
     lg.current.position.set(D.lerp(lap.screenCenter.x, -0.1, e), D.lerp(lap.screenCenter.y, 1.55, e), D.lerp(lap.screenCenter.z, 0.1, e));
@@ -229,17 +280,38 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     });
 
     // caméra
-    camera.position.x = D.damp(camera.position.x, stage.mx * 0.5 * (1 - e), 3, dt);
-    camera.position.y = D.damp(camera.position.y, D.lerp(1.55, 1.95, e) - stage.my * 0.2, 3, dt);
-    camera.position.z = D.damp(camera.position.z, D.lerp(8.2, 8.8, e) + (portrait ? 2.2 : 0) - ho * 0.5, 3, dt);
-    camera.lookAt(0, D.lerp(1.0, 1.5, e), 0);
+    const cb = camBase.current;
+    cb.x = D.damp(cb.x, mx * 0.3 * (1 - e), 3, dt);
+    cb.y = D.damp(cb.y, D.lerp(1.55, 1.95, e) - my * 0.12, 3, dt);
+    cb.z = D.damp(cb.z, D.lerp(8.2, 8.8, e) + (portrait ? 2.2 : 0) - ho * 0.5, 3, dt);
+    lookBase.set(0, D.lerp(1.0, 1.5, e), 0);
+    if (z > 0.001) {
+      // la caméra avance face à l'écran jusqu'à ce qu'il remplisse la fenêtre
+      rig.current.updateMatrixWorld(true);
+      const c = scrC.copy(lap.screenCenter); body.current.localToWorld(c);
+      const n = scrN.set(0, Math.sin(lap.tilt), Math.cos(lap.tilt)).transformDirection(body.current.matrixWorld);
+      const s = rig.current.scale.x;
+      const vf = Math.tan(THREE.MathUtils.degToRad(30 / 2));
+      const aspect = size.width / size.height;
+      const d = Math.min((1.45 * s) / (vf * aspect), (0.9 * s) / vf) * 0.96;
+      camZ.copy(c).addScaledVector(n, d);
+      camera.position.lerpVectors(cb, camZ, z);
+      lookTmp.lerpVectors(lookBase, c, z);
+      camera.lookAt(lookTmp);
+    } else {
+      camera.position.copy(cb);
+      camera.lookAt(lookBase);
+    }
   });
 
   return (
     <group ref={rig}>
       <group ref={body}>
         <primitive object={lap.root} />
-        <ContactShadows position={[0, 0.002, 0]} opacity={0.5} scale={4.6} blur={2.4} far={2.2} resolution={lowPower ? 256 : 512} frames={lowPower ? 1 : Infinity} color="#000000" />
+        <mesh ref={shadow} position={[0, 0.004, 0.1]} rotation={[-Math.PI / 2, 0, 0]} scale={[4.6, 2.6, 1]} renderOrder={-1}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={shadowTex} transparent opacity={0} depthWrite={false} toneMapped={false} />
+        </mesh>
       </group>
 
       {/* couches détachables (vue éclatée) */}
@@ -261,7 +333,7 @@ export default function StageCanvas({ layers, accent, lowPower, running, onReady
   return (
     <Canvas
       frameloop={running ? "always" : "never"}
-      dpr={[1, lowPower ? 1.5 : 2]}
+      dpr={[1, lowPower ? 1.5 : 2]} /* plafonné à 2 */
       gl={{ alpha: true, antialias: !lowPower, powerPreference: "high-performance" }}
       camera={{ fov: 30, position: [0, 1.55, 9], near: 0.1, far: 60 }}
       style={{ pointerEvents: "none" }}

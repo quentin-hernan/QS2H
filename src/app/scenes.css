@@ -61,11 +61,6 @@
 @keyframes sheetFloat { from { transform: translateZ(calc(var(--i) * 22px)); } to { transform: translateZ(calc(var(--i) * 30px + 6px)); } }
 
 /* Espace client : objet qui se construit selon l'étape */
-.pobj { position: relative; width: 120px; height: 150px; margin: 0 0 1.5rem; transform-style: preserve-3d; transform: perspective(700px) rotateX(58deg) rotateZ(-35deg); }
-.pobj i { position: absolute; left: 0; right: 0; bottom: 0; height: 100px; background: rgb(28 28 28 / 0.06); border: 1px dashed rgb(28 28 28 / 0.35); transform: translateZ(calc(var(--i) * 16px)); }
-.pobj i.on { background: rgb(var(--accent)); border: 1px solid rgb(var(--accent)); animation: pobjIn 0.7s var(--ease) both; }
-.pobj i.cur { border: 2px solid rgb(var(--accent)); background: rgb(var(--accent) / 0.12); }
-@keyframes pobjIn { from { opacity: 0; transform: translateZ(calc(var(--i) * 16px + 40px)); } to { opacity: 1; transform: translateZ(calc(var(--i) * 16px)); } }
 
 @media (prefers-reduced-motion: reduce) {
   .sc-in, .sc-panel, .sc-wrap { animation: none; opacity: 1; }
@@ -73,5 +68,38 @@
   .sc-after { animation: none; clip-path: none; }
   .lp-lid { transition: none; }
   .sheets i { animation: none; }
-  .pobj i.on { animation: none; }
 }
+
+/* Contact : « Nous trouver » centré en bas de page */
+.cf { max-width: 1040px; margin-inline: auto; text-align: center; }
+.cf-eyebrow { justify-content: center; }
+.cf-rule { display: inline-block; width: 0; height: 2px; background: rgb(var(--acc-ctx)); transition: width 0.9s var(--ease); }
+.cf-on .cf-rule { width: 36px; }
+.cf-title { margin-top: 1rem; }
+.cf-lead { max-width: 52ch; margin: 1.2rem auto 0; opacity: 0; transform: translateY(12px); transition: opacity 0.9s var(--ease) 0.5s, transform 0.9s var(--ease) 0.5s; }
+.cf-on .cf-lead { opacity: 1; transform: none; }
+.cf-grid { display: grid; gap: 2.5rem; align-items: center; justify-items: center; margin-top: 3rem; }
+@media (min-width: 900px) { .cf-grid { grid-template-columns: 1fr 1fr; gap: 3.5rem; } }
+.cf-laptop { width: 100%; max-width: 440px; }
+.cf-map { width: 100%; max-width: 480px; opacity: 0; transform: translateY(24px); transition: opacity 0.9s var(--ease) 0.7s, transform 0.9s var(--ease) 0.7s; }
+.cf-on .cf-map { opacity: 1; transform: none; }
+.cf-map > div { text-align: center; }
+.cm { position: relative; height: 100%; }
+.cm svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cm-street { stroke: rgb(28 28 28 / 0.3); stroke-width: 2.4; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.cm-river { stroke: rgb(var(--accent) / 0.55); stroke-width: 9; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.cm-route { stroke: rgb(var(--accent)); stroke-width: 3.4; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.cf-on .cm-street { animation: scDraw 1.4s var(--ease) calc(0.5s + var(--i) * 0.15s) forwards; }
+.cf-on .cm-river { animation: scDraw 1.8s var(--ease) 0.4s forwards; }
+.cf-on .cm-route { animation: scDraw 1.4s var(--ease) 1.7s forwards; }
+.cm-pin { transform-box: fill-box; opacity: 0; }
+.cf-on .cm-pin { animation: cmDrop 0.9s cubic-bezier(.3,1.5,.5,1) 2.9s forwards; }
+@keyframes cmDrop { from { opacity: 0; transform: translateY(-34px); } to { opacity: 1; transform: none; } }
+.cm-drop { fill: rgb(var(--accent)); }
+.cm-wave { fill: none; stroke: rgb(var(--accent)); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.cf-on .cm-wave { animation: cmWave 2.6s ease-out 3.6s infinite; }
+.cf-on .cm-wave2 { animation-delay: 4.5s; }
+@keyframes cmWave { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(4); opacity: 0; } }
+.cm-tag { position: absolute; left: 7%; bottom: 8%; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(28 28 28 / 0.75); opacity: 0; }
+.cf-on .cm-tag { animation: scIn 0.7s var(--ease) 3.2s forwards; }
+@media (prefers-reduced-motion: reduce) { .cm-street, .cm-river, .cm-route { stroke-dashoffset: 0 !important; animation: none !important; } .cm-pin, .cm-tag, .cf-lead, .cf-map { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; } .cm-wave { animation: none !important; } }

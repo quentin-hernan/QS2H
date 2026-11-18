@@ -68,7 +68,7 @@ export function CookieBanner({ plausibleDomain }: { plausibleDomain: string }) {
         <Script src="https://plausible.io/js/script.tagged-events.js" data-domain={plausibleDomain} strategy="afterInteractive" />
       )}
       {show && (
-        <div role="dialog" aria-label="Préférences de cookies" aria-live="polite" className="dark-section fixed inset-x-3 bottom-3 z-[80] max-w-[440px] rounded-[1.5rem] border p-6 shadow-2xl md:inset-x-auto md:bottom-6 md:left-6" style={{ borderColor: "rgb(242 239 233 / .16)", background: "#14171C" }}>
+        <div role="dialog" aria-label="Préférences de cookies" aria-live="polite" className="dark-section fixed inset-x-3 bottom-3 z-[80] max-w-[440px] rounded-[1.5rem] border hair p-6 shadow-2xl md:inset-x-auto md:bottom-6 md:left-6">
           <p className="text-[1.05rem] font-medium">Cookies et mesure d&apos;audience</p>
           <p className="muted mt-2 text-[0.92rem] leading-relaxed">
             Nous utilisons un outil de mesure d&apos;audience pour comprendre quelles pages vous aident. Il n&apos;est activé qu&apos;avec votre accord. Détails dans la <Link href="/politique-de-cookies" className="link-u acc">politique de cookies</Link>.

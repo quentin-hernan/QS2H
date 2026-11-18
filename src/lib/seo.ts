@@ -41,7 +41,7 @@ export function orgJsonLd(s: SiteSettings, rating?: { value: number; count: numb
       addressLocality: c.city,
       addressCountry: "FR",
     },
-    areaServed: [{ "@type": "City", name: c.city }, { "@type": "AdministrativeArea", name: "Gironde" }, { "@type": "Country", name: "France" }],
+    areaServed: [{ "@type": "City", name: c.city }, { "@type": "AdministrativeArea", name: "Charente-Maritime" }, { "@type": "Country", name: "France" }],
     openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "09:00", closes: "18:00" }],
     ...(sameAs.length ? { sameAs } : {}),
     ...(rating ? { aggregateRating: { "@type": "AggregateRating", ratingValue: rating.value, reviewCount: rating.count } } : {}),
