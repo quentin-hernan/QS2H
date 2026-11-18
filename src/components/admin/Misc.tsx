@@ -243,7 +243,7 @@ export function PasswordForm() {
       <div><label className="label" htmlFor="pw-c">Mot de passe actuel</label><input id="pw-c" name="current" type="password" autoComplete="current-password" required className="field" /></div>
       <div><label className="label" htmlFor="pw-n">Nouveau mot de passe</label><input id="pw-n" name="next" type="password" autoComplete="new-password" required className="field" /><p className="muted mt-1.5 text-xs">12 caractères minimum, avec majuscules, minuscules et chiffres.</p></div>
       <div><label className="label" htmlFor="pw-k">Confirmation</label><input id="pw-k" name="confirm" type="password" autoComplete="new-password" required className="field" /></div>
-      {state?.error && <p role="alert" className="err">{state.error}</p>}{state?.ok && <p role="status" className="acc">Mot de passe modifié. Si la double authentification n'est pas encore activée, activez-la plus bas pour débloquer le reste de l'administration.</p>}
+      {state?.error && <p role="alert" className="err">{state.error}</p>}{state?.ok && <p role="status" className="acc">Mot de passe modifié. Si la double authentification n&apos;est pas encore activée, activez-la plus bas pour débloquer le reste de l&apos;administration.</p>}
       <button className="btn btn-primary" disabled={pending}>Modifier</button>
     </form>
   );
