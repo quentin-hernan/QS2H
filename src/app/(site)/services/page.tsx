@@ -17,7 +17,7 @@ export default async function Services() {
   const [services, products] = await Promise.all([getServices(), getProducts()]);
   return (
     <>
-      <PageHero eyebrow="Services" title={<>Six façons de faire <span className="serif-it">travailler</span> votre site.</>} lead="Du site vitrine à la boutique en ligne, chaque service est conçu pour un objectif précis : vous faire trouver, vous faire choisir, vous faire contacter.">
+      <PageHero image={sp.heroImage || ""} eyebrow="Services" title={<>Six façons de faire <span className="serif-it">travailler</span> votre site.</>} lead="Du site vitrine à la boutique en ligne, chaque service est conçu pour un objectif précis : vous faire trouver, vous faire choisir, vous faire contacter.">
         <Breadcrumbs items={[{ name: "Services", path: "/services" }]} />
       </PageHero>
       <section className="light-section py-20 md:py-28" aria-label="Les six services">

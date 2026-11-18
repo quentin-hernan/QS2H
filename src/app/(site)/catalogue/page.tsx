@@ -18,7 +18,7 @@ export default async function Catalogue() {
   const cats = Array.from(new Set(products.map((p) => p.category || "Autres")));
   return (
     <>
-      <PageHero eyebrow="Catalogue" title={<>Licences et produits, <span className="serif-it">clairs et accompagnés.</span></>} lead="Un prix lisible, une installation prise en charge, un interlocuteur unique. Demandez le produit qui vous intéresse : nous vous répondons sous 24 heures ouvrées.">
+      <PageHero image={cp.heroImage || ""} eyebrow="Catalogue" title={<>Licences et produits, <span className="serif-it">clairs et accompagnés.</span></>} lead="Un prix lisible, une installation prise en charge, un interlocuteur unique. Demandez le produit qui vous intéresse : nous vous répondons sous 24 heures ouvrées.">
         <Breadcrumbs items={[{ name: "Catalogue", path: "/catalogue" }]} />
       </PageHero>
 

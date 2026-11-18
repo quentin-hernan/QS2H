@@ -140,3 +140,6 @@ L'accueil présente (hero 3D + vue éclatée, engagements, services avec image d
 - **Admin > Pages libres** : créez de nouvelles pages sans code (offre, promotion, page partenaire…) en assemblant des sections : bandeau d'introduction, texte, image ou vidéo 16:9, colonnes, questions fréquentes, appel à l'action. Ajout, duplication, suppression, **glisser-déposer** ou boutons ↑ ↓ pour réordonner, fond clair ou sombre par section, annulation (Ctrl+Z), **aperçu ordinateur / tablette / mobile**, brouillon ou publication, adresse et description Google modifiables.
 - Une page publiée est servie à `/<adresse>` et ajoutée au plan du site. Les adresses déjà utilisées par le site (services, tarifs, blog…) sont refusées. Les liens de boutons n'acceptent que les chemins internes, https et mailto ; le contenu est nettoyé côté serveur (types et champs connus uniquement).
 - Limite actuelle : pas d'historique de versions pour les pages libres (contrairement aux pages « Pages et textes »).
+
+### Visuels d'en-tête
+Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image ou une vidéo dans leur bandeau d'en-tête (Admin > Pages et textes > champ « Image ou vidéo du bandeau d'en-tête »). Sans visuel, le bandeau reste texte seul.

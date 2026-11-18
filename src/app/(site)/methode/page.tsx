@@ -16,7 +16,7 @@ export default async function Methode() {
   const m = await getPage("method");
   return (
     <>
-      <PageHero eyebrow="Méthode" title={m.title} lead={m.intro}>
+      <PageHero image={m.heroImage || ""} eyebrow="Méthode" title={m.title} lead={m.intro}>
         <Breadcrumbs items={[{ name: "Méthode", path: "/methode" }]} />
       </PageHero>
       <section className="light-section py-24 md:py-36">

@@ -122,14 +122,22 @@ export function CtaBand({ title, text }: { title: string; text: string }) {
   );
 }
 
-export function PageHero({ eyebrow, title, lead, children }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode }) {
+export function PageHero({ eyebrow, title, lead, children, image = "" }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode; image?: string }) {
+  const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(image);
   return (
     <section className="dark-section relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
-      <FrameDraw className="container">
-        {children}
-        <p className="eyebrow mb-7">{eyebrow}</p>
-        <h1 className="max-w-[18ch] text-h1 font-medium">{title}</h1>
-        {lead && <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{lead}</p>}
+      <FrameDraw className={`container ${image ? "grid items-center gap-12 lg:grid-cols-12" : ""}`}>
+        <div className={image ? "lg:col-span-7" : ""}>
+          {children}
+          <p className="eyebrow mb-7">{eyebrow}</p>
+          <h1 className={`text-h1 font-medium ${image ? "" : "max-w-[18ch]"}`}>{title}</h1>
+          {lead && <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{lead}</p>}
+        </div>
+        {image && (
+          <div className="relative aspect-video overflow-hidden rounded-[1.5rem] bg-ink-800 lg:col-span-5">
+            {video ? <video src={image} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={image} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />}
+          </div>
+        )}
       </FrameDraw>
     </section>
   );

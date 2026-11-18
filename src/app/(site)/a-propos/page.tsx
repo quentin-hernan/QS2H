@@ -18,7 +18,7 @@ export default async function About() {
   const paras = String(a.story).split(/\n\s*\n/);
   return (
     <>
-      <PageHero eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
+      <PageHero image={a.heroImage || ""} eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
 
       <section className="light-section py-20 md:py-32">
         <div className="container grid gap-12 lg:grid-cols-12">

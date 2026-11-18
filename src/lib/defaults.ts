@@ -59,6 +59,7 @@ export const mediaField: FieldDef = {
     { name: "text", label: "Légende (facultatif)", type: "textarea" },
   ],
 };
+export const heroImageField: FieldDef = { name: "heroImage", label: "Image ou vidéo du bandeau d'en-tête (facultatif, 16:9 conseillé)", type: "media" };
 export type PageSchema = { key: string; label: string; fields: FieldDef[]; defaults: Record<string, unknown> };
 
 export const pageSchemas: PageSchema[] = [
@@ -118,6 +119,7 @@ export const pageSchemas: PageSchema[] = [
     key: "method",
     label: "Méthode",
     fields: [
+      heroImageField,
       mediaField,
       { name: "title", label: "Titre", type: "text" },
       { name: "intro", label: "Introduction", type: "textarea" },
@@ -151,6 +153,7 @@ export const pageSchemas: PageSchema[] = [
     key: "about",
     label: "À propos",
     fields: [
+      heroImageField,
       mediaField,
       { name: "title", label: "Titre", type: "text" },
       { name: "intro", label: "Introduction", type: "textarea" },
@@ -221,19 +224,19 @@ export const pageSchemas: PageSchema[] = [
   {
     key: "services",
     label: "Page Services (visuels)",
-    fields: [mediaField],
+    fields: [heroImageField, mediaField],
     defaults: { media: [] },
   },
   {
     key: "catalogue",
     label: "Page Catalogue (visuels)",
-    fields: [mediaField],
+    fields: [heroImageField, mediaField],
     defaults: { media: [] },
   },
   {
     key: "pricing",
     label: "Page Tarifs (visuels)",
-    fields: [mediaField],
+    fields: [heroImageField, mediaField],
     defaults: { media: [] },
   },
 ];

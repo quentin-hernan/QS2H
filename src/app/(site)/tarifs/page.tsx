@@ -21,7 +21,7 @@ export default async function Tarifs() {
   return (
     <>
       <JsonLd data={faqJsonLd(f)} />
-      <PageHero eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
+      <PageHero image={tp.heroImage || ""} eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
         <Breadcrumbs items={[{ name: "Tarifs", path: "/tarifs" }]} />
       </PageHero>
 
