@@ -175,3 +175,26 @@ h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *, h4 * { font-style: normal !important; 
 .product-card { transition: transform 0.5s var(--ease, ease), box-shadow 0.5s var(--ease, ease); }
 .product-card:hover, .product-card:focus-visible { transform: translateY(-6px); box-shadow: 0 30px 50px -30px rgb(28 28 28 / 0.35); }
 @media (prefers-reduced-motion: reduce) { .product-card:hover { transform: none; } }
+
+/* Éditeur d'apparence : fonds de section, animations */
+.sx-bg { position: absolute; z-index: -1; overflow: hidden; pointer-events: none; }
+.sx-bg > .sx-media { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; }
+.sx-ov { position: absolute; inset: 0; }
+.sx-zoom { animation: sxZoom 22s ease-in-out infinite alternate; }
+@keyframes sxZoom { from { transform: scale(1); } to { transform: scale(1.15); } }
+.sx-pan { width: 116% !important; left: -8% !important; animation: sxPan 26s ease-in-out infinite alternate; }
+@keyframes sxPan { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+.sx-grad { background-size: 220% 220% !important; animation: sxGrad 14s ease infinite; }
+@keyframes sxGrad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.sx-a { transition: opacity var(--sxd, 800ms) var(--ease, ease) var(--sxl, 0ms), transform var(--sxd, 800ms) var(--ease, ease) var(--sxl, 0ms), filter var(--sxd, 800ms) var(--ease, ease) var(--sxl, 0ms); }
+.sx-pre.sx-t-fade { opacity: 0; }
+.sx-pre.sx-t-up { opacity: 0; transform: translateY(48px); }
+.sx-pre.sx-t-down { opacity: 0; transform: translateY(-48px); }
+.sx-pre.sx-t-left { opacity: 0; transform: translateX(-64px); }
+.sx-pre.sx-t-right { opacity: 0; transform: translateX(64px); }
+.sx-pre.sx-t-zoom { opacity: 0; transform: scale(0.92); }
+.sx-pre.sx-t-blur { opacity: 0; filter: blur(14px); }
+.sx-editing #contenu section:not([data-nostyle]) { cursor: pointer; }
+.sx-editing #contenu section:not([data-nostyle]):hover { outline: 2px dashed rgb(127 169 217 / 0.8); outline-offset: -2px; }
+.sx-editing #contenu section.sx-sel { outline: 3px solid #2A5587; outline-offset: -3px; }
+@media (prefers-reduced-motion: reduce) { .sx-pre { opacity: 1 !important; transform: none !important; filter: none !important; } .sx-zoom, .sx-pan, .sx-grad { animation: none !important; } }

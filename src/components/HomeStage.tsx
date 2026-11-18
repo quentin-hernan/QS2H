@@ -100,7 +100,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
       </div>
 
       {/* HERO */}
-      <section ref={heroEl} className="relative flex min-h-[100svh] flex-col justify-end pb-14 pt-32 md:justify-center md:pb-20" aria-labelledby="h1">
+      <section data-nostyle ref={heroEl} className="relative flex min-h-[100svh] flex-col justify-end pb-14 pt-32 md:justify-center md:pb-20" aria-labelledby="h1">
         <div className="container">
           <p className="eyebrow relative z-[2] mb-6 md:mb-8">{hero.kicker}</p>
           <h1 id="h1" className="text-display font-medium">
@@ -127,7 +127,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
       </section>
 
       {/* VUE ÉCLATÉE */}
-      <section ref={expEl} className={`relative ${pinned ? "h-[100svh]" : "py-24"}`} aria-labelledby="layers-title">
+      <section data-nostyle ref={expEl} className={`relative ${pinned ? "h-[100svh]" : "py-24"}`} aria-labelledby="layers-title">
         <div className={`container ${pinned ? "flex h-full items-end pb-12 md:items-center md:pb-0" : ""}`}>
           {pinned ? (
             <div className="relative z-[2] w-full max-w-[26rem]">

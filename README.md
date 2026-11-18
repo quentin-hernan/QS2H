@@ -143,3 +143,9 @@ L'accueil présente (hero 3D + vue éclatée, engagements, services avec image d
 
 ### Visuels d'en-tête
 Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image ou une vidéo dans leur bandeau d'en-tête (Admin > Pages et textes > champ « Image ou vidéo du bandeau d'en-tête »). Sans visuel, le bandeau reste texte seul.
+
+### Éditeur d'apparence (toutes les pages)
+- **Admin > Apparence des pages** : ouvre n'importe quelle page du site en mode édition. Bouton bleu « Modifier l'apparence » (visible uniquement une fois connecté) : cliquez sur une section, réglez-la dans le panneau, le résultat s'affiche en direct, « Enregistrer » publie.
+- **Fond** : couleur, dégradé (angle, 2 couleurs), image ou vidéo (médiathèque), opacité, flou, voile noir ou blanc, ajustement et position ; **emplacement** : toute la section, bande verticale à gauche ou à droite, bande horizontale en haut ou en bas (taille en % et coins arrondis). **Animation du fond** : zoom lent, panoramique, parallaxe, fond fixe, dégradé animé.
+- **Apparition** : fondu, montée, descente, glissement gauche ou droite, zoom, flou vers net (durée et délai réglables, bouton « Rejouer »). **Thème** clair ou sombre, espace en haut et en bas, hauteur minimale, afficher ou masquer la section.
+- Les réglages sont rattachés à l'**ordre des sections** de chaque page. Exclus : la scène 3D d'ouverture de l'accueil. Les animations sont désactivées avec « réduire les animations ». Pour réordonner des sections, utilisez une **page libre**.

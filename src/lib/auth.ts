@@ -27,6 +27,7 @@ export async function createSession(s: Session) {
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
     .sign(secret());
+  (await cookies()).set("qs2h_ui", "1", { httpOnly: false, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: MAX_AGE });
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -38,6 +39,7 @@ export async function createSession(s: Session) {
 
 export async function destroySession() {
   (await cookies()).delete(COOKIE);
+  (await cookies()).delete("qs2h_ui");
 }
 
 export async function getSession(): Promise<Session | null> {
