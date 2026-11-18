@@ -27,7 +27,7 @@ export function Reveal({ children, delay = 0, as: Tag = "div", className = "" }:
 }
 
 /** Titre révélé ligne par ligne (chaque ligne est masquée puis remonte). */
-export function Lines({ lines, className = "", as: Tag = "h2", delay = 0, immediate = false }: { lines: ReactNode[]; className?: string; as?: ElementType; delay?: number; immediate?: boolean }) {
+export function Lines({ lines, className = "", as: Tag = "h2", delay = 0, immediate = false, id }: { lines: ReactNode[]; className?: string; as?: ElementType; delay?: number; immediate?: boolean; id?: string }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -41,7 +41,7 @@ export function Lines({ lines, className = "", as: Tag = "h2", delay = 0, immedi
     return () => io.disconnect();
   }, [immediate]);
   return (
-    <Tag ref={ref} className={className}>
+    <Tag ref={ref} id={id} className={className}>
       {lines.map((l, i) => (
         <span key={i} className="ln" style={{ ["--d" as string]: `${delay + i * 0.1}s` }}>
           <span>{l}</span>

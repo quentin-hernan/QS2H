@@ -115,8 +115,8 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
           <div className="relative z-[2] mt-8 max-w-[34rem] md:mt-10">
             <p className="muted text-[1.1rem] leading-relaxed md:text-[1.2rem]">{hero.lead}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/contact" className="btn btn-primary">{hero.ctaPrimary} <span aria-hidden="true">→</span></Link>
-              <Link href="/realisations" className="btn btn-ghost">{hero.ctaSecondary}</Link>
+              <Link href="/contact" className="btn btn-primary btn-fill btn-arrow"><span>{hero.ctaPrimary}</span><span aria-hidden="true" className="arr">→</span></Link>
+              <a href="#expertises" className="btn btn-ghost">{hero.ctaSecondary}</a>
             </div>
           </div>
         </div>

@@ -35,7 +35,7 @@ export function ServicesList({ services, title, lead, theme = "light", bg = "" }
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-32">
             <p className="eyebrow mb-6">Services</p>
-            <Lines as="h2" lines={[title]} className="text-h2 font-medium [&_.ln]:pb-2" />
+            <Lines id="services-h" as="h2" lines={[title]} className="text-h2 font-medium [&_.ln]:pb-2" />
             <Reveal delay={0.2}><p className="muted mt-6 max-w-sm leading-relaxed">{lead}</p></Reveal>
             <Reveal delay={0.3}><Link href="/services" className="btn btn-ghost mt-8">Tous les services</Link></Reveal>
           </div>
@@ -112,7 +112,7 @@ export function CtaBand({ title, text }: { title: string; text: string }) {
   return (
     <section className="dark-section relative overflow-hidden py-28 md:py-44" aria-labelledby="cta-h">
       <FrameDraw className="container">
-        <Lines as="h2" lines={[title]} className="text-display max-w-[14ch] font-medium [&_.ln]:pb-3" />
+        <Lines id="cta-h" as="h2" lines={[title]} className="text-display max-w-[14ch] font-medium [&_.ln]:pb-3" />
         <div className="mt-10 grid items-end gap-8 md:grid-cols-2">
           <Reveal delay={0.2}><p className="muted max-w-md text-[1.15rem] leading-relaxed">{text}</p></Reveal>
           <Reveal delay={0.3}><div className="flex flex-wrap gap-3 md:justify-end"><Link href="/contact" className="btn btn-primary">Demander un devis gratuit <span aria-hidden="true">→</span></Link><Link href="/tarifs" className="btn btn-ghost">Voir les tarifs</Link></div></Reveal>
