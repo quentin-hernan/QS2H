@@ -100,7 +100,7 @@ Optionnelles : `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO` (emails de devis) ; `NEX
 
 - Sessions JWT signées (HS256) dans un cookie `HttpOnly`, `SameSite=Lax`, `Secure` en production (admin 8 h, client 7 jours, clés distinctes, « se déconnecter partout »).
 - Mots de passe hashés en **argon2id**, 12 caractères minimum, contrôle contre les fuites connues (Have I Been Pwned, k-anonymité), messages d'erreur génériques, jetons de vérification et de réinitialisation à usage unique et hashés en base.
-- **2FA obligatoire pour le propriétaire** : tant qu'elle n'est pas activée, seule la page « Mon compte » est accessible.
+- **2FA du propriétaire** : activable depuis « Mon compte ». Elle n'est plus obligatoire par défaut ; pour l'imposer (recommandé en production), définir `ADMIN_REQUIRE_2FA=true` : tant qu'elle n'est pas activée, seule la page « Mon compte » est accessible.
 - Anti brute-force : limite par IP (10 / 15 min) + verrouillage du compte après 5 échecs / 15 min, journal des connexions.
 - **2FA TOTP** optionnelle (RFC 6238) activable depuis « Mon compte ».
 - Protection CSRF native des Server Actions ; `middleware` protégeant tout `/admin` ; `X-Robots-Tag: noindex` sur l'administration.

@@ -94,7 +94,7 @@ export async function disable2fa(password: string): Promise<Result> {
   const s = await requireSession();
   const u = await db.user.findUnique({ where: { id: s.uid } });
   if (!u || !(await verifyPassword(password, u.passwordHash))) return { ok: false, error: "Mot de passe incorrect." };
-  if (u.role === "owner") return { ok: false, error: "La double authentification est obligatoire pour le propriétaire." };
+  if (u.role === "owner" && process.env.ADMIN_REQUIRE_2FA === "true") return { ok: false, error: "La double authentification est obligatoire pour le propriétaire." };
   await db.user.update({ where: { id: u.id }, data: { totpEnabled: false, totpSecret: null } });
   await audit(s.email, "désactivation 2FA", "user", u.id);
   return { ok: true };

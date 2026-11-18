@@ -13,7 +13,9 @@ function secret() {
 }
 
 /** Mot de passe initial à changer, ou propriétaire sans double authentification : l'accès est limité à « Mon compte ». */
-export const mustSetup = (u: { mustChangePassword: boolean; role: string; totpEnabled: boolean }) => u.mustChangePassword || (u.role === "owner" && !u.totpEnabled);
+/** 2FA obligatoire pour le propriétaire : désactivée par défaut, à réactiver en production avec ADMIN_REQUIRE_2FA=true. */
+export const REQUIRE_OWNER_2FA = process.env.ADMIN_REQUIRE_2FA === "true";
+export const mustSetup = (u: { mustChangePassword: boolean; role: string; totpEnabled: boolean }) => u.mustChangePassword || (REQUIRE_OWNER_2FA && u.role === "owner" && !u.totpEnabled);
 
 export type Session = { uid: string; email: string; name: string; role: "owner" | "editor"; must: boolean };
 
