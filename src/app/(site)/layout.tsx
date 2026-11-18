@@ -13,6 +13,9 @@ import { SlotsProvider } from "@/components/ImgSlot";
 import { CartProvider } from "@/components/shop/Cart";
 import { orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
+// Pages rendues à chaque visite : les modifications faites dans l'administration apparaissent immédiatement (les données restent mises en cache par étiquette).
+export const dynamic = "force-dynamic";
+
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [s, reviews, projects, services, products] = await Promise.all([getSettings(), getReviews(), getProjects(), getServices(), getProducts()]);
   const vp = projects.filter((p) => p.planes.length).map((p) => ({ slug: p.slug, title: p.title, client: p.client, sector: p.sector, year: p.year, isExample: p.isExample, url: p.url, summary: p.summary, planes: p.planes, meta: p.meta }));

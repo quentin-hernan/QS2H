@@ -5,7 +5,7 @@ import { parseJson } from "./utils";
 
 const TAG = "content";
 const cached = <A extends unknown[], R>(fn: (...a: A) => Promise<R>, key: string) =>
-  unstable_cache(fn, ["qs2h", key], { tags: [TAG], revalidate: 3600 });
+  unstable_cache(fn, ["qs2h", key], { tags: [TAG], revalidate: 30 });
 
 type Faq = { q: string; a: string };
 type Result = { label: string; value: string };

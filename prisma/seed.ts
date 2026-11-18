@@ -264,6 +264,11 @@ async function main() {
     for (const p of posts) await db.post.create({ data: { ...p, status: "published" } });
     console.log("✓ articles");
   }
+  if ((await db.shopItem.count()) === 0) {
+    const items = JSON.parse(fs.readFileSync(path.join(__dirname, "shop-seed.json"), "utf8"));
+    for (const it of items) await db.shopItem.create({ data: it });
+    console.log("✓ boutique (articles d'exemple)");
+  }
   if ((await db.teamMember.count()) === 0) {
     await db.teamMember.create({ data: { name: "[Prénom Nom]", role: "Fondateur · Direction créative et technique", bio: "Quinze lignes de présentation à remplacer depuis /admin > Équipe.", order: 0 } });
     console.log("✓ équipe (à compléter)");
