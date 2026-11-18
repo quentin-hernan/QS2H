@@ -14,18 +14,7 @@ export async function Footer() {
   const col = "eyebrow mb-5 !text-[0.8rem]";
   return (
     <footer className="dark-section relative z-[2] overflow-hidden">
-      <div className="container pt-24 md:pt-32">
-        <div className="ft-top grid gap-10 border-b pb-16 md:grid-cols-12 md:pb-24" style={{ borderColor: "rgb(248 248 247 / .14)" }}>
-          <div className="md:col-span-8">
-            <p className="ft-big">Un projet, une question ?</p>
-            <a href={`mailto:${c.email}`} className="ft-mail mt-6 inline-flex items-center gap-4">{c.email}<span aria-hidden="true">→</span></a>
-          </div>
-          <div className="flex flex-col items-start gap-3 md:col-span-4 md:items-end md:justify-end">
-            <Link href="/contact" className="btn btn-primary btn-fill btn-arrow"><span>Parler de mon projet</span><span aria-hidden="true" className="arr">→</span></Link>
-            <Link href="/rendez-vous" className="btn btn-ghost">Prendre rendez-vous</Link>
-          </div>
-        </div>
-
+      <div className="container pt-20 md:pt-28">
         <div className="grid gap-12 py-16 md:grid-cols-12">
           <div className="md:col-span-4">
             <Image src="/logo-light.png" alt="QS2H, solutions digitales" width={720} height={227} sizes="180px" className="h-12 w-auto" />

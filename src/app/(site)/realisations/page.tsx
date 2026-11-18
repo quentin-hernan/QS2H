@@ -1,6 +1,7 @@
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RealisationsView } from "@/components/RealisationsView";
+import { Showcase } from "@/components/HomeSections";
 import { getProjects, getServices } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
@@ -18,7 +19,8 @@ export default async function Realisations() {
       <PageHero eyebrow="Réalisations" title={<>Des sites pensés pour <span className="serif-it">chaque métier.</span></>} lead="Artisan, restaurant, cabinet, boutique : chaque projet part de l'activité du client, pas d'un modèle.">
         <Breadcrumbs items={[{ name: "Réalisations", path: "/realisations" }]} />
       </PageHero>
-      <section className="light-section py-16 md:py-24" aria-label="Les projets">
+      <Showcase hideLink title="Projets récents" projects={projects.slice(0, 3).map((p) => ({ slug: p.slug, title: p.title, sector: p.sector, summary: p.summary, cover: p.cover, isExample: p.isExample }))} />
+      <section className="light-section py-16 md:py-24" aria-label="Explorer les projets">
         <div className="container">
           <RealisationsView
             desk={projects.map((p) => ({ slug: p.slug, title: p.title, client: p.client, sector: p.sector, year: p.year, summary: p.summary, cover: p.cover, url: p.url, isExample: p.isExample, duration: p.duration, beforeImage: p.beforeImage, planes: p.planes, meta: p.meta }))}

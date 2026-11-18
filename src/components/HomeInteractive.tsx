@@ -153,7 +153,7 @@ export function ProductDemo({ title, text }: { title: string; text: string }) {
 }
 
 /* ================================================================== 06 · Méthode : une ligne qui avance avec la lecture */
-export function MethodLine({ steps, title }: { steps: Item[]; title: string }) {
+export function MethodLine({ steps, title, hideLink = false }: { steps: Item[]; title: string; hideLink?: boolean }) {
   const root = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = root.current;
@@ -166,7 +166,7 @@ export function MethodLine({ steps, title }: { steps: Item[]; title: string }) {
   return (
     <section ref={root} className="light-section ml-sec py-24 md:py-36" aria-labelledby="ml-h" style={{ ["--m" as string]: 0 }}>
       <div className="container">
-        <div className="mb-16 flex flex-wrap items-end justify-between gap-6"><h2 id="ml-h" className="text-h1 font-medium">{title}</h2><Link href="/methode" className="xp-link">La méthode en détail <span aria-hidden="true">→</span></Link></div>
+        <div className="mb-16 flex flex-wrap items-end justify-between gap-6"><h2 id="ml-h" className="text-h1 font-medium">{title}</h2>{!hideLink && <Link href="/methode" className="xp-link">La méthode en détail <span aria-hidden="true">→</span></Link>}</div>
         <ol className="ml-track" style={{ ["--n" as string]: steps.length }}>
           <span className="ml-line" aria-hidden="true"><span /></span>
           {steps.map((s, i) => (
@@ -184,13 +184,13 @@ export function MethodLine({ steps, title }: { steps: Item[]; title: string }) {
 }
 
 /* ================================================================== 08 · FAQ : accordéon animé, une question ouverte à la fois */
-export function HomeFaq({ items }: { items: { q: string; a: string }[] }) {
+export function HomeFaq({ items, title = "Questions fréquentes", aside }: { items: { q: string; a: string }[]; title?: string; aside?: React.ReactNode }) {
   const [open, setOpen] = useState<number | null>(0);
   if (!items.length) return null;
   return (
     <section className="light-section py-24 md:py-36" aria-labelledby="hf-h">
       <div className="container grid gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-4"><h2 id="hf-h" className="text-h1 font-medium">Questions fréquentes</h2><Link href="/faq" className="xp-link mt-8 inline-flex">Toutes les questions <span aria-hidden="true">→</span></Link></div>
+        <div className="lg:col-span-4"><h2 id="hf-h" className="text-h1 font-medium">{title}</h2>{aside && <div className="mt-8">{aside}</div>}</div>
         <div className="lg:col-span-8">
           <ul className="hf-list">
             {items.map((it, i) => (
@@ -203,5 +203,44 @@ export function HomeFaq({ items }: { items: { q: string; a: string }[] }) {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ================================================================== 02 · Dessin d'introduction : fenêtre de site, bulle de discussion, chaîne d'automatisation (tracés au défilement) */
+export function IntroArt() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }, { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const d = (i: number) => ({ style: { ["--i" as string]: i } });
+  return (
+    <div ref={ref} className="ia" aria-hidden="true">
+      <svg viewBox="0 0 600 440" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <g className="ia-float">
+          <rect className="ia-fill" x="30" y="40" width="390" height="262" rx="20" />
+          <rect className="ia-d" pathLength="1" {...d(0)} x="30" y="40" width="390" height="262" rx="20" />
+          <path className="ia-d" pathLength="1" {...d(1)} d="M30 84h390" />
+          <circle className="ia-d" pathLength="1" {...d(2)} cx="54" cy="62" r="6" /><circle className="ia-d" pathLength="1" {...d(2)} cx="76" cy="62" r="6" /><circle className="ia-d" pathLength="1" {...d(2)} cx="98" cy="62" r="6" />
+          <path className="ia-d" pathLength="1" {...d(3)} d="M64 122h150M64 150h110M64 186h130" />
+          <rect className="ia-d" pathLength="1" {...d(3)} x="64" y="214" width="92" height="30" rx="15" />
+          <rect className="ia-d" pathLength="1" {...d(4)} x="244" y="112" width="140" height="104" rx="14" />
+          <path className="ia-d" pathLength="1" {...d(4)} d="M244 216l48-52 40 36 24-20 28 36" />
+          <path className="ia-d" pathLength="1" {...d(5)} d="M64 266h96M184 266h74M282 266h102" />
+        </g>
+        <g className="ia-float ia-float2">
+          <path className="ia-fill" d="M318 214h206a22 22 0 0 1 22 22v76a22 22 0 0 1-22 22H402l-34 30v-30h-50a22 22 0 0 1-22-22v-76a22 22 0 0 1 22-22z" />
+          <path className="ia-d ia-hi" pathLength="1" {...d(6)} d="M318 214h206a22 22 0 0 1 22 22v76a22 22 0 0 1-22 22H402l-34 30v-30h-50a22 22 0 0 1-22-22v-76a22 22 0 0 1 22-22z" />
+          <circle className="ia-dot" cx="382" cy="274" r="6" /><circle className="ia-dot" cx="422" cy="274" r="6" style={{ animationDelay: "0.2s" }} /><circle className="ia-dot" cx="462" cy="274" r="6" style={{ animationDelay: "0.4s" }} />
+        </g>
+        <g>
+          <path className="ia-d" pathLength="1" {...d(7)} d="M70 400c60-44 110 20 170-8s110-44 170-4 80 18 120-12" />
+          {[[70, 400], [240, 392], [410, 388], [530, 376]].map(([x, y], i) => (<g key={i}><circle className="ia-node" cx={x} cy={y} r="11" style={{ ["--i" as string]: 8 + i }} /><circle className="ia-ring" cx={x} cy={y} r="11" style={{ animationDelay: (i * 0.6) + "s" }} /></g>))}
+        </g>
+      </svg>
+    </div>
   );
 }

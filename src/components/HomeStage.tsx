@@ -23,6 +23,7 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
   const layerEl = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"pending" | "3d" | "static">("pending");
   const [ready, setReady] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [running, setRunning] = useState(true);
   const [active, setActive] = useState(-1);
   const [prog, setProg] = useState(0);
@@ -40,6 +41,9 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
     const id = hasIdle ? w.requestIdleCallback!(go, { timeout: 1500 }) : window.setTimeout(go, 400);
     return () => (hasIdle ? w.cancelIdleCallback?.(id) : window.clearTimeout(id));
   }, [covers]);
+
+  // sécurité : si la scène 3D n'est pas prête après 6 s, on affiche l'image fixe
+  useEffect(() => { if (mode !== "3d" || ready) return; const t = setTimeout(() => setSlow(true), 6000); return () => clearTimeout(t); }, [mode, ready]);
 
   // pointeur global (la scène ne capte pas les événements)
   useEffect(() => {
@@ -91,9 +95,9 @@ export function HomeStage({ hero, layers, covers, accent }: Props) {
       <div ref={layerEl} className="pointer-events-none sticky top-0 z-[1] -mb-[100svh] h-[100svh] w-full" aria-hidden="true">
         {/* repli statique : affiché pendant le chargement, sans WebGL, ou sur appareil faible */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero-fallback.webp" alt="" width={1600} height={1000} fetchPriority="high" className={`absolute inset-y-0 right-0 my-auto h-auto w-[55%] max-w-[800px] translate-y-[9%] object-contain transition-opacity duration-700 max-md:inset-x-0 max-md:bottom-[-4%] max-md:top-auto max-md:right-auto max-md:mx-auto max-md:my-0 max-md:w-[135%] ${ready ? "opacity-0" : "opacity-100"}`} />
+        <img src="/hero-fallback.webp" alt="" width={1600} height={1000} fetchPriority="high" className={`absolute inset-y-0 right-0 my-auto h-auto w-[55%] max-w-[800px] translate-y-[9%] object-contain transition-opacity duration-700 max-md:inset-x-0 max-md:bottom-[-4%] max-md:top-auto max-md:right-auto max-md:mx-auto max-md:my-0 max-md:w-[135%] ${mode === "static" || (slow && !ready) ? "opacity-100" : "opacity-0"}`} />
         {mode === "3d" && (
-          <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}>
+          <div className={`absolute inset-0 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}>
             <StageCanvas layers={layers} accent={accent} lowPower={lowPower.current} running={running} onReady={() => setReady(true)} />
           </div>
         )}

@@ -2,24 +2,37 @@ import Link from "next/link";
 import Image from "next/image";
 import { Lines, Reveal } from "./Reveal";
 import { ScrollWords } from "./Motion";
+import { IntroArt } from "./HomeInteractive";
 
 type Item = { title: string; text: string };
 type Proj = { slug: string; title: string; sector: string; summary: string; cover: string; isExample: boolean };
 
 /* 02 · Présentation : une grande phrase, un texte court */
-export function Intro({ line1, line2, text }: { line1: string; line2: string; text: string }) {
+export function Intro({ line1, line2, text, bg = "" }: { line1: string; line2: string; text: string; bg?: string }) {
+  const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(bg);
   return (
-    <section className="light-section py-28 md:py-44" aria-label="Présentation de QS2H">
-      <div className="container">
+    <section className="light-section relative overflow-hidden py-28 md:py-44" aria-label="Présentation de QS2H">
+      {bg ? (
+        <>
+          {video ? <video src={bg} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" /> : /* eslint-disable-next-line @next/next/no-img-element */ <img src={bg} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
+          <div className="absolute inset-0 bg-ivory/80" aria-hidden="true" />
+        </>
+      ) : (
+        <>
+          <div className="ia-grid" aria-hidden="true" />
+          <div className="ia-wrap hidden md:block"><IntroArt /></div>
+        </>
+      )}
+      <div className="container relative z-10">
         <Lines as="h2" lines={[line1, <span key="b" className="text-mute-light">{line2}</span>]} className="max-w-[16ch] text-display font-medium" />
-        <div className="mt-14 grid md:grid-cols-12"><ScrollWords text={text} className="text-[1.3rem] leading-[1.6] md:col-span-7 md:col-start-6" /></div>
+        <div className="mt-14 grid md:grid-cols-12"><ScrollWords text={text} className="text-[1.25rem] leading-[1.6] md:col-span-5" /></div>
       </div>
     </section>
   );
 }
 
 /* 05 · Réalisations : grands visuels, révélés par un masque au défilement */
-export function Showcase({ projects, title }: { projects: Proj[]; title: string }) {
+export function Showcase({ projects, title, hideLink = false }: { projects: Proj[]; title: string; hideLink?: boolean }) {
   if (!projects.length) return null;
   const [first, ...rest] = projects;
   const Card = ({ p, big }: { p: Proj; big?: boolean }) => (
@@ -38,7 +51,7 @@ export function Showcase({ projects, title }: { projects: Proj[]; title: string 
   return (
     <section className="light-section py-24 md:py-36" aria-labelledby="sc-h">
       <div className="container">
-        <div className="mb-14 flex flex-wrap items-end justify-between gap-6"><h2 id="sc-h" className="text-h1 font-medium">{title}</h2><Link href="/realisations" className="xp-link">Toutes les réalisations <span aria-hidden="true">→</span></Link></div>
+        <div className="mb-14 flex flex-wrap items-end justify-between gap-6"><h2 id="sc-h" className="text-h1 font-medium">{title}</h2>{!hideLink && <Link href="/realisations" className="xp-link">Toutes les réalisations <span aria-hidden="true">→</span></Link>}</div>
         <Reveal><Card p={first} big /></Reveal>
         {rest.length > 0 && <div className="mt-16 grid gap-x-10 gap-y-16 md:grid-cols-2">{rest.slice(0, 2).map((p, i) => (<Reveal key={p.slug} delay={i * 0.1}><Card p={p} /></Reveal>))}</div>}
       </div>

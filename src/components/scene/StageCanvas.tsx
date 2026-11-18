@@ -174,7 +174,9 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     const portrait = size.width < size.height * 0.95;
 
     // ouverture du capot à l'arrivée
-    const open = smooth(0.3, 2.1, t - born.current);
+    const age = t - born.current;
+    const arrive = smooth(0.2, 1.7, age); // arrivée : translation douce puis stabilisation
+    const open = smooth(0.9, 2.6, age); // le capot s'ouvre quand le portable est presque en place
     lap.hinge.rotation.x = D.lerp(Math.PI / 2 + lap.tilt, 0, open);
     const opened = open > 0.995;
     // écran réel du portable tant que les couches ne sont pas déployées ; les couches apparaissent / disparaissent en fondu
@@ -199,8 +201,8 @@ function Rig({ layers, accent, lowPower, onReady }: Omit<Props, "running">) {
     const ty = portrait ? D.lerp(D.lerp(2.1, 0.35, ho), 1.3, e) : 0;
     const ts = (portrait ? D.lerp(0.4, 0.55, ho) : D.lerp(heroS, heroS + 0.04, ho)) * D.lerp(1, portrait ? 0.82 : 0.78, e);
     rig.current.position.x = D.damp(rig.current.position.x, tx, 3, dt);
-    rig.current.position.y = D.damp(rig.current.position.y, ty + Math.sin(t * 0.7) * 0.03, 3, dt);
-    rig.current.scale.setScalar(D.damp(rig.current.scale.x, ts, 3, dt));
+    rig.current.position.y = D.damp(rig.current.position.y, ty + Math.sin(t * 0.7) * 0.03 - (1 - arrive) * (portrait ? 0.7 : 1.1), 3, dt);
+    rig.current.scale.setScalar(D.damp(rig.current.scale.x, ts * (0.9 + 0.1 * arrive), 3, dt));
     rig.current.rotation.y = D.damp(rig.current.rotation.y, (-0.3 + stage.mx * 0.22) * (1 - e * 0.5), 3, dt);
     rig.current.rotation.x = D.damp(rig.current.rotation.x, stage.my * 0.04, 3, dt);
 

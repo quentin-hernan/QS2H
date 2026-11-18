@@ -157,3 +157,8 @@ Les pages Services, Tarifs, Catalogue, Méthode et À propos acceptent une image
 - **Pied de page** : phrase de clôture, email en grand, expertises, services, navigation, coordonnées, mentions.
 - **Menu mobile** : plein écran, liens numérotés, devis, rendez-vous, espace client, email.
 - Transitions de page : View Transitions API (fondu court, sans flash), repli en fondu.
+
+### Où est quoi (aucun doublon entre l'accueil et les pages dédiées)
+- **Accueil** : hero 3D, présentation (fond modifiable : image, vidéo ou dessin animé par défaut), expertises, démonstrations, « Pourquoi QS2H ? », appel final.
+- **Réalisations** : projets récents en grands visuels, puis exploration par secteur et par service. **Méthode** : vue d'ensemble en 5 phases (Admin > Pages et textes > Méthode) puis étapes détaillées. **FAQ** : accordéon animé, tout le contenu de Admin > FAQ.
+- **Un seul appel à l'action en bas de chaque page** ; le pied de page ne répète plus le bouton « Parler de mon projet ».
