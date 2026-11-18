@@ -338,3 +338,20 @@ model ChatConversation {
 
   @@index([updatedAt])
 }
+
+model Appointment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  startsAt  DateTime
+  endsAt    DateTime
+  kind      String
+  name      String
+  email     String
+  phone     String   @default("")
+  message   String   @default("")
+  status    String   @default("confirmé") // confirmé | annulé
+  token     String   @unique
+  reminded  Boolean  @default(false)
+
+  @@index([startsAt, status])
+}

@@ -310,6 +310,7 @@ const settingSchemas: Record<string, z.ZodTypeAny> = {
   theme: z.object({ accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Couleur hexadécimale attendue (#2A5587).") }),
   social: z.object({ linkedin: url, instagram: url, facebook: url }),
   integrations: z.object({ calendlyUrl: url, plausibleDomain: str(100), searchConsoleToken: str(200) }),
+  booking: z.object({ mon: str(80), tue: str(80), wed: str(80), thu: str(80), fri: str(80), sat: str(80), sun: str(80), buffer: str(4), maxPerDay: str(4), noticeHours: str(4), horizonDays: str(4), closed: str(2000) }),
   footerText: str(500),
   trust: z.array(z.object({ value: str(30), label: str(120) })).max(6),
 };

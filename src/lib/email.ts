@@ -4,14 +4,14 @@ import { Resend } from "resend";
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** Envoie un email via Resend. Sans RESEND_API_KEY (dev), le contenu est simplement journalisé. Ne lève jamais. */
-export async function sendMail(opts: { to: string; subject: string; html: string; replyTo?: string }) {
+export async function sendMail(opts: { to: string; subject: string; html: string; replyTo?: string; attachments?: { filename: string; content: string }[] }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
     console.log(`[mail:dev] → ${opts.to} | ${opts.subject}`);
     return false;
   }
   try {
-    const r = await new Resend(key).emails.send({ from: process.env.MAIL_FROM || "QS2H <noreply@qs2h.fr>", to: opts.to, subject: opts.subject, html: opts.html, replyTo: opts.replyTo });
+    const r = await new Resend(key).emails.send({ from: process.env.MAIL_FROM || "QS2H <noreply@qs2h.fr>", to: opts.to, subject: opts.subject, html: opts.html, replyTo: opts.replyTo, attachments: opts.attachments?.map((a) => ({ filename: a.filename, content: Buffer.from(a.content, "utf8") })) });
     if (r.error) console.error("[mail] erreur Resend", r.error);
     return !r.error;
   } catch (e) {

@@ -70,6 +70,11 @@ _prototype/              première maquette HTML (archive, ignorée par le build
 - Fonctionne sans clé d'API (moteur à règles). Avec `ANTHROPIC_API_KEY` (et `CHATBOT_MODEL` en option), les réponses libres passent par Claude, limité à la base de connaissances du site.
 - RGPD : conversations conservées 90 jours (purge dans `scripts/purge-inactive.ts`), aucune IP stockée, mention affichée dans la fenêtre. Pensez à citer l'assistant dans la politique de confidentialité.
 
+### Rendez-vous et méga-menu
+- **/rendez-vous** : réservation en 3 étapes (appel découverte 20 min, visio 45 min, sur place 1 h), calendrier et créneaux réels en heure de Paris, confirmation par email avec fichier .ics, lien d'annulation sécurisé, contact créé dans « Demandes reçues » (source « rendez-vous »). Un créneau déjà pris est refusé même en cas de réservations simultanées.
+- **Admin > Rendez-vous** : liste, plages horaires par jour, pause entre rendez-vous, maximum par jour, délai minimum, horizon, jours de congé. Rappel 24 h avant : planifier `npx tsx --env-file=.env scripts/send-reminders.ts` toutes les heures. Les rendez-vous de plus d'un an sont purgés par `purge-inactive.ts`.
+- **En-tête** : méga-menus « Services » (liste issue de l'admin) et « Ressources » (blog, FAQ, rendez-vous, à propos, contact), ouverture au survol avec délai ou au clic, fermeture par Échap.
+
 ### Scène 3D
 - `components/SiteBuilder.tsx` : scène 3D CSS liée au métier — une page web se construit bloc par bloc au scroll (couches de l'accueil éditables dans l'admin). `components/HomeStage.tsx` : hero + section épinglée « vue éclatée » (GSAP ScrollTrigger).
 - `components/scene/StageCanvas.tsx` : portable MacBook chargé depuis `public/models/macbook.fbx` (FBXLoader ; modèle normalisé : écran de 2,9 unités de large, base posée sur y = 0), écran en texture temps réel alimentée par les **images de couverture des réalisations** du back-office, 5 couches détachables. Les pages devant la couche active s'effacent (fondu court) et le portable reste visible jusqu'au bout. Les sources du modèle (`.blend`, `.obj`, textures) sont dans `3d-model/`, ignoré par git.

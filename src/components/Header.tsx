@@ -11,16 +11,31 @@ const links = [
   { href: "/methode", label: "Méthode", hint: "De l'audit à la mise en ligne, étape par étape." },
   { href: "/blog", label: "Blog", hint: "Conseils concrets pour votre site et votre référencement." },
   { href: "/a-propos", label: "À propos", hint: "Qui nous sommes, nos engagements." },
+  { href: "/rendez-vous", label: "Rendez-vous", hint: "Réservez un appel, une visio ou une rencontre à Bordeaux." },
+];
+
+type Svc = { slug: string; title: string; tagline: string };
+const RESSOURCES = [
+  { href: "/blog", label: "Blog", text: "Conseils concrets pour votre site et votre référencement." },
+  { href: "/faq", label: "Questions fréquentes", text: "Prix, délais, propriété du site, maintenance." },
+  { href: "/rendez-vous", label: "Prendre rendez-vous", text: "Appel découverte, visio ou sur place." },
+  { href: "/a-propos", label: "À propos", text: "Qui nous sommes et nos engagements." },
+  { href: "/contact", label: "Contact et devis", text: "Une estimation sous 24 heures ouvrées." },
 ];
 
 /** Barre d'en-tête : transparente en haut, floutée au scroll, claire ou sombre selon la section dessous, masquée en descendant. */
-export function Header() {
+export function Header({ services = [] }: { services?: Svc[] }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [dark, setDark] = useState(false);
   const [hover, setHover] = useState<number | null>(null);
+  const [mega, setMega] = useState<null | "services" | "ressources">(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const megaRef = useRef<typeof mega>(null);
+  megaRef.current = mega;
+  const openMega = (k: "services" | "ressources" | null, delay = 0) => { if (timer.current) clearTimeout(timer.current); if (delay) timer.current = setTimeout(() => setMega(k), delay); else setMega(k); };
   const btn = useRef<HTMLButtonElement>(null);
   const last = useRef(0);
 
@@ -40,15 +55,23 @@ export function Header() {
       const el = document.elementFromPoint(window.innerWidth / 2, (y > 24 ? 60 : 76) + 6); // section juste sous la barre
       const sec = el?.closest("section, header, footer, main > div, [data-tone]") as HTMLElement | null;
       const tone = sec?.closest("[data-tone]")?.getAttribute("data-tone");
-      setDark(tone ? tone === "dark" : !!sec?.closest(".dark-section"));
+      if (!megaRef.current) setDark(tone ? tone === "dark" : !!sec?.closest(".dark-section")); // figé tant qu'un panneau est ouvert
     };
     const on = () => { if (!raf) raf = requestAnimationFrame(tick); };
     tick();
+    const t1 = setTimeout(tick, 500), t2 = setTimeout(tick, 1800); // après le préchargeur (première visite) qui recouvre l'en-tête
     window.addEventListener("scroll", on, { passive: true });
     window.addEventListener("resize", on);
-    return () => { window.removeEventListener("scroll", on); window.removeEventListener("resize", on); if (raf) cancelAnimationFrame(raf); };
+    return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener("scroll", on); window.removeEventListener("resize", on); if (raf) cancelAnimationFrame(raf); };
   }, [open, path]);
-  useEffect(() => { setOpen(false); setHidden(false); }, [path]);
+  useEffect(() => { setOpen(false); setHidden(false); setMega(null); }, [path]);
+  useEffect(() => {
+    if (!mega) return;
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setMega(null);
+    const out = (e: PointerEvent) => { if (!(e.target as HTMLElement).closest("[data-mega]")) setMega(null); };
+    addEventListener("keydown", esc); addEventListener("pointerdown", out);
+    return () => { removeEventListener("keydown", esc); removeEventListener("pointerdown", out); };
+  }, [mega]);
   useEffect(() => {
     document.documentElement.classList.toggle("lenis-stopped", open);
     document.body.style.overflow = open ? "hidden" : "";
@@ -69,11 +92,22 @@ export function Header() {
             <Link href="/" aria-label="QS2H — accueil" className="relative z-[60] block shrink-0">
               <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="160px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-9" : "h-11"}`} />
             </Link>
-            <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex">
-              {links.map((l) => {
-                const active = path === l.href || path.startsWith(l.href + "/");
+            <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex" data-mega onMouseLeave={() => openMega(null, 160)}>
+              {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/tarifs", label: "Tarifs" }, { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
+                const active = path === l.href || path.startsWith(l.href + "/") || (l.k === "ressources" && ["/blog", "/faq", "/rendez-vous", "/a-propos", "/contact"].some((p) => path.startsWith(p)));
+                if (l.k) {
+                  const k = l.k;
+                  return (
+                    <div key={k} className="relative" onMouseEnter={() => openMega(k, 120)}>
+                      <button type="button" aria-expanded={mega === k} aria-controls={`mega-${k}`} data-active={active} className="nav-link relative inline-flex items-center gap-1.5 px-4 py-2 text-[0.92rem] font-medium" onClick={() => openMega(mega === k ? null : k)}>
+                        {l.label}
+                        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true" className={`transition-transform duration-300 ${mega === k ? "rotate-180" : ""}`}><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </button>
+                    </div>
+                  );
+                }
                 return (
-                  <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined} className="nav-link relative px-4 py-2 text-[0.92rem] font-medium" data-active={active}>
+                  <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined} className="nav-link relative px-4 py-2 text-[0.92rem] font-medium" data-active={active} onMouseEnter={() => openMega(null)}>
                     {l.label}
                   </Link>
                 );
@@ -85,6 +119,31 @@ export function Header() {
               <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem]" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
             </div>
           </div>
+          {mega && (
+            <div id={`mega-${mega}`} data-mega role="region" aria-label={mega === "services" ? "Nos services" : "Ressources"} className="hidden border-t lg:block" style={{ borderColor: line, background: dark ? "rgb(28 28 28 / .97)" : "rgb(248 248 247 / .98)", color: dark ? "#F8F8F7" : "#1C1C1C" }} onMouseEnter={() => openMega(mega)} onMouseLeave={() => openMega(null, 160)}>
+              <div className="container max-w-[1440px] py-8">
+                {mega === "services" ? (
+                  <div className="grid gap-x-8 gap-y-2 md:grid-cols-3">
+                    {services.map((sv, i) => (
+                      <Link key={sv.slug} href={`/services/${sv.slug}`} className="mega-item group flex gap-4 rounded-2xl p-4">
+                        <span className="mega-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                        <span><strong className="block font-serif text-[1.02rem]">{sv.title}</strong><span className="mega-sub block text-[0.88rem] leading-snug">{sv.tagline}</span></span>
+                      </Link>
+                    ))}
+                    <Link href="/services" className="mega-item flex items-center gap-2 rounded-2xl p-4 font-semibold">Voir tous nos services <span aria-hidden="true">→</span></Link>
+                  </div>
+                ) : (
+                  <div className="grid gap-x-8 gap-y-2 md:grid-cols-3">
+                    {RESSOURCES.map((r) => (
+                      <Link key={r.href} href={r.href} className="mega-item group block rounded-2xl p-4">
+                        <strong className="block font-serif text-[1.02rem]">{r.label}</strong><span className="mega-sub block text-[0.88rem] leading-snug">{r.text}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </header>
 

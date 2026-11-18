@@ -39,6 +39,8 @@ async function main() {
     }
   }
   const chats = await db.chatConversation.deleteMany({ where: { updatedAt: { lt: new Date(now - 90 * 864e5) } } });
+  const rdv = await db.appointment.deleteMany({ where: { startsAt: { lt: new Date(now - 365 * 864e5) } } });
+  console.log(`Rendez-vous de plus d'un an supprimés : ${rdv.count}`);
   console.log(`Conversations de l'assistant supprimées (90 jours) : ${chats.count}`);
   console.log(`Comptes avertis : ${warned} · supprimés : ${erased}`);
 }

@@ -29,6 +29,7 @@ export const defaultSettings = {
   theme: { accent: "#2A5587" },
   social: { linkedin: "", instagram: "", facebook: "" },
   integrations: { calendlyUrl: "", plausibleDomain: "", searchConsoleToken: "" },
+  booking: { mon: "09:00-12:00,14:00-18:00", tue: "09:00-12:00,14:00-18:00", wed: "09:00-12:00,14:00-18:00", thu: "09:00-12:00,14:00-18:00", fri: "09:00-12:00,14:00-17:00", sat: "", sun: "", buffer: "15", maxPerDay: "6", noticeHours: "24", horizonDays: "45", closed: "" },
   footerText: "Sites web sur mesure pour les entreprises. Conçus à Bordeaux, livrés partout en France.",
   trust: [
     { value: "24 h", label: "pour recevoir votre devis (jours ouvrés)" },
