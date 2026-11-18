@@ -220,3 +220,22 @@ export async function confirmDeletion(t: string) {
   await destroyClientSession();
   return true;
 }
+
+/* ------------------------------------------------------------------ Demandes de modification */
+export async function createClientRequest(_: S, fd: FormData): Promise<S> {
+  const c = await requireClient();
+  const title = String(fd.get("title") || "").trim();
+  const details = String(fd.get("details") || "").trim();
+  const priority = ["basse", "normale", "urgente"].includes(String(fd.get("priority"))) ? String(fd.get("priority")) : "normale";
+  const projectId = String(fd.get("projectId") || "") || null;
+  if (title.length < 3 || title.length > 120) return { error: "Donnez un titre court à votre demande (3 à 120 caractères)." };
+  if (details.length < 10 || details.length > 4000) return { error: "Décrivez la modification (10 à 4 000 caractères)." };
+  if (projectId && !(await db.clientProject.findFirst({ where: { id: projectId, clientId: c.id } }))) return { error: "Projet inconnu." };
+  if (!rateLimit(`req:${c.id}`, 10, 3600e3).ok) return { error: "Trop de demandes. Réessayez plus tard." };
+  await db.clientRequest.create({ data: { clientId: c.id, projectId, title, details, priority } });
+  const to = process.env.MAIL_TO || "contact@qs2h.fr";
+  await sendMail({ to, subject: `Demande de modification (${priority}) — ${c.firstName} ${c.lastName}`, html: layout("Nouvelle demande de modification", `<p><strong>${esc(title)}</strong></p><p style="line-height:1.6;white-space:pre-wrap">${esc(details)}</p><p style="font-size:13px">${SITE_URL}/admin/clients/${c.id}</p>`), replyTo: c.email });
+  revalidatePath("/compte/demandes");
+  revalidatePath("/compte");
+  return { ok: "Demande envoyée. Vous suivrez son avancement ici." };
+}

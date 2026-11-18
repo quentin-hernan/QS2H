@@ -91,7 +91,7 @@ export function ScrollUI() {
     const on = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const t = setTimeout(() => {
       const els = Array.from(document.querySelectorAll<HTMLElement>("main section[aria-labelledby], main section[aria-label]"));
-      setSecs(els.length >= 3 && els.length <= 9 ? els.map((el, i) => ({ id: el.id || (el.id = `sec-${i}`), label: el.getAttribute("aria-label") || el.querySelector("h1,h2")?.textContent?.slice(0, 40) || `Section ${i + 1}` })) : []);
+      setSecs(!document.querySelector(".espace") && els.length >= 3 && els.length <= 9 ? els.map((el, i) => ({ id: el.id || (el.id = `sec-${i}`), label: el.getAttribute("aria-label") || el.querySelector("h1,h2")?.textContent?.slice(0, 40) || `Section ${i + 1}` })) : []);
       tick();
     }, 600);
     addEventListener("scroll", on, { passive: true });

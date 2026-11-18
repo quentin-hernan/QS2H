@@ -251,6 +251,7 @@ model Client {
   projects         ClientProject[]
   documents        ClientDocument[]
   messages         ClientMessage[]
+  requests         ClientRequest[]
 }
 
 model Consent {
@@ -382,4 +383,20 @@ model CustomPage {
   published   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ClientRequest {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId String?
+  title     String
+  details   String
+  priority  String   @default("normale") // basse | normale | urgente
+  status    String   @default("nouvelle") // nouvelle | en cours | terminée
+  reply     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId, status])
 }

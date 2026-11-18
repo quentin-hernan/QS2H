@@ -469,3 +469,19 @@ export async function deleteClientDocument(clientId: string, docId: string) {
   await audit(s.email, "suppression document client", "client", clientId);
   revalidatePath(`/admin/clients/${clientId}`);
 }
+
+/* ---------------------------------------------------------------- Demandes de modification des clients */
+export async function updateClientRequest(id: string, status: string, reply: string): Promise<Result> {
+  const s = await requireSession();
+  if (!["nouvelle", "en cours", "terminée"].includes(status)) return { ok: false, error: "Statut invalide." };
+  const r = await db.clientRequest.findUnique({ where: { id }, include: { client: true } });
+  if (!r) return { ok: false, error: "Demande introuvable." };
+  const text = String(reply || "").trim().slice(0, 4000);
+  await db.clientRequest.update({ where: { id }, data: { status, reply: text } });
+  await audit(s.email, "traitement demande client", "clientRequest", id);
+  if (status !== r.status || text !== r.reply) {
+    await sendMail({ to: r.client.email, subject: `Votre demande « ${r.title} » : ${status === "nouvelle" ? "reçue" : status}`, html: layout("Votre demande a été mise à jour", `<p style="line-height:1.6">Bonjour ${esc(r.client.firstName)},</p><p style="line-height:1.6">Demande : <strong>${esc(r.title)}</strong><br>Statut : ${esc(status)}</p>${text ? `<p style="line-height:1.6;white-space:pre-wrap">${esc(text)}</p>` : ""}<p><a href="${SITE_URL}/compte/demandes">Voir dans mon espace client</a></p>`) });
+  }
+  revalidatePath(`/admin/clients/${r.clientId}`);
+  return { ok: true };
+}

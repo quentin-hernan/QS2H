@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { ClientAdmin } from "@/components/admin/ClientAdmin";
+import { RequestAdmin } from "@/components/admin/RequestAdmin";
 import { formatDate, parseJson } from "@/lib/utils";
 
 export const metadata = { title: "Fiche client" };
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function ClientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [c, session] = await Promise.all([
-    db.client.findUnique({ where: { id }, include: { projects: { orderBy: { createdAt: "desc" } }, documents: { orderBy: { createdAt: "desc" } }, messages: { orderBy: { createdAt: "asc" } }, consents: { orderBy: { givenAt: "desc" } } } }),
+    db.client.findUnique({ where: { id }, include: { projects: { orderBy: { createdAt: "desc" } }, documents: { orderBy: { createdAt: "desc" } }, messages: { orderBy: { createdAt: "asc" } }, consents: { orderBy: { givenAt: "desc" } }, requests: { orderBy: { createdAt: "desc" } } } }),
     getSession(),
   ]);
   if (!c) notFound();
@@ -30,6 +31,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
         documents={c.documents.map((d) => ({ id: d.id, title: d.title, kind: d.kind, status: d.status, projectId: d.projectId, createdAt: d.createdAt.toISOString() }))}
         messages={c.messages.map((m) => ({ id: m.id, body: m.body, fromClient: m.fromClient, createdAt: m.createdAt.toISOString() }))}
       />
+      <RequestAdmin items={c.requests.map((r) => ({ id: r.id, title: r.title, details: r.details, priority: r.priority, status: r.status, reply: r.reply, createdAt: r.createdAt.toISOString(), project: c.projects.find((p) => p.id === r.projectId)?.title }))} />
       <section>
         <h2 className="eyebrow mb-4">Consentements</h2>
         <ul className="muted space-y-1 text-sm">{c.consents.map((k) => (<li key={k.id}>{k.kind} · v{k.docVersion} · {formatDate(k.givenAt)} · IP {k.ipTruncated || "—"}{k.withdrawnAt ? ` · retiré le ${formatDate(k.withdrawnAt)}` : ""}</li>))}</ul>

@@ -1,28 +1,29 @@
-import Link from "next/link";
 import { requireClient } from "@/lib/client-auth";
+import { db } from "@/lib/db";
 import { logoutClient } from "../actions";
+import { EspaceNav } from "@/components/EspaceNav";
 
-const nav = [
-  { href: "/compte", label: "Suivi" },
-  { href: "/compte/documents", label: "Documents" },
-  { href: "/compte/messages", label: "Messagerie" },
-  { href: "/compte/profil", label: "Mes informations" },
-  { href: "/compte/donnees", label: "Mes données et mes droits" },
-];
-
+/** Espace client : coque d'application (navigation latérale, compteurs) partagée par toutes les pages du compte. */
 export default async function Espace({ children }: { children: React.ReactNode }) {
   const c = await requireClient();
+  const [unread, toValidate, openReq] = await Promise.all([
+    db.clientMessage.count({ where: { clientId: c.id, fromClient: false, readAt: null } }),
+    db.clientDocument.count({ where: { clientId: c.id, kind: "maquette", status: "" } }),
+    db.clientRequest.count({ where: { clientId: c.id, status: { not: "terminée" } } }),
+  ]);
+  const initials = `${c.firstName[0] ?? ""}${c.lastName[0] ?? ""}`.toUpperCase();
   return (
-    <section className="light-section pb-24 pt-32 md:pt-40">
+    <section className="espace light-section pb-20 pt-24 md:pt-28" aria-label="Espace client">
       <div className="container">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b hair pb-8">
-          <div><p className="eyebrow solo mb-3">Espace client</p><h1 className="text-h2">Bonjour {c.firstName}</h1></div>
-          <form action={logoutClient}><button className="btn btn-ghost !min-h-[44px] !px-5 text-sm">Me déconnecter</button></form>
-        </div>
-        <div className="grid gap-12 lg:grid-cols-[220px_1fr]">
-          <nav aria-label="Espace client" className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
-            {nav.map((n) => (<Link key={n.href} href={n.href} className="border-l-2 border-transparent px-3 py-2 text-[0.95rem] hover:border-[rgb(var(--accent))]">{n.label}</Link>))}
-          </nav>
+        <div className="grid gap-8 lg:grid-cols-[260px_1fr] lg:gap-12">
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <div className="es-card mb-4 flex items-center gap-4 p-5">
+              <span className="es-avatar" aria-hidden="true">{initials}</span>
+              <span className="min-w-0"><span className="block truncate font-semibold">{c.firstName} {c.lastName}</span><span className="muted block truncate text-sm">{c.company || c.email}</span></span>
+            </div>
+            <EspaceNav badges={{ "/compte/messages": unread, "/compte/documents": toValidate, "/compte/demandes": openReq }} />
+            <form action={logoutClient} className="mt-4 hidden lg:block"><button className="muted px-4 text-sm underline">Me déconnecter</button></form>
+          </aside>
           <div className="min-w-0">{children}</div>
         </div>
       </div>

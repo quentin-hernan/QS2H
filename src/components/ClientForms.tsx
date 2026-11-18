@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
-import { changeClientPassword, forgotPassword, loginClient, registerAction, requestDeletion, resetPassword, reviewMockup, sendClientMessage, setNewsletter, updateProfile, logoutEverywhere, type S } from "@/app/(site)/compte/actions";
+import { changeClientPassword, forgotPassword, loginClient, registerAction, requestDeletion, resetPassword, reviewMockup, sendClientMessage, createClientRequest, setNewsletter, updateProfile, logoutEverywhere, type S } from "@/app/(site)/compte/actions";
 
 function Msg({ s }: { s: S }) {
   if (!s) return null;
@@ -84,6 +84,20 @@ export function ProfileForm({ c }: { c: { firstName: string; lastName: string; c
 export function PasswordForm() {
   const [s, act, pending] = useActionState(changeClientPassword, undefined);
   return (<form action={act} className="space-y-5"><Msg s={s} /><F id="current" label="Mot de passe actuel" type="password" autoComplete="current-password" /><F id="next" label="Nouveau mot de passe" type="password" autoComplete="new-password" /><F id="confirm" label="Confirmation" type="password" autoComplete="new-password" /><Btn pending={pending}>Changer le mot de passe</Btn></form>);
+}
+
+export function RequestForm({ projects, preset }: { projects: { id: string; title: string }[]; preset?: string }) {
+  const [s, act, pending] = useActionState(createClientRequest, undefined);
+  return (
+    <form action={act} className="grid gap-5 md:grid-cols-2">
+      <div className="md:col-span-2"><Msg s={s} /></div>
+      <div className="md:col-span-2"><label className="label" htmlFor="rq-title">Objet</label><input id="rq-title" name="title" required maxLength={120} className="field" placeholder="Ex. Changer la photo de la page À propos" /></div>
+      {projects.length > 0 && <div><label className="label" htmlFor="rq-p">Projet concerné</label><select id="rq-p" name="projectId" defaultValue={preset ?? projects[0]?.id} className="field">{projects.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}<option value="">Autre / général</option></select></div>}
+      <div><label className="label" htmlFor="rq-pr">Priorité</label><select id="rq-pr" name="priority" defaultValue="normale" className="field"><option value="basse">Basse</option><option value="normale">Normale</option><option value="urgente">Urgente</option></select></div>
+      <div className="md:col-span-2"><label className="label" htmlFor="rq-d">Détails</label><textarea id="rq-d" name="details" rows={5} required maxLength={4000} className="field" placeholder="Page, texte actuel, texte souhaité, lien vers une image…" /></div>
+      <div className="md:col-span-2"><Btn pending={pending}>Envoyer la demande</Btn></div>
+    </form>
+  );
 }
 
 export function MessageForm() {
