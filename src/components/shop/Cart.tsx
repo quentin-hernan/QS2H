@@ -94,6 +94,7 @@ export function QtyInput({ value, onChange, max, label = "Quantité" }: { value:
 function CartDrawer() {
   const { lines, open, setOpen, setQty, remove, total, count } = useCart();
   return (
+    <div className="site-shell">
     <div className={`cart-layer ${open ? "is-open" : ""}`} aria-hidden={!open}>
       <button type="button" className="cart-scrim" aria-label="Fermer le panier" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} />
       <aside className="cart-drawer light-section" role="dialog" aria-modal="true" aria-label="Panier">
@@ -138,6 +139,7 @@ function CartDrawer() {
           </>
         )}
       </aside>
+    </div>
     </div>
   );
 }
