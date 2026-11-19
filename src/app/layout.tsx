@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: { default: "QS2H — Création de sites web pour entreprises à La Rochelle", template: "%s | QS2H" },
   description: "QS2H conçoit des sites vitrines, sur mesure et e-commerce pour TPE, PME et indépendants : design soigné, chargement rapide, référencement Google.",
   applicationName: "QS2H",
-  icons: { icon: "/icon-512.png", apple: "/apple-touch-icon.png" },
+  icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }, { url: "/icon-512.png", sizes: "512x512", type: "image/png" }], shortcut: "/favicon.ico", apple: "/apple-touch-icon.png" },
   manifest: "/manifest.webmanifest",
   formatDetection: { telephone: false },
 };
