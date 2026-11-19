@@ -157,9 +157,9 @@ export function CheckoutForm({ account }: { account: { name: string; email: stri
                 <F id="address" label="Adresse *" error={errs.address}>
                   <input id="address" name="address" autoComplete="off" role="combobox" aria-expanded={sugs.length > 0} aria-autocomplete="list" aria-controls="addr-list" required aria-required="true" className="field" placeholder="Numéro et rue (ex. 12 rue des Merciers)" value={v.address} onChange={(e) => { picked.current = ""; set("address", e.target.value.replace(/[^\p{L}0-9\s,.'’°#/-]/gu, "")); }} onKeyDown={onAddrKey} onBlur={() => setTimeout(() => setSugs([]), 150)} {...bad("address")} />
                 </F>
-                {sugState === "loading" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Recherche de l'adresse…</p>}
+                {sugState === "loading" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Recherche de l&apos;adresse…</p>}
                 {sugState === "none" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Aucune adresse trouvée : vérifiez la saisie ou le code postal.</p>}
-                {sugState === "error" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Suggestions indisponibles pour le moment : saisissez l'adresse complète.</p>}
+                {sugState === "error" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Suggestions indisponibles pour le moment : saisissez l&apos;adresse complète.</p>}
                 {sugs.length > 0 && (
                   <ul id="addr-list" role="listbox" className="shop-sug">
                     {sugs.map((s, i) => (<li key={s.label} role="option" aria-selected={i === active}><button type="button" tabIndex={-1} className={i === active ? "is-on" : ""} onMouseDown={(e) => { e.preventDefault(); choose(s); }}>{s.label}</button></li>))}
