@@ -70,7 +70,7 @@ export function ResetForm({ token }: { token: string }) {
   return (<form action={act} className="space-y-5"><Msg s={s} /><F id="password" label="Nouveau mot de passe" type="password" autoComplete="new-password" hint="12 caractères minimum." /><F id="confirm" label="Confirmation" type="password" autoComplete="new-password" /><Btn pending={pending}>Enregistrer</Btn></form>);
 }
 
-export function ProfileForm({ c }: { c: { firstName: string; lastName: string; company: string; email: string; phone?: string } }) {
+export function ProfileForm({ c }: { c: { firstName: string; lastName: string; company: string; email: string; phone?: string; address?: string; zip?: string; city?: string } }) {
   const [s, act, pending] = useActionState(updateProfile, undefined);
   return (
     <form action={act} className="space-y-5">
@@ -78,6 +78,8 @@ export function ProfileForm({ c }: { c: { firstName: string; lastName: string; c
       <div className="grid gap-5 sm:grid-cols-2"><F id="firstName" label="Prénom" defaultValue={c.firstName} autoComplete="given-name" /><F id="lastName" label="Nom" defaultValue={c.lastName} autoComplete="family-name" /></div>
       <F id="company" label="Entreprise" defaultValue={c.company} required={false} />
       <F id="phone" label="Téléphone" type="tel" autoComplete="tel" defaultValue={c.phone ?? ""} required={false} hint="Utilisé pour préremplir vos demandes, commandes et rendez-vous : vous ne le retapez plus." />
+      <F id="address" label="Adresse" autoComplete="street-address" defaultValue={c.address ?? ""} required={false} hint="Numéro et rue. Préremplie à chaque commande." />
+      <div className="grid gap-5 sm:grid-cols-[10rem_1fr]"><F id="zip" label="Code postal" autoComplete="postal-code" defaultValue={c.zip ?? ""} required={false} /><F id="city" label="Ville" autoComplete="address-level2" defaultValue={c.city ?? ""} required={false} /></div>
       <p className="muted text-[0.9rem]">Email : {c.email} (pour le modifier, écrivez-nous depuis la messagerie).</p>
       <Btn pending={pending}>Enregistrer</Btn>
     </form>

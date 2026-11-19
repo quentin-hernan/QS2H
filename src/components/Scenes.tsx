@@ -184,6 +184,11 @@ function useCycle(n: number, ms: number) {
   return i;
 }
 
+/** En-tête du blog : petit empilement de feuillets 3D (animation simple d'origine). */
+export function SheetStack() {
+  return (<div className="sheets hidden md:block" aria-hidden="true">{[0, 1, 2, 3].map((i) => (<i key={i} style={{ ["--i" as string]: i }} />))}</div>);
+}
+
 /** Blog : un article s'écrit à l'écran (titre, paragraphes, image), puis passe « Publié ». */
 export function BlogScene() {
   const k = useCycle(1000, 9000); // relance l'écriture toutes les 9 s

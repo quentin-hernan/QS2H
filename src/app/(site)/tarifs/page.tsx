@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlanDevices, PriceScene } from "@/components/Scenes";
+import { PlanDevices } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/Reveal";
@@ -22,7 +22,7 @@ export default async function Tarifs() {
   return (
     <>
       <JsonLd data={faqJsonLd(f)} />
-      <PageHero image={tp.heroImage || ""} art={<PriceScene />} tight eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
+      <PageHero image={tp.heroImage || ""} tight eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
         <Breadcrumbs items={[{ name: "Tarifs", path: "/tarifs" }]} />
       </PageHero>
 

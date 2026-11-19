@@ -151,7 +151,7 @@ export async function resetPassword(t: string, _: S, fd: FormData): Promise<S> {
 /* ------------------------------------------------------------------ Profil, mot de passe, newsletter */
 export async function updateProfile(_: S, fd: FormData): Promise<S> {
   const c = await requireClient();
-  const p = z.object({ firstName: z.string().trim().min(1, "Prénom requis.").max(80), lastName: z.string().trim().min(1, "Nom requis.").max(80), company: z.string().trim().max(120), phone: z.string().trim().max(30).regex(/^[0-9+().s-]*$/, "Numéro de téléphone invalide.") }).safeParse(Object.fromEntries(fd));
+  const p = z.object({ firstName: z.string().trim().min(1, "Prénom requis.").max(80), lastName: z.string().trim().min(1, "Nom requis.").max(80), company: z.string().trim().max(120), phone: z.string().trim().max(30).regex(/^[0-9+().\s-]*$/, "Numéro de téléphone invalide."), address: z.string().trim().max(160).regex(/^[\p{L}0-9\s,.'’°#/-]*$/u, "L'adresse contient des caractères non autorisés."), zip: z.string().trim().max(10).regex(/^[0-9]*$/, "Code postal invalide."), city: z.string().trim().max(80).regex(/^[^0-9]*$/, "Ville invalide.") }).safeParse(Object.fromEntries(fd));
   if (!p.success) return { error: p.error.issues[0].message };
   await db.client.update({ where: { id: c.id }, data: p.data });
   revalidatePath("/compte", "layout");

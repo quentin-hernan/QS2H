@@ -1,7 +1,6 @@
 import { MediaBand, type MediaItemT } from "@/components/MediaBand";
 import { ServicesStage } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
-import { ServicesScene } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { Expertises } from "@/components/HomeInteractive";
@@ -20,10 +19,10 @@ export default async function Services() {
   const others = ((home.expertises ?? []) as { title: string; text: string; href?: string }[]).filter((e) => !/site/i.test(e.title));
   return (
     <>
-      <PageHero image={sp.heroImage || ""} art={<ServicesScene />} eyebrow="Services" title={<>Six façons de faire <span className="serif-it">travailler</span> votre site.</>} lead="Du site vitrine à la boutique en ligne, chaque service est conçu pour un objectif précis : vous faire trouver, vous faire choisir, vous faire contacter.">
+      <PageHero tight image={sp.heroImage || ""} eyebrow="Services" title={<>Six façons de faire <span className="serif-it">travailler</span> votre site.</>} lead="Du site vitrine à la boutique en ligne, chaque service est conçu pour un objectif précis : vous faire trouver, vous faire choisir, vous faire contacter.">
         <Breadcrumbs items={[{ name: "Services", path: "/services" }]} />
       </PageHero>
-      <section className="light-section py-20 md:py-28" aria-label="Les six services">
+      <section className="light-section pb-20 pt-8 md:pb-28 md:pt-10" aria-label="Les six services">
         <div className="container"><ServicesStage services={services.map((x) => ({ slug: x.slug, title: x.title, tagline: x.tagline, priceFrom: x.priceFrom, priceUnit: x.priceUnit }))} /></div>
       </section>
       {((sp.media ?? []) as MediaItemT[]).map((it, i) => (<MediaBand key={i} item={it} tone={i % 2 ? "dark" : "light"} />))}

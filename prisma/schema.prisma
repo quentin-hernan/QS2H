@@ -235,6 +235,9 @@ model Client {
   lastName         String
   company          String    @default("")
   phone            String    @default("")
+  address          String    @default("")
+  zip              String    @default("")
+  city             String    @default("")
   passwordHash     String
   emailVerifiedAt  DateTime?
   verifyTokenHash  String?   @unique

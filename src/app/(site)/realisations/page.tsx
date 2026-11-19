@@ -3,11 +3,12 @@ import { TradesScene } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RealisationsView } from "@/components/RealisationsView";
 import { getProjects, getServices } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata, collectionJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Réalisations : sites web pour artisans, restaurants, cabinets, boutiques",
-  description: "Découvrez les sites créés par QS2H pour des entreprises de secteurs variés : artisan, restaurant, cabinet, e-commerce, coach, immobilier.",
+  description: "Découvrez les sites conçus par QS2H pour des métiers variés : auto-école, menuiserie, restauration, artisans, cabinets, e-commerce. Vue éclatée de chaque site, page par page.",
   path: "/realisations",
 });
 
@@ -16,6 +17,7 @@ export default async function Realisations() {
   const sectors = [...new Set(projects.map((p) => p.sector))];
   return (
     <>
+      <JsonLd data={collectionJsonLd({ name: "Réalisations QS2H", description: "Sites web conçus par QS2H pour différents métiers.", path: "/realisations" }, projects.map((p) => ({ name: p.title, path: `/realisations/${p.slug}`, image: p.cover })))} />
       <PageHero art={<TradesScene />} tight eyebrow="Réalisations" title={<>Des sites pensés pour <span className="serif-it">chaque métier.</span></>} lead="Artisan, restaurant, cabinet, boutique : chaque projet part de l'activité du client, pas d'un modèle.">
         <Breadcrumbs items={[{ name: "Réalisations", path: "/realisations" }]} />
       </PageHero>

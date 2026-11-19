@@ -15,7 +15,7 @@ export default async function Commande() {
       <div className="container">
         <Breadcrumbs items={[{ name: "Boutique", path: "/boutique" }, { name: "Commande", path: "/boutique/commande" }]} />
         <h1 className="mb-10 mt-6 text-h1 font-medium">Finaliser la commande</h1>
-        <CheckoutForm account={{ name: `${c.firstName} ${c.lastName}`.trim(), email: c.email, company: c.company, phone: c.phone }} />
+        <CheckoutForm account={{ name: `${c.firstName} ${c.lastName}`.trim(), email: c.email, company: c.company, phone: c.phone, address: c.address, zip: c.zip, city: c.city }} />
       </div>
     </section>
   );

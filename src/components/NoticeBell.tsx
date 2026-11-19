@@ -32,6 +32,15 @@ export function NoticeBell({ endpoint, label = "Notifications" }: { endpoint: st
   const [bump, setBump] = useState(0);
   const seen = useRef<Set<string> | null>(null);
   const root = useRef<HTMLDivElement>(null);
+  const btn = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; maxH: number }>({ top: 64, left: 8, maxH: 480 });
+  const place = useCallback(() => {
+    const r = btn.current?.getBoundingClientRect();
+    if (!r) return;
+    const w = Math.min(380, window.innerWidth * 0.86);
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+    setPos({ top: r.bottom + 10, left, maxH: Math.max(220, window.innerHeight - r.bottom - 24) });
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -65,9 +74,10 @@ export function NoticeBell({ endpoint, label = "Notifications" }: { endpoint: st
     if (!open) return;
     const close = (e: MouseEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
     const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("resize", place);
     document.addEventListener("mousedown", close); document.addEventListener("keydown", esc);
-    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
-  }, [open]);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); window.removeEventListener("resize", place); };
+  }, [open, place]);
 
   const markAll = async () => {
     await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ all: true }) }).catch(() => null);
@@ -83,12 +93,12 @@ export function NoticeBell({ endpoint, label = "Notifications" }: { endpoint: st
 
   return (
     <div ref={root} className="nb">
-      <button type="button" className={`nb-btn ${unread ? "has" : ""}`} aria-label={`${label}${unread ? ` : ${unread} non lue${unread > 1 ? "s" : ""}` : ""}`} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button ref={btn} type="button" className={`nb-btn ${unread ? "has" : ""}`} aria-label={`${label}${unread ? ` : ${unread} non lue${unread > 1 ? "s" : ""}` : ""}`} aria-expanded={open} onClick={() => { place(); setOpen((o) => !o); }}>
         <svg key={bump} className={bump ? "nb-ring" : ""} viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9zM10 20a2 2 0 0 0 4 0" /></svg>
         {unread > 0 && <span key={`b${bump}`} className="nb-badge">{unread > 99 ? "99+" : unread}</span>}
       </button>
       {open && (
-        <div className="nb-panel" role="dialog" aria-label={label}>
+        <div className="nb-panel" role="dialog" aria-label={label} style={{ top: pos.top, left: pos.left, maxHeight: pos.maxH }}>
           <div className="nb-head"><strong>{label}</strong>{unread > 0 && <button type="button" className="text-sm underline" onClick={markAll}>Tout marquer comme lu</button>}</div>
           {items.length === 0 ? <p className="nb-empty">Aucune notification pour l&apos;instant.</p> : (
             <ul className="nb-list">

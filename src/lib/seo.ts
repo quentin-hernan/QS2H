@@ -106,3 +106,31 @@ export const creativeWorkJsonLd = (p: { title: string; summary: string; slug: st
   about: p.client,
   ...(p.url ? { sameAs: p.url } : {}),
 });
+
+/** Page de liste (boutique, réalisations, blog) : CollectionPage + liste ordonnée des éléments, pour les résultats enrichis. */
+export const collectionJsonLd = (page: { name: string; description: string; path: string }, items: { name: string; path: string; image?: string }[]) => ({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: page.name,
+  description: page.description,
+  url: `${SITE_URL}${page.path}`,
+  inLanguage: "fr-FR",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 50).map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, url: `${SITE_URL}${it.path}`, ...(it.image ? { image: abs(it.image) } : {}) })),
+  },
+});
+
+/** Page simple typée (À propos, Contact). */
+export const simplePageJsonLd = (type: "AboutPage" | "ContactPage", page: { name: string; description: string; path: string }) => ({
+  "@context": "https://schema.org",
+  "@type": type,
+  name: page.name,
+  description: page.description,
+  url: `${SITE_URL}${page.path}`,
+  inLanguage: "fr-FR",
+  isPartOf: { "@id": `${SITE_URL}/#website` },
+  about: { "@id": `${SITE_URL}/#organization` },
+});

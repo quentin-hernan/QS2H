@@ -3,7 +3,8 @@ import { ShopGrid } from "@/components/shop/ShopCard";
 import { WordReveal } from "@/components/Motion";
 import { CartRoll } from "@/components/Scenes";
 import { getShopItems } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata, collectionJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Boutique : matériel, logiciels et solutions clés en main",
@@ -16,6 +17,7 @@ export default async function Boutique() {
   const cards = items.map(({ slug, title, tagline, category, brand, price, comparePrice, stock, badge, image, images, isExample, featured, order, features }) => ({ slug, title, tagline, category, brand, price, comparePrice, stock, badge, image, images, isExample, featured, order, features }));
   return (
     <>
+      <JsonLd data={collectionJsonLd({ name: "Boutique QS2H", description: "Matériel informatique, logiciels, licences et prestations packagées.", path: "/boutique" }, items.map((p) => ({ name: p.title, path: `/boutique/${p.slug}`, image: p.image || undefined })))} />
       <section className="light-section pb-10 pt-32 md:pt-40" aria-labelledby="shop-h">
         <div className="container">
           <Breadcrumbs items={[{ name: "Boutique", path: "/boutique" }]} />

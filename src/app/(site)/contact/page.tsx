@@ -2,7 +2,8 @@ import { QuoteForm } from "@/components/QuoteForm";
 import { ContactFind } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getSettings } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata, simplePageJsonLd } from "@/lib/seo";
 import { isPlaceholder } from "@/lib/utils";
 
 export const metadata = buildMetadata({
@@ -15,6 +16,8 @@ export default async function Contact({ searchParams }: { searchParams: Promise<
   const [{ formule }, s] = await Promise.all([searchParams, getSettings()]);
   const c = s.company;
   return (
+    <>
+    <JsonLd data={simplePageJsonLd("ContactPage", { name: "Contact et devis gratuit", description: "Demandez votre devis gratuit pour un site web : réponse sous 24 h ouvrées.", path: "/contact" })} />
     <section className="dark-section min-h-screen pb-24 pt-40 md:pt-48">
       <div className="container grid gap-14 lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-5">
@@ -34,5 +37,6 @@ export default async function Contact({ searchParams }: { searchParams: Promise<
       </div>
       <div className="container mt-24 md:mt-32"><ContactFind city={c.city} area={c.area} /></div>
     </section>
+    </>
   );
 }

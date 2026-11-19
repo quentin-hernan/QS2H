@@ -52,8 +52,8 @@ html[data-theme="dark"] .stock-ok { color: #8fd2a8; } html[data-theme="dark"] .s
 .cart-layer.is-open { pointer-events: auto; }
 .cart-scrim { position: absolute; inset: 0; background: rgb(14 16 19 / 0.45); opacity: 0; transition: opacity 0.4s ease; }
 .cart-layer.is-open .cart-scrim { opacity: 1; }
-.cart-drawer { position: absolute; right: 0; top: 0; bottom: 0; width: min(440px, 100vw); display: flex; flex-direction: column; box-shadow: -30px 0 60px -30px rgb(0 0 0 / 0.4); transform: translateX(102%); transition: transform 0.55s cubic-bezier(.2,.8,.2,1); }
-.cart-layer.is-open .cart-drawer { transform: none; }
+.cart-drawer { position: absolute; right: 0; top: 0; bottom: 0; width: min(440px, 100vw); display: flex; flex-direction: column; box-shadow: none; transform: translateX(102%); transition: transform 0.55s cubic-bezier(.2,.8,.2,1), box-shadow 0.55s; }
+.cart-layer.is-open .cart-drawer { transform: none; box-shadow: -30px 0 60px -30px rgb(0 0 0 / 0.4); }
 @media (prefers-reduced-motion: reduce) { .cart-drawer, .cart-scrim, .shop-img, .shop-quick { transition: none; } }
 
 /* Survol d'un article */
@@ -90,7 +90,7 @@ html[data-theme="dark"] .stock-ok { color: #8fd2a8; } html[data-theme="dark"] .s
 .shop-sug button:hover, .shop-sug button.is-on { background: color-mix(in srgb, var(--s-fg, #1C1C1C) 8%, transparent); }
 
 /* Le tiroir du panier est dans la coque du site (thème) : on garde sa glissière malgré la transition de fond des sections */
-.site-shell .cart-drawer.cart-drawer { transition: transform 0.55s cubic-bezier(.2,.8,.2,1), background-color 0.4s, color 0.4s; }
+.site-shell .cart-drawer.cart-drawer { transition: transform 0.55s cubic-bezier(.2,.8,.2,1), box-shadow 0.55s, background-color 0.4s, color 0.4s; }
 @media (prefers-reduced-motion: reduce) { .site-shell .cart-drawer.cart-drawer { transition: none; } }
 
 /* Fiche article : visuel plus mesuré (image entière, sans recadrage) */

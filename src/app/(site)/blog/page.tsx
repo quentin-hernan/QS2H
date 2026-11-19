@@ -1,9 +1,10 @@
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { BlogScene } from "@/components/Scenes";
+import { SheetStack } from "@/components/Scenes";
 import { BlogList } from "@/components/BlogList";
 import { getPosts } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata, collectionJsonLd } from "@/lib/seo";
 import { formatDate, readingMinutes } from "@/lib/utils";
 
 export const metadata = buildMetadata({
@@ -16,8 +17,10 @@ export default async function Blog() {
   const all = await getPosts();
   return (
     <>
-      <PageHero eyebrow="Blog" title={<>Conseils pour un site qui <span className="serif-it">fait venir des clients.</span></>} lead="Budget, choix techniques, référencement local : des articles concrets, sans jargon." art={<BlogScene />}>
+      <JsonLd data={collectionJsonLd({ name: "Blog QS2H", description: "Conseils création de site web et référencement.", path: "/blog" }, all.map((p) => ({ name: p.title, path: `/blog/${p.slug}`, image: p.cover || undefined })))} />
+      <PageHero eyebrow="Blog" title={<>Conseils pour un site qui <span className="serif-it">fait venir des clients.</span></>} lead="Budget, choix techniques, référencement local : des articles concrets, sans jargon.">
         <Breadcrumbs items={[{ name: "Blog", path: "/blog" }]} />
+        <SheetStack />
       </PageHero>
       <section className="light-section py-16 md:py-24" aria-label="Articles">
         <div className="container">

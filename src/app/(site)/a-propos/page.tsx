@@ -7,7 +7,8 @@ import { Tilt } from "@/components/BlogList";
 import { Reveal } from "@/components/Reveal";
 import { TeamTools } from "@/components/TeamTools";
 import { getPage, getTeam } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { buildMetadata, simplePageJsonLd } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "À propos : une agence web à taille humaine à La Rochelle",
@@ -20,6 +21,7 @@ export default async function About() {
   const paras = String(a.story).split(/\n\s*\n/);
   return (
     <>
+      <JsonLd data={simplePageJsonLd("AboutPage", { name: "À propos de QS2H", description: "Agence de création de sites web à La Rochelle : histoire, valeurs, équipe et engagements.", path: "/a-propos" })} />
       <PageHero image={a.heroImage || ""} art={<AboutScene />} eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
 
       <section className="light-section py-20 md:py-32">

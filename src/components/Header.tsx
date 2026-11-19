@@ -117,7 +117,7 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
         <div className={`${bg} backdrop-blur-md transition-[background-color,border-color,backdrop-filter] duration-300`} style={{ borderColor: scrolled && !open ? line : "transparent", color: light ? "#F8F8F7" : "#1C1C1C", ["--acc-ctx" as string]: light ? "var(--accent-hi)" : "var(--accent)" }}>
           <div className={`container flex max-w-[1440px] items-center justify-between transition-[height] duration-300 ease-out ${scrolled ? "h-[64px]" : "h-[80px]"}`}>
             <Link href="/" aria-label="QS2H — accueil" className="relative z-[60] block shrink-0">
-              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="220px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-10" : "h-12"}`} />
+              <Image src={light ? "/logo-light.png" : "/logo.png"} alt="QS2H, solutions digitales" width={720} height={227} sizes="220px" priority className={`w-auto transition-[height] duration-300 ${scrolled ? "h-8 sm:h-10" : "h-9 sm:h-12"}`} />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex" data-mega onMouseLeave={() => openMega(null, 160)}>
               {([{ k: "services", label: "Services", href: "/services" }, { href: "/realisations", label: "Réalisations" }, { href: "/boutique", label: "Boutique" }, { href: "/tarifs", label: "Tarifs" }, ...(hasCatalogue ? [{ href: "/catalogue", label: "Catalogue" }] : []), { href: "/methode", label: "Méthode" }, { k: "ressources", label: "Ressources", href: "/blog" }] as { k?: "services" | "ressources"; href: string; label: string }[]).map((l) => {
@@ -140,12 +140,12 @@ export function Header({ services = [], hasCatalogue = false, email = "" }: { se
                 );
               })}
             </nav>
-            <div className="relative z-[60] flex items-center gap-3">
+            <div className="relative z-[60] flex items-center gap-2 sm:gap-3">
               <ThemeToggle />
               <CartButton />
               <Link href="/compte" className="btn btn-outline hidden !min-h-[44px] !px-5 !py-2.5 text-[0.88rem] xl:inline-flex">Espace client</Link>
-              <Link href="/contact" className="btn btn-primary btn-fill !min-h-[44px] !px-5 !py-2.5 text-[0.9rem]"><span className="sm:hidden">Devis</span><span className="hidden sm:inline">Demander un devis</span></Link>
-              <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-4 !py-2.5 text-[0.88rem] lg:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
+              <Link href="/contact" className="btn btn-primary btn-fill !min-h-[44px] !px-4 !py-2.5 sm:!px-5 text-[0.9rem]"><span className="sm:hidden">Devis</span><span className="hidden sm:inline">Demander un devis</span></Link>
+              <button ref={btn} type="button" className="btn btn-outline !min-h-[44px] !px-3.5 !py-2.5 sm:!px-4 text-[0.88rem] lg:hidden" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>{open ? "Fermer" : "Menu"}</button>
             </div>
           </div>
           {mega && (

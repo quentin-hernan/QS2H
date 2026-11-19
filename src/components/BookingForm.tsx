@@ -84,7 +84,7 @@ export function BookingForm({ kinds, art }: { kinds: Kind[]; art?: ReactNode }) 
         {dates === null ? <p className="muted">Chargement des disponibilités…</p> : dates.length === 0 ? (
           <p className="rounded-2xl border p-5" style={{ borderColor: "rgb(248 248 247 / .2)" }}>Aucun créneau n&apos;est ouvert pour le moment. Écrivez-nous via la page contact, nous vous répondons sous 24 heures ouvrées.</p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-[minmax(260px,320px)_1fr]">
+          <div className="grid gap-6 md:grid-cols-[minmax(260px,320px)_1fr] md:gap-x-16 lg:gap-x-24">
             <div>
               <div className="mb-3 flex items-center justify-between">
                 <button type="button" aria-label="Mois précédent" disabled={months.indexOf(month) <= 0} onClick={() => setMonth(months[months.indexOf(month) - 1])} className="h-11 w-11 rounded-full border disabled:opacity-30" style={{ borderColor: "rgb(248 248 247 / .2)" }}>‹</button>
@@ -100,7 +100,7 @@ export function BookingForm({ kinds, art }: { kinds: Kind[]; art?: ReactNode }) 
               </div>
             </div>
             <div aria-live="polite">
-              {!date ? <div><p className="muted">Choisissez un jour dans le calendrier.</p>{art && <div className="mt-6 hidden max-w-[360px] md:block">{art}</div>}</div> : slots === null ? <p className="muted">Chargement…</p> : slots.length === 0 ? <p className="muted">Plus de créneau ce jour-là.</p> : (
+              {!date ? <div><p className="muted">Choisissez un jour dans le calendrier.</p>{art && <div className="mt-6 hidden max-w-[360px] md:ml-auto md:block">{art}</div>}</div> : slots === null ? <p className="muted">Chargement…</p> : slots.length === 0 ? <p className="muted">Plus de créneau ce jour-là.</p> : (
                 <>
                   <p className="mb-3 capitalize">{longDate(date)}</p>
                   <div className="flex flex-wrap gap-2">
