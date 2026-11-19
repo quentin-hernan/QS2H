@@ -234,6 +234,7 @@ model Client {
   firstName        String
   lastName         String
   company          String    @default("")
+  phone            String    @default("")
   passwordHash     String
   emailVerifiedAt  DateTime?
   verifyTokenHash  String?   @unique
@@ -353,9 +354,11 @@ model Appointment {
   email     String
   phone     String   @default("")
   message   String   @default("")
-  status    String   @default("confirmé") // confirmé | annulé
+  status    String   @default("en attente") // en attente (à valider) | confirmé | refusé | annulé
   token     String   @unique
   reminded  Boolean  @default(false)
+  clientId  String?
+  adminNote String   @default("") // message au client (motif du refus, précisions)
 
   @@index([startsAt, status])
 }

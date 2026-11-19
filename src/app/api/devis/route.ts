@@ -4,6 +4,7 @@ import { quoteSchema } from "@/lib/validators";
 import { rateLimit } from "@/lib/rate-limit";
 import { esc, layout, sendMail } from "@/lib/email";
 import { getSettings } from "@/lib/content";
+import { withAccount } from "@/lib/lead-account";
 
 export const runtime = "nodejs";
 
@@ -36,10 +37,11 @@ export async function POST(req: Request) {
 
   const parsed = quoteSchema.safeParse(json);
   if (!parsed.success) return NextResponse.json({ ok: false, error: "Certains champs sont invalides.", fields: parsed.error.flatten().fieldErrors }, { status: 422 });
-  const d = parsed.data;
+  const acc = await withAccount(parsed.data);
+  const d = acc.d;
   if (!(await verifyTurnstile(d.turnstileToken, ip))) return NextResponse.json({ ok: false, error: "La vérification anti-spam a échoué. Rechargez la page et réessayez." }, { status: 400 });
 
-  await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", company: d.company || "", projectType: d.projectType, budget: d.budget, deadline: d.deadline, message: d.message, consent: true, source: "formulaire devis" } });
+  await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", company: d.company || "", projectType: d.projectType, budget: d.budget, deadline: d.deadline, message: d.message, consent: true, source: "formulaire devis", clientId: acc.clientId } });
 
   const s = await getSettings();
   const rows = [["Nom", d.name], ["Email", d.email], ["Téléphone", d.phone || "—"], ["Entreprise", d.company || "—"], ["Projet", d.projectType], ["Budget", d.budget], ["Délai", d.deadline]].map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#5C5C56">${k}</td><td style="padding:6px 0"><strong>${esc(String(v))}</strong></td></tr>`).join("");

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { maxQty, money, type CartLine } from "@/lib/shop";
 
@@ -22,6 +23,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [open, setOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const pathname = usePathname();
+  useEffect(() => { setOpen(false); }, [pathname]); // le panier se referme quand on change de page (ex. « Commander » vers la connexion)
   useEffect(() => {
     try { const v = JSON.parse(localStorage.getItem(KEY) || "[]"); if (Array.isArray(v)) setLines(v.filter((x) => x && typeof x.slug === "string")); } catch { /* stockage indisponible */ }
     setLoaded(true);

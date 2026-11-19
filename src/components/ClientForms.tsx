@@ -70,13 +70,14 @@ export function ResetForm({ token }: { token: string }) {
   return (<form action={act} className="space-y-5"><Msg s={s} /><F id="password" label="Nouveau mot de passe" type="password" autoComplete="new-password" hint="12 caractères minimum." /><F id="confirm" label="Confirmation" type="password" autoComplete="new-password" /><Btn pending={pending}>Enregistrer</Btn></form>);
 }
 
-export function ProfileForm({ c }: { c: { firstName: string; lastName: string; company: string; email: string } }) {
+export function ProfileForm({ c }: { c: { firstName: string; lastName: string; company: string; email: string; phone?: string } }) {
   const [s, act, pending] = useActionState(updateProfile, undefined);
   return (
     <form action={act} className="space-y-5">
       <Msg s={s} />
       <div className="grid gap-5 sm:grid-cols-2"><F id="firstName" label="Prénom" defaultValue={c.firstName} autoComplete="given-name" /><F id="lastName" label="Nom" defaultValue={c.lastName} autoComplete="family-name" /></div>
       <F id="company" label="Entreprise" defaultValue={c.company} required={false} />
+      <F id="phone" label="Téléphone" type="tel" autoComplete="tel" defaultValue={c.phone ?? ""} required={false} hint="Utilisé pour préremplir vos demandes, commandes et rendez-vous : vous ne le retapez plus." />
       <p className="muted text-[0.9rem]">Email : {c.email} (pour le modifier, écrivez-nous depuis la messagerie).</p>
       <Btn pending={pending}>Enregistrer</Btn>
     </form>

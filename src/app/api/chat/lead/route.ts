@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
 import { esc, layout, sendMail } from "@/lib/email";
 import { getSettings } from "@/lib/content";
+import { withAccount } from "@/lib/lead-account";
 import { parseJson } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -24,10 +25,11 @@ export async function POST(req: Request) {
   if (!rateLimit(`chatlead:${ip}`, 4, 60 * 60 * 1000).ok) return NextResponse.json({ ok: false, error: "Trop de demandes. Réessayez plus tard." }, { status: 429 });
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: "Certains champs sont invalides.", fields: parsed.error.flatten().fieldErrors }, { status: 422 });
-  const d = parsed.data;
+  const acc = await withAccount(parsed.data);
+  const d = acc.d;
   if (d.website) return NextResponse.json({ ok: true });
 
-  const lead = await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", projectType: "Via l'assistant du site", message: d.message, consent: true, source: "chatbot" } });
+  const lead = await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", projectType: "Via l'assistant du site", message: d.message, consent: true, source: "chatbot", clientId: acc.clientId } });
   let transcript = "";
   if (d.conversationId) {
     const conv = await db.chatConversation.findUnique({ where: { id: d.conversationId } });

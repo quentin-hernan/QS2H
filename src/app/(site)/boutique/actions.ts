@@ -44,6 +44,7 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
     return { ok: false, error: "Certains champs sont à corriger.", fields };
   }
   const d = { ...p.data, email: client.email };
+  if (!client.phone && d.phone) await db.client.update({ where: { id: client.id }, data: { phone: d.phone } }).catch(() => null); // le téléphone saisi est conservé dans le compte
   if (d.website) return { ok: true, number: "—" };
   if (d.delivery === "livraison") {
     const fields: Record<string, string> = {};

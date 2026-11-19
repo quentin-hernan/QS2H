@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useMe } from "@/lib/use-me";
 
 type Kind = { id: string; label: string; minutes: number; text: string };
 const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
@@ -19,6 +20,7 @@ export function BookingForm({ kinds }: { kinds: Kind[] }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState<{ when: string; kind: string } | null>(null);
+  const me = useMe(); // client connecté : nom, email et téléphone viennent du compte
 
   useEffect(() => {
     setDates(null); setDate(""); setTime(""); setSlots(null);
@@ -44,7 +46,7 @@ export function BookingForm({ kinds }: { kinds: Kind[] }) {
     e.preventDefault();
     setErr(""); setBusy(true);
     const fd = new FormData(e.currentTarget);
-    const r = await fetch("/api/rdv", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind.id, date, time, name: fd.get("name"), email: fd.get("email"), phone: fd.get("phone") || "", message: fd.get("message") || "", consent: fd.get("consent") === "on" ? true : undefined, website: fd.get("website") || "" }) }).catch(() => null);
+    const r = await fetch("/api/rdv", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: kind.id, date, time, name: me?.name || fd.get("name"), email: me?.email || fd.get("email"), phone: me?.phone || fd.get("phone") || "", message: fd.get("message") || "", consent: fd.get("consent") === "on" ? true : undefined, website: fd.get("website") || "" }) }).catch(() => null);
     const j = await r?.json().catch(() => null);
     setBusy(false);
     if (!j?.ok) { setErr(j?.error || "Réservation impossible. Réessayez."); if (r?.status === 409) { setTime(""); setDate((d) => { setSlots(null); fetch(`/api/rdv?kind=${kind.id}&date=${d}`).then((x) => x.json()).then((y) => setSlots(y.ok ? y.slots : [])); return d; }); } return; }
@@ -54,8 +56,8 @@ export function BookingForm({ kinds }: { kinds: Kind[] }) {
   if (done) {
     return (
       <div role="status" className="rounded-2xl border p-8 md:p-12" style={{ borderColor: "rgb(248 248 247 / .18)" }}>
-        <p className="eyebrow mb-4">Rendez-vous confirmé</p>
-        <h2 className="text-h2 font-medium">C&apos;est noté.</h2>
+        <p className="eyebrow mb-4">Demande envoyée</p>
+        <h2 className="text-h2 font-medium">Créneau réservé.</h2>
         <p className="mt-6 max-w-prose text-lg leading-relaxed">{done.kind}, le {done.when} (heure de Paris). Un email de confirmation avec un fichier agenda vient de vous être envoyé, ainsi qu&apos;un lien pour annuler ou déplacer le rendez-vous.</p>
       </div>
     );
@@ -115,9 +117,19 @@ export function BookingForm({ kinds }: { kinds: Kind[] }) {
         <fieldset className="grid gap-5 sm:grid-cols-2">
           <legend className={label}>3. Vos coordonnées</legend>
           <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-          <div><label className="label" htmlFor="rdv-name">Nom</label><input id="rdv-name" name="name" required autoComplete="name" maxLength={120} className="field" /></div>
-          <div><label className="label" htmlFor="rdv-email">Email</label><input id="rdv-email" name="email" type="email" required autoComplete="email" maxLength={200} className="field" /></div>
-          <div><label className="label" htmlFor="rdv-phone">Téléphone {kind.id === "decouverte" ? "(pour vous appeler)" : "(facultatif)"}</label><input id="rdv-phone" name="phone" type="tel" autoComplete="tel" maxLength={30} className="field" /></div>
+          {me ? (
+            <div className="acc-border rounded-xl border p-4 sm:col-span-2" role="status">
+              <p className="font-medium">Connecté(e) : {me.name}</p>
+              <p className="muted text-sm">{me.email}{me.phone ? ` · ${me.phone}` : ""}. Ces informations viennent de votre compte, rien à retaper.</p>
+            </div>
+          ) : (
+            <>
+              {me === null && <p className="muted text-[0.9rem] sm:col-span-2">Vous avez un compte ? <Link href="/compte/connexion?next=/rendez-vous" className="underline">Connectez-vous</Link> : vos coordonnées seront reprises automatiquement et vous suivrez le rendez-vous dans votre espace client.</p>}
+              <div><label className="label" htmlFor="rdv-name">Nom</label><input id="rdv-name" name="name" required autoComplete="name" maxLength={120} className="field" /></div>
+              <div><label className="label" htmlFor="rdv-email">Email</label><input id="rdv-email" name="email" type="email" required autoComplete="email" maxLength={200} className="field" /></div>
+            </>
+          )}
+          {!me?.phone && <div><label className="label" htmlFor="rdv-phone">Téléphone {kind.id === "decouverte" ? "(pour vous appeler)" : "(facultatif)"}{me ? ", enregistré dans votre compte" : ""}</label><input id="rdv-phone" name="phone" type="tel" autoComplete="tel" maxLength={30} className="field" /></div>}
           <div className="sm:col-span-2"><label className="label" htmlFor="rdv-msg">Votre projet en quelques mots (facultatif)</label><textarea id="rdv-msg" name="message" rows={3} maxLength={1500} className="field" /></div>
           <label className="flex items-start gap-3 text-sm sm:col-span-2"><input type="checkbox" name="consent" required className="mt-1 h-5 w-5" /><span>J&apos;accepte que QS2H utilise ces informations pour organiser ce rendez-vous. <Link href="/politique-de-confidentialite" className="underline">Politique de confidentialité</Link></span></label>
           {err && <p role="alert" className="err sm:col-span-2">{err}</p>}

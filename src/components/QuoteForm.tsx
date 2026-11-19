@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useMe } from "@/lib/use-me";
 import { BUDGETS, DEADLINES, PROJECT_TYPES, quoteSchema, stepFields, type QuoteInput } from "@/lib/validators";
 
 const DRAFT = "qs2h-devis-draft";
@@ -16,6 +18,7 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
   const [sending, setSending] = useState(false);
   const [serverError, setServerError] = useState("");
   const head = useRef<HTMLHeadingElement>(null);
+  const me = useMe(); // client connecté : ses coordonnées viennent du compte, on ne redemande que ce qui manque
   const { register, handleSubmit, trigger, watch, setValue, reset, formState: { errors } } = useForm<QuoteInput>({
     resolver: zodResolver(quoteSchema),
     mode: "onTouched",
@@ -39,6 +42,14 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
   useEffect(() => {
     (window as unknown as { onTurnstile?: (t: string) => void }).onTurnstile = (t: string) => setValue("turnstileToken", t);
   }, [setValue]);
+
+  useEffect(() => {
+    if (!me) return;
+    setValue("name", me.name, { shouldDirty: true });
+    setValue("email", me.email, { shouldDirty: true });
+    if (me.phone) setValue("phone", me.phone);
+    if (me.company) setValue("company", me.company);
+  }, [me, setValue]);
 
   const next = async () => { if (await trigger(stepFields[step])) setStep((s) => Math.min(s + 1, STEPS.length - 1)); };
   const prev = () => setStep((s) => Math.max(0, s - 1));
@@ -101,10 +112,25 @@ export function QuoteForm({ presetPlan }: { presetPlan?: string }) {
       </div>
 
       <div hidden={step !== 3} className="grid gap-5 sm:grid-cols-2">
-        <div><label className="label" htmlFor="name">Nom et prénom</label><input id="name" autoComplete="name" className="field" {...register("name")} {...aria("name")} /><Err k="name" /></div>
-        <div><label className="label" htmlFor="email">Email professionnel</label><input id="email" type="email" autoComplete="email" className="field" {...register("email")} {...aria("email")} /><Err k="email" /></div>
-        <div><label className="label" htmlFor="phone">Téléphone (facultatif)</label><input id="phone" type="tel" autoComplete="tel" className="field" {...register("phone")} {...aria("phone")} /><Err k="phone" /></div>
-        <div><label className="label" htmlFor="company">Entreprise (facultatif)</label><input id="company" autoComplete="organization" className="field" {...register("company")} /></div>
+        {me ? (
+          <>
+            <div className="acc-border rounded-xl border p-4 sm:col-span-2" role="status">
+              <p className="font-medium">Connecté(e) : {me.name}</p>
+              <p className="muted text-sm">{me.email}{me.phone ? ` · ${me.phone}` : ""}{me.company ? ` · ${me.company}` : ""}. Ces informations viennent de votre compte, rien à retaper.</p>
+            </div>
+            <input type="hidden" {...register("name")} /><input type="hidden" {...register("email")} />
+            {!me.phone && <div><label className="label" htmlFor="phone">Téléphone (facultatif, enregistré dans votre compte)</label><input id="phone" type="tel" autoComplete="tel" className="field" {...register("phone")} {...aria("phone")} /><Err k="phone" /></div>}
+            {!me.company && <div><label className="label" htmlFor="company">Entreprise (facultatif)</label><input id="company" autoComplete="organization" className="field" {...register("company")} /></div>}
+          </>
+        ) : (
+          <>
+            {me === null && <p className="muted text-[0.9rem] sm:col-span-2">Vous avez un compte ? <Link href="/compte/connexion?next=/contact" className="link-u acc">Connectez-vous</Link> : vos coordonnées seront reprises automatiquement et vous suivrez votre demande dans votre espace client.</p>}
+            <div><label className="label" htmlFor="name">Nom et prénom</label><input id="name" autoComplete="name" className="field" {...register("name")} {...aria("name")} /><Err k="name" /></div>
+            <div><label className="label" htmlFor="email">Email professionnel</label><input id="email" type="email" autoComplete="email" className="field" {...register("email")} {...aria("email")} /><Err k="email" /></div>
+            <div><label className="label" htmlFor="phone">Téléphone (facultatif)</label><input id="phone" type="tel" autoComplete="tel" className="field" {...register("phone")} {...aria("phone")} /><Err k="phone" /></div>
+            <div><label className="label" htmlFor="company">Entreprise (facultatif)</label><input id="company" autoComplete="organization" className="field" {...register("company")} /></div>
+          </>
+        )}
         {/* honeypot : invisible pour les humains */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Ne pas remplir<input tabIndex={-1} autoComplete="off" {...register("website")} /></label></div>
         <div className="sm:col-span-2">

@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
 import { esc, layout, sendMail } from "@/lib/email";
 import { getSettings } from "@/lib/content";
+import { withAccount } from "@/lib/lead-account";
 import { SITE_URL } from "@/lib/utils";
-import { availableDates, fmtLong, freeSlots, ics, kindById, newToken, parisToDate } from "@/lib/booking";
+import { availableDates, fmtLong, freeSlots, kindById, newToken, parisToDate } from "@/lib/booking";
 
 export const runtime = "nodejs";
 
@@ -49,23 +50,24 @@ export async function POST(req: Request) {
   const free = (await freeSlots([d.date], kind.minutes))[d.date] ?? [];
   if (!free.includes(d.time)) return NextResponse.json({ ok: false, error: "Ce créneau vient d'être pris. Choisissez-en un autre." }, { status: 409 });
 
+  const acc = await withAccount({ name: d.name, email: d.email, phone: d.phone || "", company: "" });
+  const who = acc.d;
   const startsAt = parisToDate(d.date, d.time), endsAt = new Date(startsAt.getTime() + kind.minutes * 60e3);
   const token = newToken();
-  const appt = await db.appointment.create({ data: { startsAt, endsAt, kind: kind.label, name: d.name, email: d.email, phone: d.phone || "", message: d.message || "", token } });
-  // un contact dans l'admin (CRM)
-  await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", projectType: `Rendez-vous : ${kind.label}`, message: d.message || "", consent: true, source: "rendez-vous" } });
+  // le créneau est réservé tout de suite (personne d'autre ne peut le prendre) mais reste « en attente » jusqu'à validation dans l'administration
+  const appt = await db.appointment.create({ data: { startsAt, endsAt, kind: kind.label, name: who.name || d.name, email: who.email, phone: who.phone || "", message: d.message || "", token, status: "en attente", clientId: acc.clientId } });
+  await db.lead.create({ data: { name: who.name || d.name, email: who.email, phone: who.phone || "", projectType: `Rendez-vous : ${kind.label}`, message: d.message || "", consent: true, source: "rendez-vous", clientId: acc.clientId } });
 
   const s = await getSettings();
   const when = fmtLong(startsAt);
   const cancel = `${SITE_URL}/rendez-vous/annuler/${token}`;
-  const where = kind.id === "sur-place" ? `${s.company.address}, ${s.company.zip} ${s.company.city}` : kind.id === "visio" ? "Visioconférence (lien envoyé avant le rendez-vous)" : "Par téléphone";
-  const file = ics({ id: appt.id, startsAt, endsAt, title: `${kind.label} QS2H`, description: `Rendez-vous avec QS2H. Annuler ou déplacer : ${cancel}`, location: where });
   await Promise.all([
     sendMail({
-      to: d.email, subject: `Rendez-vous confirmé : ${when}`, attachments: [{ filename: "rendez-vous-qs2h.ics", content: file }],
-      html: layout("Votre rendez-vous est confirmé", `<p style="line-height:1.6">Bonjour ${esc(d.name)},</p><p style="line-height:1.6"><strong>${esc(kind.label)}</strong><br>${esc(when)} (heure de Paris), durée ${kind.minutes} min.<br>${esc(where)}</p><p style="line-height:1.6">Le fichier joint l'ajoute à votre agenda. Vous recevrez un rappel 24 heures avant.</p><p style="line-height:1.6">Un empêchement ? <a href="${cancel}">Annuler ou déplacer le rendez-vous</a>.</p>`),
+      to: who.email, subject: `Demande de rendez-vous reçue : ${when}`,
+      html: layout("Votre demande de rendez-vous est bien reçue", `<p style="line-height:1.6">Bonjour ${esc(who.name || d.name)},</p><p style="line-height:1.6"><strong>${esc(kind.label)}</strong><br>${esc(when)} (heure de Paris), durée ${kind.minutes} minutes.</p><p style="line-height:1.6">Ce créneau vous est réservé. Nous le validons rapidement et vous recevez alors un email de confirmation avec le fichier agenda. Vous pouvez aussi suivre votre demande dans votre espace client.</p><p style="font-size:13px">Annuler : ${cancel}</p>`),
     }),
-    sendMail({ to: process.env.MAIL_TO || s.company.email, subject: `Nouveau rendez-vous — ${d.name}, ${when}`, replyTo: d.email, html: layout("Nouveau rendez-vous", `<p><strong>${esc(d.name)}</strong> · ${esc(d.email)}${d.phone ? " · " + esc(d.phone) : ""}</p><p>${esc(kind.label)} — ${esc(when)}</p><p style="white-space:pre-wrap">${esc(d.message || "")}</p>`) }),
+    sendMail({ to: process.env.MAIL_TO || s.company.email, subject: `Rendez-vous à valider — ${who.name || d.name}, ${when}`, replyTo: who.email, html: layout("Rendez-vous à valider", `<p><strong>${esc(who.name || d.name)}</strong> · ${esc(who.email)}${who.phone ? " · " + esc(who.phone) : ""}</p><p>${esc(kind.label)} · ${esc(when)}</p>${d.message ? `<p style="white-space:pre-wrap">${esc(d.message)}</p>` : ""}<p><a href="${SITE_URL}/admin/rendez-vous">Valider ou refuser dans l'administration</a></p>`) }),
   ]);
+  void appt;
   return NextResponse.json({ ok: true, when, kind: kind.label });
 }

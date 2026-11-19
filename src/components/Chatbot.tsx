@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMe } from "@/lib/use-me";
 
 type Msg = { role: "user" | "bot"; text: string; links?: { label: string; href: string }[] };
 type Cfg = { enabled: boolean; name: string; welcome: string };
@@ -18,6 +19,7 @@ export function BotIcon({ size = 26 }: { size?: number; glow?: boolean }) {
 
 export function Chatbot() {
   const [cfg, setCfg] = useState<Cfg | null>(null);
+  const me = useMe();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [quick, setQuick] = useState<string[]>([]);
@@ -77,7 +79,7 @@ export function Chatbot() {
     e.preventDefault();
     setErr("");
     const fd = new FormData(e.currentTarget);
-    const payload = { conversationId: idRef.current || undefined, name: fd.get("name"), email: fd.get("email"), phone: fd.get("phone") || "", message: fd.get("message"), consent: fd.get("consent") === "on" ? true : undefined, website: fd.get("website") || "" };
+    const payload = { conversationId: idRef.current || undefined, name: me?.name || fd.get("name"), email: me?.email || fd.get("email"), phone: me?.phone || fd.get("phone") || "", message: fd.get("message"), consent: fd.get("consent") === "on" ? true : undefined, website: fd.get("website") || "" };
     setBusy(true);
     const r = await fetch("/api/chat/lead", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }).catch(() => null);
     const j = await r?.json().catch(() => null);
@@ -121,9 +123,15 @@ export function Chatbot() {
             {form && !sent && (
               <form onSubmit={submitLead} className="qchat-form" noValidate>
                 <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-                <label>Nom<input name="name" required autoComplete="name" maxLength={120} /></label>
-                <label>Email<input name="email" type="email" required autoComplete="email" maxLength={200} /></label>
-                <label>Téléphone (facultatif)<input name="phone" type="tel" autoComplete="tel" maxLength={30} /></label>
+                {me ? (
+                  <p className="qchat-sub" role="status">Connecté(e) : <strong>{me.name}</strong> ({me.email}). Vos coordonnées viennent de votre compte.</p>
+                ) : (
+                  <>
+                    <label>Nom<input name="name" required autoComplete="name" maxLength={120} /></label>
+                    <label>Email<input name="email" type="email" required autoComplete="email" maxLength={200} /></label>
+                  </>
+                )}
+                {!me?.phone && <label>Téléphone (facultatif)<input name="phone" type="tel" autoComplete="tel" maxLength={30} /></label>}
                 <label>Votre demande<textarea name="message" required rows={3} maxLength={2000} defaultValue={[...msgs].reverse().find((m) => m.role === "user" && m.text.length > 12)?.text ?? ""} /></label>
                 <label className="qchat-check"><input type="checkbox" name="consent" required /> <span>J&apos;accepte que QS2H utilise ces informations pour me répondre. <Link href="/politique-de-confidentialite" className="underline">Politique de confidentialité</Link></span></label>
                 {err && <p role="alert" className="qchat-err">{err}</p>}

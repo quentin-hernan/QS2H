@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const NAV = [
   { href: "/compte", label: "Tableau de bord" },
+  { href: "/compte/devis", label: "Mes demandes de devis" },
   { href: "/compte/commandes", label: "Mes commandes" },
   { href: "/compte/projets", label: "Mes projets" },
   { href: "/compte/demandes", label: "Demandes de modification" },

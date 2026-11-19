@@ -38,11 +38,11 @@ const validate = (v: Vals, delivery: "livraison" | "retrait", consent: boolean, 
  * Champs obligatoires contrôlés dans le navigateur (puis revérifiés côté serveur), saisies filtrées (code postal et téléphone : chiffres),
  * villes proposées d'après le code postal (geo.api.gouv.fr) et adresses suggérées (api-adresse.data.gouv.fr).
  */
-export function CheckoutForm({ account }: { account: { name: string; email: string; company: string } }) {
+export function CheckoutForm({ account }: { account: { name: string; email: string; company: string; phone?: string } }) {
   const { lines, total, clear } = useCart();
   const router = useRouter();
   const [delivery, setDelivery] = useState<"livraison" | "retrait">("livraison");
-  const [v, setV] = useState<Vals>({ name: account.name, email: account.email, phone: "", company: account.company, address: "", zip: "", city: "", note: "" });
+  const [v, setV] = useState<Vals>({ name: account.name, email: account.email, phone: account.phone ?? "", company: account.company, address: "", zip: "", city: "", note: "" });
   const [consent, setConsent] = useState(false);
   const [cgv, setCgv] = useState(false);
   const [errs, setErrs] = useState<Record<string, string>>({});

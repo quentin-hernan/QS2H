@@ -52,7 +52,7 @@ export async function getRules(): Promise<Rules> {
 export async function freeSlots(dates: string[], minutes: number, rules?: Rules): Promise<Record<string, string[]>> {
   const r = rules ?? (await getRules());
   const lo = parisToDate(dates[0], "00:00"), hi = parisToDate(addDays(dates[dates.length - 1], 1), "00:00");
-  const busy = await db.appointment.findMany({ where: { status: "confirmé", startsAt: { gte: new Date(lo.getTime() - 864e5), lt: hi } } });
+  const busy = await db.appointment.findMany({ where: { status: { in: ["confirmé", "en attente"] }, startsAt: { gte: new Date(lo.getTime() - 864e5), lt: hi } } });
   const earliest = Date.now() + r.notice * 3600e3;
   const out: Record<string, string[]> = {};
   for (const date of dates) {

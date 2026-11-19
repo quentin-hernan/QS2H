@@ -318,3 +318,5 @@ body.sx-dragging * { cursor: grabbing !important; }
 .sx-seg { min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--s-line, rgb(248 248 247 / .22)); font-size: 0.9rem; line-height: 1; }
 .sx-seg:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 .sx-seg.is-on { background: #2A5587; color: #fff; border-color: #2A5587; }
+
+.es-track-4 { grid-template-columns: repeat(4, 1fr); }
