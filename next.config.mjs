@@ -7,7 +7,7 @@ const makeCsp = (frameSrc, ancestors) => [
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://plausible.io",
+  "connect-src 'self' https://plausible.io https://api-adresse.data.gouv.fr https://geo.api.gouv.fr",
   `frame-src ${frameSrc}`,
   "worker-src 'self' blob:",
   "object-src 'none'",

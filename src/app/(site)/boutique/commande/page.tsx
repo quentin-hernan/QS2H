@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { CheckoutForm } from "@/components/shop/Checkout";
+import { CheckoutForm } from "@/components/shop/CheckoutForm";
 
 export const metadata = { title: "Commande", robots: { index: false } };
 

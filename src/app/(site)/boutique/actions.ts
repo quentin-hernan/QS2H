@@ -13,12 +13,12 @@ import { legalVersionNumber } from "@/lib/legal-db";
 const schema = z.object({
   name: z.string().trim().min(2, "Indiquez votre nom.").max(120),
   email: z.string().trim().toLowerCase().email("Email invalide.").max(200),
-  phone: z.string().trim().max(40).optional().default(""),
+  phone: z.string().trim().max(40).optional().default("").refine((v) => !v || (/^\+?[0-9 .()-]{6,20}$/.test(v) && v.replace(/\D/g, "").length >= 8 && v.replace(/\D/g, "").length <= 15), "Numéro de téléphone invalide (chiffres uniquement, ex. 06 12 34 56 78)."),
   company: z.string().trim().max(120).optional().default(""),
   delivery: z.enum(["livraison", "retrait"]),
   address: z.string().trim().max(200).optional().default(""),
   zip: z.string().trim().max(12).optional().default(""),
-  city: z.string().trim().max(80).optional().default(""),
+  city: z.string().trim().max(80).optional().default("").refine((v) => !v || /^[\p{L}][\p{L}\s'’.-]*$/u.test(v), "Nom de ville invalide."),
   note: z.string().trim().max(2000).optional().default(""),
   consent: z.literal(true, { errorMap: () => ({ message: "Merci d'accepter l'utilisation de vos informations pour traiter la commande." }) }),
   cgv: z.literal(true, { errorMap: () => ({ message: "Merci d'accepter les conditions générales de vente de la boutique." }) }),
@@ -32,16 +32,23 @@ export type OrderResult = { ok: true; number: string } | { ok: false; error: str
 export async function placeOrder(input: OrderInput): Promise<OrderResult> {
   const h = await headers();
   const ip = (h.get("x-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || "local").trim();
-  if (!rateLimit(`order:${ip}`, 5, 60 * 60 * 1000).ok) return { ok: false, error: "Trop de commandes en peu de temps. Réessayez plus tard ou écrivez-nous." };
+  // les formulaires incomplets ne comptent pas dans la limite : seules les vraies commandes sont limitées
   const p = schema.safeParse(input);
   if (!p.success) {
     const fields: Record<string, string> = {};
     for (const i of p.error.issues) fields[String(i.path[0])] ??= i.message;
-    return { ok: false, error: p.error.issues[0].message, fields };
+    return { ok: false, error: "Certains champs sont à corriger.", fields };
   }
   const d = p.data;
   if (d.website) return { ok: true, number: "—" };
-  if (d.delivery === "livraison" && (!d.address || !d.zip || !d.city)) return { ok: false, error: "Indiquez l'adresse de livraison complète.", fields: { address: "Adresse requise pour la livraison." } };
+  if (d.delivery === "livraison") {
+    const fields: Record<string, string> = {};
+    if (d.address.length < 5) fields.address = "Indiquez votre adresse (numéro et rue).";
+    if (!/^\d{5}$/.test(d.zip)) fields.zip = "Code postal à 5 chiffres.";
+    if (d.city.length < 2) fields.city = "Indiquez votre ville.";
+    if (Object.keys(fields).length) return { ok: false, error: "Indiquez l'adresse de livraison complète.", fields };
+  }
+  if (!rateLimit(`order:${ip}`, 8, 60 * 60 * 1000).ok) return { ok: false, error: "Trop de commandes en peu de temps. Réessayez plus tard ou écrivez-nous." };
 
   const items = await db.shopItem.findMany({ where: { published: true, slug: { in: d.lines.map((l) => l.slug) } } });
   const lines: OrderLine[] = [];

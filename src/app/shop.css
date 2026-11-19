@@ -83,3 +83,8 @@ html[data-theme="dark"] .stock-ok { color: #8fd2a8; } html[data-theme="dark"] .s
 .shop-qv-close { position: absolute; right: 16px; top: 14px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; background: color-mix(in srgb, var(--s-fg, #1C1C1C) 7%, transparent); }
 .shop-qv-close:hover { background: color-mix(in srgb, var(--s-fg, #1C1C1C) 14%, transparent); }
 @media (prefers-reduced-motion: reduce) { .shop-qv[open] { animation: none; } .shop-peek { transition: none; } }
+
+/* Suggestions d'adresse (commande) */
+.shop-sug { position: absolute; left: 0; right: 0; top: calc(100% - 4px); z-index: 20; max-height: 280px; overflow-y: auto; border-radius: 14px; border: 1px solid var(--s-line, rgb(28 28 28 / .14)); background: var(--s-bg, #fff); color: var(--s-fg, #1C1C1C); box-shadow: 0 24px 50px -24px rgb(0 0 0 / 0.45); padding: 6px; }
+.shop-sug button { display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 10px; font-size: 0.92rem; }
+.shop-sug button:hover, .shop-sug button.is-on { background: color-mix(in srgb, var(--s-fg, #1C1C1C) 8%, transparent); }
