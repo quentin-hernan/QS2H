@@ -282,3 +282,5 @@ html:not(.sx-editing) [data-ov-hidden] { display: none !important; }
 #sx-bar button:hover { background: rgb(248 248 247 / 0.12); }
 #sx-bar .sx-bar-del { color: #ff8a80; }
 #sx-bar .sx-bar-tag { padding: 0 8px; color: #A9AEB5; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.66rem; }
+.team-tools { display: none; }
+.sx-editing .team-tools { display: block; }

@@ -58,8 +58,16 @@ export async function captureViaService(url: string): Promise<Captured> {
     if (!img.ok) throw new Error("Capture illisible.");
     return { data: j.data, png: Buffer.from(await img.arrayBuffer()) };
   };
+  // repli si le quota Microlink est atteint : thum.io (page entière, sans clé), titre et description lus dans le HTML de la page
+  const viaThum = async () => {
+    const img = await fetch(`https://image.thum.io/get/fullpage/width/1440/wait/4/noanimate/${url}`, { signal: AbortSignal.timeout(90_000) });
+    if (!img.ok || !(img.headers.get("content-type") || "").startsWith("image/png")) throw new Error("Le service de capture n'a pas pu ouvrir ce site.");
+    const html = await fetch(url, { signal: AbortSignal.timeout(15_000), headers: { "user-agent": "QS2H-Capture/1.0" } }).then((r) => r.text()).catch(() => "");
+    const pick = (re: RegExp) => (re.exec(html)?.[1] || "").replace(/s+/g, " ").trim();
+    return { data: { title: pick(/<title[^>]*>([^<]*)</i), description: pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i), lang: pick(/<html[^>]+lang=["']([^"']*)/i), publisher: pick(/property=["']og:site_name["'][^>]+content=["']([^"']*)/i) }, png: Buffer.from(await img.arrayBuffer()) };
+  };
   const [desk, mob] = await Promise.all([
-    call({ fullPage: "true", "viewport.width": "1440", "viewport.height": "900", waitForTimeout: "2500" }),
+    call({ fullPage: "true", "viewport.width": "1440", "viewport.height": "900", waitForTimeout: "2500" }).catch((e: Error) => (/Quota|capture/.test(e.message) ? viaThum() : Promise.reject(e))),
     call({ "viewport.width": "390", "viewport.height": "844", "viewport.isMobile": "true", "viewport.hasTouch": "true", "viewport.deviceScaleFactor": "2", waitForTimeout: "2000" }).catch(() => null),
   ]);
   const meta0 = await sharp(desk.png, { limitInputPixels: 400_000_000 }).metadata();

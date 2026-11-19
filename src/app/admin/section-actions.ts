@@ -93,3 +93,30 @@ export async function resetOverrides(path: string): Promise<Result> {
   await persistOv(map, s.email, path);
   return { ok: true };
 }
+
+/* ------------------------------------------------------------------ Équipe (page À propos) : même donnée que l'admin › Équipe */
+const refreshAll = () => { revalidateTag("content"); revalidatePath("/", "layout"); };
+export async function addTeamMember(): Promise<Result & { id?: string }> {
+  const s = await requireSession();
+  const last = await db.teamMember.findFirst({ orderBy: { order: "desc" }, select: { order: true } });
+  const m = await db.teamMember.create({ data: { name: "Prénom Nom", role: "Rôle dans l'équipe", bio: "Quelques lignes de présentation.", order: (last?.order ?? -1) + 1 } });
+  await audit(s.email, "ajout d'un collaborateur", "teamMember", m.id);
+  refreshAll();
+  return { ok: true, id: m.id };
+}
+export async function updateTeamMember(id: string, d: { name: string; role: string; bio: string }): Promise<Result> {
+  const s = await requireSession();
+  const name = String(d.name).trim().slice(0, 120), role = String(d.role).trim().slice(0, 160), bio = String(d.bio).trim().slice(0, 2000);
+  if (!name || !role) return { ok: false, error: "Le nom et le rôle sont requis." };
+  await db.teamMember.update({ where: { id }, data: { name, role, bio } });
+  await audit(s.email, "modification d'un collaborateur", "teamMember", id);
+  refreshAll();
+  return { ok: true };
+}
+export async function deleteTeamMember(id: string): Promise<Result> {
+  const s = await requireSession();
+  await db.teamMember.delete({ where: { id } });
+  await audit(s.email, "suppression d'un collaborateur", "teamMember", id);
+  refreshAll();
+  return { ok: true };
+}

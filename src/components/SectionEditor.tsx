@@ -53,7 +53,7 @@ export function SectionEditor({ styles, overrides = {} }: { styles: StyleMap; ov
     refresh();
     const click = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("#sx-panel, #sx-toggle, dialog, .slot, [data-ov='m']")) return;
+      if (t.closest("#sx-panel, #sx-toggle, #sx-bar, dialog, .slot, .sx-skip, [data-ov='m']")) return;
       const list = listSections();
       const i = list.findIndex((s) => s.el.contains(t));
       if (i < 0) return;

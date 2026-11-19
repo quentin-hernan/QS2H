@@ -4,6 +4,7 @@ import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tilt } from "@/components/BlogList";
 import { Reveal } from "@/components/Reveal";
+import { TeamTools } from "@/components/TeamTools";
 import { getPage, getTeam } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
@@ -68,6 +69,7 @@ export default async function About() {
               </Reveal>
             ))}
           </ul>
+          <div className="lg:col-span-12"><TeamTools members={team.map((m) => ({ id: m.id, name: m.name, role: m.role, bio: m.bio }))} /></div>
         </div>
       </section>
 
