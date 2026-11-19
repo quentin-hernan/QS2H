@@ -47,12 +47,15 @@ export default async function PostPage({ params }: P) {
       <JsonLd data={articleJsonLd(post)} />
       <article>
         <header className="dark-section pb-16 pt-40 md:pb-24 md:pt-52">
-          <div className="container">
-            <Breadcrumbs items={[{ name: "Blog", path: "/blog" }, { name: post.title, path: `/blog/${post.slug}` }]} />
-            <p className="eyebrow mb-6">{post.category}</p>
-            <h1 className="max-w-[22ch] text-h1 font-medium">{post.title}</h1>
-            <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{post.excerpt}</p>
-            <p className="muted mt-8 text-[0.9rem]">Par {post.author} · <time dateTime={post.publishedAt?.toISOString()}>{formatDate(post.publishedAt)}</time> · {readingMinutes(post.content)} min de lecture</p>
+          <div className={`container ${post.cover ? "grid items-center gap-12 lg:grid-cols-12" : ""}`}>
+            <div className={post.cover ? "lg:col-span-7" : ""}>
+              <Breadcrumbs items={[{ name: "Blog", path: "/blog" }, { name: post.title, path: `/blog/${post.slug}` }]} />
+              <p className="eyebrow mb-6">{post.category}</p>
+              <h1 className={`text-h1 font-medium ${post.cover ? "" : "max-w-[22ch]"}`}>{post.title}</h1>
+              <p className="muted mt-8 max-w-2xl text-[1.2rem] leading-relaxed">{post.excerpt}</p>
+              <p className="muted mt-8 text-[0.9rem]">Par {post.author} · <time dateTime={post.publishedAt?.toISOString()}>{formatDate(post.publishedAt)}</time> · {readingMinutes(post.content)} min de lecture</p>
+            </div>
+            {post.cover && <div className="relative aspect-[3/2] overflow-hidden chamfer lg:col-span-5"><Image src={post.cover} alt="" fill priority sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" /></div>}
           </div>
         </header>
         <div className="light-section py-16 md:py-24">
@@ -61,7 +64,6 @@ export default async function PostPage({ params }: P) {
               <aside className="lg:col-span-3"><TocNav toc={toc} /></aside>
             )}
             <div className={toc.length > 1 ? "lg:col-span-8 lg:col-start-5" : "lg:col-span-8 lg:col-start-3"}>
-              {post.cover && <div className="relative mb-12 aspect-[3/2] overflow-hidden chamfer"><Image src={post.cover} alt="" fill priority sizes="(min-width:1024px) 60vw, 100vw" className="object-cover" /></div>}
               <div className="prose-qs [&_h2]:scroll-mt-32" dangerouslySetInnerHTML={{ __html: html }} />
             </div>
           </div>
