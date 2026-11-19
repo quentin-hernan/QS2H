@@ -16,12 +16,15 @@ type Sug = { label: string; street: string; zip: string; city: string };
 const validate = (v: Vals, delivery: "livraison" | "retrait", consent: boolean, cgv: boolean) => {
   const e: Record<string, string> = {};
   if (v.name.trim().length < 2) e.name = "Indiquez votre nom et prénom.";
+  else if (!/^[\p{L}][\p{L}\s'’.-]*$/u.test(v.name.trim())) e.name = "Le nom ne peut contenir que des lettres (pas de chiffres).";
   if (!v.email.trim()) e.email = "Indiquez votre email.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = "Adresse email invalide.";
   const digits = v.phone.replace(/\D/g, "");
   if (v.phone.trim() && (digits.length < 8 || digits.length > 15)) e.phone = "Numéro de téléphone invalide (ex. 06 12 34 56 78).";
   if (delivery === "livraison") {
-    if (v.address.trim().length < 5) e.address = "Indiquez votre adresse (numéro et rue).";
+    const a = v.address.trim();
+    if (a.length < 5 || !/\p{L}{3,}/u.test(a)) e.address = "Indiquez une adresse valide (numéro et nom de rue).";
+    else if (!/^[\p{L}0-9\s,.'’°#/-]+$/u.test(a)) e.address = "L'adresse contient des caractères non autorisés.";
     if (!/^\d{5}$/.test(v.zip)) e.zip = v.zip ? "Code postal à 5 chiffres." : "Indiquez votre code postal.";
     if (v.city.trim().length < 2) e.city = "Indiquez votre ville.";
   }
@@ -48,6 +51,7 @@ export function CheckoutForm({ account }: { account: { name: string; email: stri
   const [zipInfo, setZipInfo] = useState("");
   const [sugs, setSugs] = useState<Sug[]>([]);
   const [active, setActive] = useState(-1);
+  const [sugState, setSugState] = useState<"idle" | "loading" | "none" | "error">("idle");
   const [pending, start] = useTransition();
   const hp = useRef<HTMLInputElement>(null);
   const picked = useRef("");
@@ -77,17 +81,18 @@ export function CheckoutForm({ account }: { account: { name: string; email: stri
   // adresse → suggestions (base adresse nationale), limitées au code postal s'il est saisi
   useEffect(() => {
     const q = v.address.trim();
-    if (q.length < 3 || picked.current === q) { setSugs([]); return; }
+    if (q.length < 3 || picked.current === q || !/\p{L}{2,}/u.test(q)) { setSugs([]); setSugState("idle"); return; }
     const ac = new AbortController();
     const t = setTimeout(() => {
+      setSugState("loading");
       const pc = /^\d{5}$/.test(v.zip) ? `&postcode=${v.zip}` : "";
       fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=6&autocomplete=1${pc}`, { signal: ac.signal })
         .then((r) => r.json())
         .then((j: { features?: { properties: { label: string; name: string; postcode: string; city: string } }[] }) => {
-          setSugs((j.features ?? []).map((f) => ({ label: f.properties.label, street: f.properties.name, zip: f.properties.postcode, city: f.properties.city })));
-          setActive(-1);
+          const list = (j.features ?? []).map((f) => ({ label: f.properties.label, street: f.properties.name, zip: f.properties.postcode, city: f.properties.city }));
+          setSugs(list); setActive(-1); setSugState(list.length ? "idle" : "none");
         })
-        .catch(() => {});
+        .catch((err) => { if ((err as Error).name !== "AbortError") setSugState("error"); });
     }, 250);
     return () => { clearTimeout(t); ac.abort(); };
   }, [v.address, v.zip]);
@@ -131,7 +136,7 @@ export function CheckoutForm({ account }: { account: { name: string; email: stri
       <div className="space-y-8 lg:col-span-7">
         {top && <p role="alert" className="err rounded-xl border p-4">{top}</p>}
         <fieldset className="grid gap-5 sm:grid-cols-2"><legend className="mb-4 text-h3 font-medium">Vos coordonnées</legend>
-          <F id="name" label="Nom et prénom *" error={errs.name}><input id="name" name="name" autoComplete="name" className="field" required aria-required="true" value={v.name} onChange={(e) => set("name", e.target.value)} {...bad("name")} /></F>
+          <F id="name" label="Nom et prénom *" error={errs.name}><input id="name" name="name" autoComplete="name" className="field" required aria-required="true" value={v.name} onChange={(e) => set("name", e.target.value.replace(/[0-9_@#$%^&*()+=<>{}[\]\\|/~]/g, ""))} {...bad("name")} /></F>
           <F id="email" label="Email (de votre compte) *" error={errs.email}><input id="email" name="email" type="email" inputMode="email" autoComplete="email" className="field" required aria-required="true" readOnly value={v.email} {...bad("email")} /></F>
           <F id="phone" label="Téléphone" error={errs.phone}><input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={20} placeholder="06 12 34 56 78" className="field" value={v.phone} onChange={(e) => set("phone", e.target.value.replace(/[^0-9+ .()-]/g, ""))} {...bad("phone")} /></F>
           <F id="company" label="Entreprise"><input id="company" name="company" autoComplete="organization" className="field" value={v.company} onChange={(e) => set("company", e.target.value)} /></F>
@@ -150,8 +155,11 @@ export function CheckoutForm({ account }: { account: { name: string; email: stri
             <div className="mt-5 grid gap-5 sm:grid-cols-6">
               <div className="relative sm:col-span-6">
                 <F id="address" label="Adresse *" error={errs.address}>
-                  <input id="address" name="address" autoComplete="off" role="combobox" aria-expanded={sugs.length > 0} aria-autocomplete="list" aria-controls="addr-list" required aria-required="true" className="field" placeholder="Numéro et rue : des adresses vous sont proposées" value={v.address} onChange={(e) => { picked.current = ""; set("address", e.target.value); }} onKeyDown={onAddrKey} onBlur={() => setTimeout(() => setSugs([]), 150)} {...bad("address")} />
+                  <input id="address" name="address" autoComplete="off" role="combobox" aria-expanded={sugs.length > 0} aria-autocomplete="list" aria-controls="addr-list" required aria-required="true" className="field" placeholder="Numéro et rue (ex. 12 rue des Merciers)" value={v.address} onChange={(e) => { picked.current = ""; set("address", e.target.value.replace(/[^\p{L}0-9\s,.'’°#/-]/gu, "")); }} onKeyDown={onAddrKey} onBlur={() => setTimeout(() => setSugs([]), 150)} {...bad("address")} />
                 </F>
+                {sugState === "loading" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Recherche de l'adresse…</p>}
+                {sugState === "none" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Aucune adresse trouvée : vérifiez la saisie ou le code postal.</p>}
+                {sugState === "error" && <p className="muted mt-1 text-[0.8rem]" aria-live="polite">Suggestions indisponibles pour le moment : saisissez l'adresse complète.</p>}
                 {sugs.length > 0 && (
                   <ul id="addr-list" role="listbox" className="shop-sug">
                     {sugs.map((s, i) => (<li key={s.label} role="option" aria-selected={i === active}><button type="button" tabIndex={-1} className={i === active ? "is-on" : ""} onMouseDown={(e) => { e.preventDefault(); choose(s); }}>{s.label}</button></li>))}

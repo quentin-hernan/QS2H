@@ -34,8 +34,9 @@ export function OverridesAdmin({ pages, initial, slots: initialSlots }: { pages:
   const edit = (path: string, fn: (p: PageOverrides) => void) => {
     const next: PageOverrides = JSON.parse(JSON.stringify(map[path] ?? {}));
     fn(next);
-    for (const k of ["t", "m", "x"] as const) if (next[k] && !Object.keys(next[k]!).length) delete next[k];
+    for (const k of ["t", "m", "x", "s"] as const) if (next[k] && !Object.keys(next[k]!).length) delete next[k];
     if (next.a && !next.a.length) delete next.a;
+    if (next.f && !next.f.length) delete next.f;
     save(path, next);
   };
 
@@ -43,7 +44,7 @@ export function OverridesAdmin({ pages, initial, slots: initialSlots }: { pages:
     <div className="space-y-4">
       {paths.map((path) => {
         const p = map[path] ?? {};
-        const n = Object.keys(p.t ?? {}).length + Object.keys(p.m ?? {}).length + Object.keys(p.x ?? {}).length + (p.a?.length ?? 0);
+        const n = Object.keys(p.t ?? {}).length + Object.keys(p.m ?? {}).length + Object.keys(p.x ?? {}).length + Object.keys(p.s ?? {}).length + (p.a?.length ?? 0) + (p.f?.length ?? 0);
         return (
           <details key={path} className="rounded-2xl border" style={ring}>
             <summary className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -86,6 +87,27 @@ export function OverridesAdmin({ pages, initial, slots: initialSlots }: { pages:
                     <button type="button" className="err text-sm underline" onClick={() => edit(path, (q) => { q.a = q.a!.filter((x) => x.id !== a.id); })}>Supprimer</button>
                   </li>))}
               </ol></section>}
+
+              {p.f && <section><h3 className="mb-3 font-medium">Zones libres (placées n&apos;importe où)</h3><ul className="space-y-3">
+                {p.f.map((z, n) => (
+                  <li key={z.id} className="flex flex-wrap items-center gap-3">
+                    <span className="muted w-24 text-xs uppercase">{z.k === "img" ? "Image" : "Texte"} · section {z.sec + 1}</span>
+                    {z.k === "img"
+                      ? <><Thumb src={z.v} /><button type="button" className="btn btn-ghost !min-h-[38px] !px-4 !py-2 text-sm" onClick={() => setPick(() => (url: string) => edit(path, (q) => { q.f![n] = { ...z, v: url }; }))}>Changer</button></>
+                      : <textarea defaultValue={z.v} rows={2} className="field min-w-[240px] flex-1 !py-2 text-sm" onBlur={(ev) => { const v = ev.target.value.trim(); if (v && v !== z.v) edit(path, (q) => { q.f![n] = { ...z, v }; }); }} />}
+                    <span className="muted text-xs">x {Math.round(z.x)} % · y {Math.round(z.y)} px</span>
+                    <button type="button" className="err text-sm underline" onClick={() => edit(path, (q) => { q.f = q.f!.filter((x) => x.id !== z.id); })}>Supprimer</button>
+                  </li>))}
+              </ul></section>}
+
+              {p.s && <section><h3 className="mb-3 font-medium">Éléments déplacés ou mis en forme</h3><ul className="space-y-2">
+                {Object.entries(p.s).map(([k, e]) => (
+                  <li key={k} className="flex flex-wrap items-center gap-3 text-sm">
+                    <span className="muted">{k.startsWith("t:") ? "Texte" : k.startsWith("m:") ? "Image" : "Icône"} {k.startsWith("m:") || k.startsWith("i:") ? "" : "« " + e.o.slice(0, 50) + " »"}</span>
+                    <span className="muted text-xs">{[e.st.x || e.st.y ? "déplacé" : "", e.st.w ? `largeur ${e.st.w}px` : "", e.st.sc ? `échelle ${e.st.sc}%` : "", e.st.fs ? `taille ${e.st.fs}px` : "", e.st.ff ? "police" : "", e.st.ta ? "alignement" : "", e.st.b || e.st.i || e.st.u ? "style" : "", e.st.c ? "couleur" : ""].filter(Boolean).join(" · ")}</span>
+                    <button type="button" className="text-sm underline" onClick={() => edit(path, (q) => { delete q.s![k]; })}>Remettre l&apos;original</button>
+                  </li>))}
+              </ul></section>}
 
               {p.x && <section><h3 className="mb-3 font-medium">Éléments supprimés</h3><ul className="space-y-2">
                 {Object.entries(p.x).map(([k, e]) => (

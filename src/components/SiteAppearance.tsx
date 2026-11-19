@@ -28,7 +28,7 @@ export function SiteAppearance({ styles, overrides = {} }: { styles: StyleMap; o
     };
     const t1 = setTimeout(run, 60), t2 = setTimeout(run, 900);
     // textes et images modifiés directement sur la page (plusieurs passes : certains contenus se montent après coup)
-    const ovRun = () => applyOverrides(overrides[path]);
+    const ovRun = () => applyOverrides(overrides[path], () => listSections().map((s) => s.el));
     const o1 = setTimeout(ovRun, 80), o2 = setTimeout(ovRun, 900), o3 = setTimeout(ovRun, 2600);
     const stop = startParallax();
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(o1); clearTimeout(o2); clearTimeout(o3); stop(); };

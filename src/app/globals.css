@@ -304,3 +304,17 @@ html[data-theme="dark"] .es-track li.is-done::before, html[data-theme="dark"] .e
 html[data-theme="dark"] .es-track-dot { background: #1F1F1F; border-color: rgb(248 248 247 / 0.25); color: #A9AEB5; }
 html[data-theme="dark"] .es-track-date, html[data-theme="dark"] .es-track li:not(.is-done):not(.is-now) .es-track-label { color: #A9AEB5; }
 html[data-theme="dark"] .es-cancel { background: rgb(255 138 128 / 0.12); color: #ff8a80; }
+
+/* Éditeur : zones libres, poignée d'agrandissement, sélection par zone, mise en forme */
+[data-ov-host] { position: relative; }
+.ov-free { position: absolute; z-index: 6; margin: 0; max-width: 92%; }
+p.ov-free { min-width: 6ch; }
+#sx-handle { position: fixed; z-index: 96; width: 16px; height: 16px; border-radius: 4px; background: #2A5587; border: 2px solid #fff; box-shadow: 0 2px 8px rgb(0 0 0 / 0.4); cursor: nwse-resize; touch-action: none; }
+#sx-marquee { position: fixed; z-index: 97; pointer-events: none; border: 1.5px dashed #7FA9D9; background: rgb(127 169 217 / 0.14); }
+body.sx-dragging { user-select: none; cursor: grabbing; }
+body.sx-dragging * { cursor: grabbing !important; }
+.sx-editing [data-ov="i"]:hover { outline: 1.5px dashed rgb(127 169 217 / 0.95); outline-offset: 3px; cursor: pointer; }
+.sx-editing [data-ov="m"]:hover, .sx-editing [data-ov="g"]:hover { cursor: move; }
+.sx-seg { min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--s-line, rgb(248 248 247 / .22)); font-size: 0.9rem; line-height: 1; }
+.sx-seg:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+.sx-seg.is-on { background: #2A5587; color: #fff; border-color: #2A5587; }

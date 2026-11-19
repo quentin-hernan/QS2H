@@ -12,7 +12,7 @@ import { legalVersionNumber } from "@/lib/legal-db";
 import { getClient } from "@/lib/client-auth";
 
 const schema = z.object({
-  name: z.string().trim().min(2, "Indiquez votre nom.").max(120),
+  name: z.string().trim().min(2, "Indiquez votre nom.").max(120).regex(/^[\p{L}][\p{L}\s'’.-]*$/u, "Le nom ne peut contenir que des lettres."),
   email: z.string().trim().toLowerCase().email("Email invalide.").max(200),
   phone: z.string().trim().max(40).optional().default("").refine((v) => !v || (/^\+?[0-9 .()-]{6,20}$/.test(v) && v.replace(/\D/g, "").length >= 8 && v.replace(/\D/g, "").length <= 15), "Numéro de téléphone invalide (chiffres uniquement, ex. 06 12 34 56 78)."),
   company: z.string().trim().max(120).optional().default(""),
@@ -47,7 +47,7 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
   if (d.website) return { ok: true, number: "—" };
   if (d.delivery === "livraison") {
     const fields: Record<string, string> = {};
-    if (d.address.length < 5) fields.address = "Indiquez votre adresse (numéro et rue).";
+    if (d.address.length < 5 || !/\p{L}{3,}/u.test(d.address) || !/^[\p{L}0-9\s,.'’°#/-]+$/u.test(d.address)) fields.address = "Indiquez une adresse valide (numéro et nom de rue).";
     if (!/^\d{5}$/.test(d.zip)) fields.zip = "Code postal à 5 chiffres.";
     if (d.city.length < 2) fields.city = "Indiquez votre ville.";
     if (Object.keys(fields).length) return { ok: false, error: "Indiquez l'adresse de livraison complète.", fields };
