@@ -3,15 +3,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CtaBand } from "@/components/Blocks";
-import { getProduct, getProducts } from "@/lib/content";
+import { getProduct } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
 // rendu à chaque visite : les modifications de l'admin apparaissent tout de suite
 export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  return (await getProducts()).map((p) => ({ slug: p.slug }));
-}
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const p = await getProduct((await params).slug);
   if (!p) return {};
