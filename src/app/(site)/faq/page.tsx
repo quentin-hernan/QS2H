@@ -1,4 +1,5 @@
 import { PageHero, CtaBand } from "@/components/Blocks";
+import { FaqScene } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { HomeFaq } from "@/components/HomeInteractive";
@@ -17,7 +18,7 @@ export default async function FaqPage() {
   return (
     <>
       <JsonLd data={faqJsonLd(items)} />
-      <PageHero eyebrow="FAQ" title={<>Vos questions, <span className="serif-it">nos réponses.</span></>} lead="Prix, délais, propriété du site, référencement : l'essentiel de ce que l'on nous demande avant de commencer.">
+      <PageHero eyebrow="FAQ" title={<>Vos questions, <span className="serif-it">nos réponses.</span></>} lead="Prix, délais, propriété du site, référencement : l'essentiel de ce que l'on nous demande avant de commencer." art={<FaqScene />}>
         <Breadcrumbs items={[{ name: "FAQ", path: "/faq" }]} />
       </PageHero>
       <HomeFaq items={items} title="Questions fréquentes" aside={<p className="muted max-w-xs leading-relaxed">Une question absente de cette liste ? <Link href="/contact" className="acc underline">Écrivez-nous</Link> ou <Link href="/rendez-vous" className="acc underline">prenez rendez-vous</Link>.</p>} />

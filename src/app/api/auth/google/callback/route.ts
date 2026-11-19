@@ -5,6 +5,7 @@ import { hashPassword } from "@/lib/password";
 import { createClientSession, truncatedIp, userAgent } from "@/lib/client-auth";
 import { SITE_URL } from "@/lib/utils";
 import { safeNext } from "@/lib/shop";
+import { notifyAdmin } from "@/lib/notify";
 
 const fail = (why = "google") => NextResponse.redirect(`${SITE_URL}/compte/connexion?erreur=${why}`);
 
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
     if (!c) {
       const [first, ...rest] = (p.name || email.split("@")[0]).split(" ");
       c = await db.client.create({ data: { email, firstName: p.given_name || first || "Client", lastName: p.family_name || rest.join(" ") || "-", passwordHash: await hashPassword(crypto.randomBytes(32).toString("hex")), emailVerifiedAt: new Date() } });
+      await notifyAdmin({ kind: "compte", title: `Nouveau compte client (Google) : ${c.firstName} ${c.lastName}`, body: email, link: `/admin/clients/${c.id}` });
     } else if (!c.emailVerifiedAt) {
       c = await db.client.update({ where: { id: c.id }, data: { emailVerifiedAt: new Date() } });
     }

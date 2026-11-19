@@ -7,6 +7,7 @@ import { getSettings } from "@/lib/content";
 import { withAccount } from "@/lib/lead-account";
 import { SITE_URL } from "@/lib/utils";
 import { availableDates, fmtLong, freeSlots, kindById, newToken, parisToDate } from "@/lib/booking";
+import { notifyAdmin, notifyClient } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
   // le créneau est réservé tout de suite (personne d'autre ne peut le prendre) mais reste « en attente » jusqu'à validation dans l'administration
   const appt = await db.appointment.create({ data: { startsAt, endsAt, kind: kind.label, name: who.name || d.name, email: who.email, phone: who.phone || "", message: d.message || "", token, status: "en attente", clientId: acc.clientId } });
   await db.lead.create({ data: { name: who.name || d.name, email: who.email, phone: who.phone || "", projectType: `Rendez-vous : ${kind.label}`, message: d.message || "", consent: true, source: "rendez-vous", clientId: acc.clientId } });
+  await notifyAdmin({ kind: "rdv", title: `Rendez-vous à valider : ${who.name || d.name}`, body: `${kind.label} · ${fmtLong(startsAt)}`, link: "/admin/rendez-vous" });
+  await notifyClient(acc.clientId, { kind: "rdv", title: "Demande de rendez-vous reçue", body: `${kind.label} · ${fmtLong(startsAt)} : en attente de validation`, link: "/compte/rendez-vous" });
 
   const s = await getSettings();
   const when = fmtLong(startsAt);

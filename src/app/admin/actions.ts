@@ -16,6 +16,7 @@ import { SITE_URL } from "@/lib/utils";
 import { captureSite, captureViaService, captureViaWorker, storeCapture } from "@/lib/capture";
 import { saveImage } from "@/lib/media";
 import { removePrivate, removePublic } from "@/lib/storage";
+import { notifyClient } from "@/lib/notify";
 
 type Result = { ok: boolean; error?: string; id?: string; fields?: Record<string, string[] | undefined> };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -331,7 +332,10 @@ export async function saveSettings(section: string, data: unknown): Promise<Resu
 export async function updateLead(id: string, status: string, notes: string): Promise<Result> {
   const s = await requireSession();
   if (!(LEAD_STATUSES as readonly string[]).includes(status)) return { ok: false, error: "Statut invalide." };
+  const before = await db.lead.findUnique({ where: { id }, select: { status: true, clientId: true, projectType: true } });
   await db.lead.update({ where: { id }, data: { status, notes: notes.slice(0, 10000) } });
+  const LBL: Record<string, string> = { contacté: "en cours d'étude", "devis envoyé": "devis envoyé", gagné: "acceptée", perdu: "clôturée" };
+  if (before?.clientId && before.status !== status && LBL[status]) await notifyClient(before.clientId, { kind: "devis", title: `Votre demande « ${before.projectType || "de devis"} » : ${LBL[status]}`, link: "/compte/devis" });
   await audit(s.email, "mise à jour demande", "lead", id);
   revalidatePath("/admin/demandes");
   return { ok: true };
@@ -451,6 +455,7 @@ export async function replyToClient(clientId: string, body: string): Promise<Res
   const c = await db.client.findUnique({ where: { id: clientId } });
   if (!c) return { ok: false, error: "Client introuvable." };
   await db.clientMessage.create({ data: { clientId, body: b.slice(0, 4000), fromClient: false } });
+  await notifyClient(clientId, { kind: "message", title: "Nouveau message de QS2H", body: b.slice(0, 140), link: "/compte/messages" });
   await sendMail({ to: c.email, subject: "Nouveau message de QS2H", html: layout("Vous avez un nouveau message", `<p style="line-height:1.6">Bonjour ${esc(c.firstName)}, QS2H vous a écrit dans votre espace client.</p><p><a href="${SITE_URL}/compte/messages" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;text-decoration:none">Lire le message</a></p>`) });
   await audit(s.email, "réponse client", "client", clientId);
   revalidatePath(`/admin/clients/${clientId}`);
@@ -484,6 +489,7 @@ export async function updateClientRequest(id: string, status: string, reply: str
   await db.clientRequest.update({ where: { id }, data: { status, reply: text } });
   await audit(s.email, "traitement demande client", "clientRequest", id);
   if (status !== r.status || text !== r.reply) {
+    await notifyClient(r.clientId, { kind: "demande", title: `Votre demande « ${r.title} » : ${status === "nouvelle" ? "reçue" : status}`, body: text.slice(0, 140), link: "/compte/demandes" });
     await sendMail({ to: r.client.email, subject: `Votre demande « ${r.title} » : ${status === "nouvelle" ? "reçue" : status}`, html: layout("Votre demande a été mise à jour", `<p style="line-height:1.6">Bonjour ${esc(r.client.firstName)},</p><p style="line-height:1.6">Demande : <strong>${esc(r.title)}</strong><br>Statut : ${esc(status)}</p>${text ? `<p style="line-height:1.6;white-space:pre-wrap">${esc(text)}</p>` : ""}<p><a href="${SITE_URL}/compte/demandes">Voir dans mon espace client</a></p>`) });
   }
   revalidatePath(`/admin/clients/${r.clientId}`);

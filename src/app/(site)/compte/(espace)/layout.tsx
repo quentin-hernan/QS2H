@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { logoutClient } from "../actions";
 import { EspaceNav } from "@/components/EspaceNav";
 import { VerifyBanner } from "@/components/VerifyBanner";
+import { NoticeBell } from "@/components/NoticeBell";
 
 /** Espace client : coque d'application (navigation latérale, compteurs) partagée par toutes les pages du compte. */
 export default async function Espace({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,7 @@ export default async function Espace({ children }: { children: React.ReactNode }
             <div className="es-card mb-4 flex items-center gap-4 p-5">
               <span className="es-avatar" aria-hidden="true">{initials}</span>
               <span className="min-w-0"><span className="block truncate font-semibold">{c.firstName} {c.lastName}</span><span className="muted block truncate text-sm">{c.company || c.email}</span></span>
+              <span className="ml-auto"><NoticeBell endpoint="/api/compte/notices" label="Mes notifications" /></span>
             </div>
             <EspaceNav badges={{ "/compte/messages": unread, "/compte/documents": toValidate, "/compte/demandes": openReq, "/compte/commandes": openOrders }} />
             <form action={logoutClient} className="mt-4 hidden lg:block"><button className="muted px-4 text-sm underline">Me déconnecter</button></form>

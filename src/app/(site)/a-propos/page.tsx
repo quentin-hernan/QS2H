@@ -1,6 +1,7 @@
 import { MediaBand } from "@/components/MediaBand";
 import { ImgSlot } from "@/components/ImgSlot";
 import { PageHero, CtaBand } from "@/components/Blocks";
+import { AboutScene } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tilt } from "@/components/BlogList";
 import { Reveal } from "@/components/Reveal";
@@ -19,7 +20,7 @@ export default async function About() {
   const paras = String(a.story).split(/\n\s*\n/);
   return (
     <>
-      <PageHero image={a.heroImage || ""} eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
+      <PageHero image={a.heroImage || ""} art={<AboutScene />} eyebrow="À propos" title={a.title} lead={a.intro}><Breadcrumbs items={[{ name: "À propos", path: "/a-propos" }]} /></PageHero>
 
       <section className="light-section py-20 md:py-32">
         <div className="container">

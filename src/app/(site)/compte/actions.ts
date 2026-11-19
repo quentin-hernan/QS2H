@@ -11,6 +11,7 @@ import { esc, layout, sendMail } from "@/lib/email";
 import { legalVersionNumber } from "@/lib/legal-db";
 import { SITE_URL } from "@/lib/utils";
 import { eraseClient } from "@/lib/client-data";
+import { notifyAdmin } from "@/lib/notify";
 
 export type S = { error?: string; ok?: string } | undefined;
 const btn = (href: string, label: string) => `<p><a href="${href}" style="display:inline-block;background:#2A5587;color:#fff;padding:12px 22px;text-decoration:none">${esc(label)}</a></p><p style="font-size:13px;color:#5F5F5F;word-break:break-all">${esc(href)}</p>`;
@@ -62,6 +63,7 @@ export async function registerAction(_: S, fd: FormData): Promise<S> {
   });
   await sendMail({ to: d.email, subject: "Confirmez votre adresse email", html: layout("Activez votre compte", `<p style="line-height:1.6">Bonjour ${esc(d.firstName)}, confirmez votre adresse pour activer votre espace client QS2H.</p>${btn(`${SITE_URL}/compte/verification/${t}`, "Vérifier mon adresse")}`) });
   if (d.newsletter === "on") await sendNewsletterConfirmation(client.id, d.email, d.firstName);
+  await notifyAdmin({ kind: "compte", title: `Nouveau compte client : ${d.firstName} ${d.lastName}`, body: d.company || d.email, link: `/admin/clients/${client.id}` });
   // accès immédiat à l'espace client : l'adresse email sera confirmée plus tard (rappel affiché dans l'espace)
   await createClientSession(client.id, client.sessionVersion);
   redirect(safeNext(fd.get("next")) || "/compte");
@@ -203,6 +205,7 @@ export async function sendClientMessage(_: S, fd: FormData): Promise<S> {
   if (body.length > 4000) return { error: "Message trop long (4 000 caractères)." };
   if (!rateLimit(`msg:${c.id}`, 20, 3600e3).ok) return { error: "Trop de messages. Réessayez plus tard." };
   await db.clientMessage.create({ data: { clientId: c.id, body, fromClient: true } });
+  await notifyAdmin({ kind: "message", title: `Message de ${c.firstName} ${c.lastName}`, body: body.slice(0, 140), link: `/admin/clients/${c.id}` });
   const to = process.env.MAIL_TO || "contact@qs2h.fr";
   await sendMail({ to, subject: `Message de ${c.firstName} ${c.lastName}`, html: layout("Nouveau message client", `<p style="line-height:1.6;white-space:pre-wrap">${esc(body)}</p><p style="font-size:13px">${SITE_URL}/admin/clients/${c.id}</p>`), replyTo: c.email });
   revalidatePath("/compte/messages");
@@ -247,6 +250,7 @@ export async function createClientRequest(_: S, fd: FormData): Promise<S> {
   if (projectId && !(await db.clientProject.findFirst({ where: { id: projectId, clientId: c.id } }))) return { error: "Projet inconnu." };
   if (!rateLimit(`req:${c.id}`, 10, 3600e3).ok) return { error: "Trop de demandes. Réessayez plus tard." };
   await db.clientRequest.create({ data: { clientId: c.id, projectId, title, details, priority } });
+  await notifyAdmin({ kind: "demande", title: `Demande de modification : ${title}`, body: `${c.firstName} ${c.lastName} · priorité ${priority}`, link: `/admin/clients/${c.id}` });
   const to = process.env.MAIL_TO || "contact@qs2h.fr";
   await sendMail({ to, subject: `Demande de modification (${priority}) — ${c.firstName} ${c.lastName}`, html: layout("Nouvelle demande de modification", `<p><strong>${esc(title)}</strong></p><p style="line-height:1.6;white-space:pre-wrap">${esc(details)}</p><p style="font-size:13px">${SITE_URL}/admin/clients/${c.id}</p>`), replyTo: c.email });
   revalidatePath("/compte/demandes");

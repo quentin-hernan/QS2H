@@ -10,6 +10,7 @@ import { money, type OrderLine } from "@/lib/shop";
 import { SITE_URL } from "@/lib/utils";
 import { legalVersionNumber } from "@/lib/legal-db";
 import { getClient } from "@/lib/client-auth";
+import { notifyAdmin, notifyClient } from "@/lib/notify";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Indiquez votre nom.").max(120).regex(/^[\p{L}][\p{L}\s'’.-]*$/u, "Le nom ne peut contenir que des lettres."),
@@ -77,6 +78,8 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
     }),
   ]);
   revalidateTag("content");
+  await notifyAdmin({ kind: "commande", title: `Nouvelle commande ${number} : ${money(total)}`, body: `${d.name} · ${lines.reduce((a, l) => a + l.qty, 0)} article(s) · ${d.delivery}`, link: "/admin/commandes" });
+  await notifyClient(client.id, { kind: "commande", title: `Commande ${number} reçue`, body: "Nous la vérifions et la validons rapidement.", link: "/compte/commandes" });
 
   const s = await getSettings();
   const table = `<table style="width:100%;border-collapse:collapse">${lines.map((l) => `<tr><td style="padding:6px 0">${esc(l.title)} × ${l.qty}</td><td style="text-align:right">${money(l.price * l.qty)}</td></tr>`).join("")}<tr><td style="padding-top:10px;font-weight:bold">Total TTC</td><td style="text-align:right;font-weight:bold">${money(total)}</td></tr></table>`;

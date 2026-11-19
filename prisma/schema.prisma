@@ -462,3 +462,37 @@ model ShopOrder {
 
   @@index([clientId])
 }
+
+/// Mesure d'audience interne (avec l'accord du visiteur) : aucune IP ni cookie stockés ; l'empreinte du visiteur est un hachage renouvelé chaque jour
+model PageView {
+  id       String   @id @default(cuid())
+  at       DateTime @default(now())
+  path     String
+  visitor  String // empreinte anonyme du jour
+  session  String // visite (30 min d'inactivité = nouvelle visite)
+  referrer String   @default("") // domaine d'origine
+  source   String   @default("Direct")
+  device   String   @default("Ordinateur")
+  browser  String   @default("")
+  country  String   @default("")
+  duration Int      @default(0) // secondes passées sur la page
+
+  @@index([at])
+  @@index([visitor, at])
+}
+
+/// Notifications : pour l'administration (audience « admin ») ou pour un client dans son espace (audience « client »)
+model Notice {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  audience  String // admin | client
+  clientId  String?
+  kind      String // message, panier, rdv, devis, commande, demande, compte, statut
+  title     String
+  body      String    @default("")
+  link      String    @default("")
+  readAt    DateTime?
+
+  @@index([audience, createdAt])
+  @@index([clientId, createdAt])
+}

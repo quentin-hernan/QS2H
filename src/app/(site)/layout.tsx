@@ -11,6 +11,7 @@ import { getProjects, getProducts, getReviews, getServices, getSettings } from "
 import { ViewerProvider } from "@/components/ProjectViewer";
 import { SlotsProvider } from "@/components/ImgSlot";
 import { CartProvider } from "@/components/shop/Cart";
+import { Analytics } from "@/components/Analytics";
 import { orgJsonLd, websiteJsonLd } from "@/lib/seo";
 
 // Pages rendues à chaque visite : les modifications faites dans l'administration apparaissent immédiatement (les données restent mises en cache par étiquette).
@@ -44,6 +45,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Chatbot />
       <SiteAppearance styles={s.sectionStyles ?? {}} overrides={s.overrides ?? {}} />
       <CookieBanner plausibleDomain={s.integrations.plausibleDomain} />
+      <Analytics />
     </div>
     </CartProvider>
     </>

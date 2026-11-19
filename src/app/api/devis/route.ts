@@ -5,6 +5,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { esc, layout, sendMail } from "@/lib/email";
 import { getSettings } from "@/lib/content";
 import { withAccount } from "@/lib/lead-account";
+import { notifyAdmin } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
   const d = acc.d;
   if (!(await verifyTurnstile(d.turnstileToken, ip))) return NextResponse.json({ ok: false, error: "La vérification anti-spam a échoué. Rechargez la page et réessayez." }, { status: 400 });
 
-  await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", company: d.company || "", projectType: d.projectType, budget: d.budget, deadline: d.deadline, message: d.message, consent: true, source: "formulaire devis", clientId: acc.clientId } });
+  const lead = await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", company: d.company || "", projectType: d.projectType, budget: d.budget, deadline: d.deadline, message: d.message, consent: true, source: "formulaire devis", clientId: acc.clientId } });
+  await notifyAdmin({ kind: "devis", title: `Nouvelle demande de devis : ${d.name}`, body: `${d.projectType} · ${d.budget} · ${d.deadline}`, link: `/admin/demandes/${lead.id}` });
 
   const s = await getSettings();
   const rows = [["Nom", d.name], ["Email", d.email], ["Téléphone", d.phone || "—"], ["Entreprise", d.company || "—"], ["Projet", d.projectType], ["Budget", d.budget], ["Délai", d.deadline]].map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#5C5C56">${k}</td><td style="padding:6px 0"><strong>${esc(String(v))}</strong></td></tr>`).join("");

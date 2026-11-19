@@ -135,11 +135,6 @@ export function SentLaptop() {
   );
 }
 
-/** En-tête du blog : petit empilement de feuillets 3D. */
-export function SheetStack() {
-  return (<div className="sheets hidden md:block" aria-hidden="true">{[0, 1, 2, 3].map((i) => (<i key={i} style={{ ["--i" as string]: i }} />))}</div>);
-}
-
 /** Bas de la page Contact : un portable qui s'ouvre sur une carte animée (rues, Garonne, épingle) et la carte OpenStreetMap, le tout centré sous le formulaire. */
 export function ContactFind({ city, area }: { city: string; area: string }) {
   const root = useRef<HTMLDivElement>(null);
@@ -175,5 +170,85 @@ export function ContactFind({ city, area }: { city: string; area: string }) {
         <div className="cf-map"><MapEmbed city={city} /></div>
       </div>
     </div>
+  );
+}
+
+/** Petite horloge partagée : fait avancer une étape toutes les `ms` (immobile si l'utilisateur réduit les animations). */
+function useCycle(n: number, ms: number) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setI((x) => (x + 1) % n), ms);
+    return () => clearInterval(t);
+  }, [n, ms]);
+  return i;
+}
+
+/** Blog : un article s'écrit à l'écran (titre, paragraphes, image), puis passe « Publié ». */
+export function BlogScene() {
+  const k = useCycle(1000, 9000); // relance l'écriture toutes les 9 s
+  return (
+    <Laptop label="Un article de blog en cours de rédaction">
+      <div key={k} className="sc bs">
+        <div className="sc-row"><span className="bs-tag sc-in">Article</span><span className="bs-pub" style={{ animationDelay: "3.2s" }}>Publié</span></div>
+        <Bar w="78%" h={14} d={200} /><Bar w="52%" h={14} d={420} />
+        <div className="bs-body"><span className="bs-img sc-in" style={{ animationDelay: "900ms" }} /><span className="bs-lines">{[92, 86, 90, 64].map((w, i) => (<Bar key={i} w={`${w}%`} h={6} d={1200 + i * 260} />))}</span></div>
+        <span className="bs-caret" />
+      </div>
+    </Laptop>
+  );
+}
+
+/** FAQ : les questions s'ouvrent l'une après l'autre, comme sur la page. */
+export function FaqScene() {
+  const open = useCycle(4, 3000);
+  return (
+    <Laptop label="Questions et réponses qui s'ouvrent">
+      <div className="sc fs">
+        <p className="sc-t">Vos questions</p>
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className={`fs-q ${open === i ? "is-open" : ""}`}>
+            <div className="sc-row"><Bar w={`${[62, 54, 70, 48][i]}%`} h={8} /><span className="fs-plus" aria-hidden="true" /></div>
+            <div className="fs-a"><Bar w="88%" h={5} /><Bar w="72%" h={5} /></div>
+          </div>
+        ))}
+      </div>
+    </Laptop>
+  );
+}
+
+/** Prendre rendez-vous : un jour se sélectionne dans le calendrier, un créneau se pose, la demande part. */
+export function RdvScene() {
+  const days = [9, 11, 15, 18, 23];
+  const step = useCycle(days.length, 3600);
+  const d = days[step];
+  return (
+    <Laptop label="Choix d'un jour et d'un créneau dans un calendrier">
+      <div className="sc rs">
+        <div className="sc-row"><p className="sc-t">Novembre</p><span className="rs-slot" key={`s${step}`}>{["9 h 30", "14 h 00", "10 h 30", "16 h 00", "11 h 00"][step]}</span></div>
+        <div className="rs-grid">
+          {Array.from({ length: 28 }, (_, i) => i + 1).map((n) => (<i key={n} className={`${[6, 7, 13, 14, 20, 21, 27, 28].includes(n) ? "rs-off" : ""} ${n === d ? "rs-on" : ""}`} />))}
+        </div>
+        <span className="rs-ok" key={`o${step}`}><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>Créneau réservé</span>
+      </div>
+    </Laptop>
+  );
+}
+
+/** À propos : l'équipe se présente (portraits, rôles) et l'agence se place sur la carte. */
+export function AboutScene({ city = "La Rochelle" }: { city?: string }) {
+  return (
+    <Laptop label={`L'équipe QS2H, à ${city}`}>
+      <div className="sc as">
+        <p className="sc-t">L&apos;équipe</p>
+        <div className="as-row">
+          {[0, 1, 2].map((i) => (<div key={i} className="as-card sc-in" style={{ animationDelay: `${300 + i * 260}ms` }}><span className="as-face" /><Bar w="70%" h={6} d={600 + i * 260} /><Bar w="46%" h={5} c="acc" d={760 + i * 260} /></div>))}
+        </div>
+        <div className="as-map sc-in" style={{ animationDelay: "1.4s" }}>
+          <svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30C40 22 70 36 110 26S170 14 200 20" fill="none" stroke="rgb(var(--accent) / .45)" strokeWidth="2" pathLength="1" className="sc-draw sc-draw-late" /></svg>
+          <span className="as-pin" /><span className="as-city">{city}</span>
+        </div>
+      </div>
+    </Laptop>
   );
 }

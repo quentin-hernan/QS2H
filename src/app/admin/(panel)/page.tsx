@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { getSettings } from "@/lib/content";
 import { formatDate } from "@/lib/utils";
+import { AnalyticsBoard } from "@/components/admin/AnalyticsBoard";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Tableau de bord" };
 
@@ -24,6 +27,8 @@ export default async function Dashboard() {
   return (
     <div className="space-y-10">
       <header><p className="eyebrow mb-4">Bonjour {s?.name}</p><h1 className="text-h2 font-medium">Tableau de bord</h1></header>
+
+      <AnalyticsBoard />
 
       <section aria-label="Chiffres clés" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[[String(newCount), "demandes à traiter", "/admin/demandes"], [String(total30), "demandes sur 30 jours", "/admin/demandes"], [String(projects), `réalisations publiées${drafts ? ` (+${drafts} brouillon${drafts > 1 ? "s" : ""})` : ""}`, "/admin/realisations"], [String(posts), "articles publiés", "/admin/articles"]].map(([n, l, h]) => (

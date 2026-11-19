@@ -103,3 +103,55 @@
 .cm-tag { position: absolute; left: 7%; bottom: 8%; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(28 28 28 / 0.75); opacity: 0; }
 .cf-on .cm-tag { animation: scIn 0.7s var(--ease) 3.2s forwards; }
 @media (prefers-reduced-motion: reduce) { .cm-street, .cm-river, .cm-route { stroke-dashoffset: 0 !important; animation: none !important; } .cm-pin, .cm-tag, .cf-lead, .cf-map { opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important; } .cm-wave { animation: none !important; } }
+
+/* Blog : article qui s'écrit */
+.bs { gap: 8px; }
+.bs-tag { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgb(var(--accent)); }
+.bs-pub { margin-left: auto; font-size: 0.55rem; font-weight: 700; padding: 3px 8px; background: #1F6B3A; color: #fff; opacity: 0; animation: bsPub 0.6s var(--ease) forwards; }
+@keyframes bsPub { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+.bs-body { display: grid; grid-template-columns: 38% 1fr; gap: 10px; margin-top: 4px; flex: 1; }
+.bs-img { background: rgb(var(--accent) / 0.18); }
+.bs-lines { display: flex; flex-direction: column; gap: 7px; }
+.bs-caret { width: 2px; height: 10px; background: rgb(var(--accent)); animation: bsBlink 1s steps(1) infinite; }
+@keyframes bsBlink { 50% { opacity: 0; } }
+
+/* FAQ : questions qui s'ouvrent */
+.fs { gap: 6px; }
+.fs-q { border-top: 1px solid rgb(28 28 28 / 0.12); padding-top: 7px; }
+.fs-q .sc-row { justify-content: space-between; }
+.fs-q .sc-in { animation: none; opacity: 1; }
+.fs-plus { position: relative; width: 9px; height: 9px; flex: none; }
+.fs-plus::before, .fs-plus::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: rgb(var(--accent)); }
+.fs-plus::after { transform: rotate(90deg); transition: transform 0.5s var(--ease); }
+.fs-q.is-open .fs-plus::after { transform: rotate(0deg); }
+.fs-a { display: grid; gap: 5px; max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.6s var(--ease), opacity 0.5s var(--ease), margin 0.6s var(--ease); }
+.fs-q.is-open .fs-a { max-height: 40px; opacity: 1; margin-top: 7px; }
+.fs-a .sc-in { opacity: 0.55; }
+
+/* Rendez-vous : calendrier */
+.rs { gap: 8px; }
+.rs .sc-row { justify-content: space-between; }
+.rs-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; flex: 1; }
+.rs-grid i { background: rgb(28 28 28 / 0.08); transition: background-color 0.5s var(--ease), transform 0.5s var(--ease); }
+.rs-grid i.rs-off { background: transparent; box-shadow: inset 0 0 0 1px rgb(28 28 28 / 0.08); }
+.rs-grid i.rs-on { background: rgb(var(--accent)); transform: scale(1.12); }
+.rs-slot { font-size: 0.55rem; font-weight: 700; padding: 3px 8px; border: 1px solid rgb(var(--accent)); color: rgb(var(--accent)); animation: scIn 0.5s var(--ease) 0.4s both; }
+.rs-ok { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; font-size: 0.55rem; font-weight: 700; padding: 3px 9px; background: #1F6B3A; color: #fff; animation: scIn 0.5s var(--ease) 1s both; }
+
+/* À propos : l'équipe */
+.as { gap: 10px; }
+.as-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.as-card { display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #fff; box-shadow: 0 6px 14px -10px rgb(0 0 0 / 0.5); }
+.as-face { width: 44%; aspect-ratio: 1; border-radius: 50%; background: rgb(28 28 28 / 0.14); }
+.as-card:nth-child(2) .as-face { background: rgb(var(--accent) / 0.3); }
+.as-map { position: relative; flex: 1; min-height: 28px; background: rgb(var(--accent) / 0.06); }
+.as-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.as-pin { position: absolute; left: 58%; top: 34%; width: 9px; height: 9px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: rgb(var(--accent)); animation: asPin 2.4s var(--ease) 1.8s infinite; }
+@keyframes asPin { 0%, 100% { translate: 0 0; } 50% { translate: 0 -3px; } }
+.as-city { position: absolute; left: calc(58% + 14px); top: 26%; font-size: 0.55rem; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bs-caret, .as-pin { animation: none; }
+  .bs-pub, .rs-slot, .rs-ok { animation: none; opacity: 1; }
+  .fs-a, .fs-plus::after, .rs-grid i { transition: none; }
+}

@@ -1,6 +1,6 @@
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { SheetStack } from "@/components/Scenes";
+import { BlogScene } from "@/components/Scenes";
 import { BlogList } from "@/components/BlogList";
 import { getPosts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
@@ -16,9 +16,8 @@ export default async function Blog() {
   const all = await getPosts();
   return (
     <>
-      <PageHero eyebrow="Blog" title={<>Conseils pour un site qui <span className="serif-it">fait venir des clients.</span></>} lead="Budget, choix techniques, référencement local : des articles concrets, sans jargon.">
+      <PageHero eyebrow="Blog" title={<>Conseils pour un site qui <span className="serif-it">fait venir des clients.</span></>} lead="Budget, choix techniques, référencement local : des articles concrets, sans jargon." art={<BlogScene />}>
         <Breadcrumbs items={[{ name: "Blog", path: "/blog" }]} />
-        <SheetStack />
       </PageHero>
       <section className="light-section py-16 md:py-24" aria-label="Articles">
         <div className="container">

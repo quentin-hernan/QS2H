@@ -6,6 +6,7 @@ import { esc, layout, sendMail } from "@/lib/email";
 import { getSettings } from "@/lib/content";
 import { withAccount } from "@/lib/lead-account";
 import { parseJson } from "@/lib/utils";
+import { notifyAdmin } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
   if (d.website) return NextResponse.json({ ok: true });
 
   const lead = await db.lead.create({ data: { name: d.name, email: d.email, phone: d.phone || "", projectType: "Via l'assistant du site", message: d.message, consent: true, source: "chatbot", clientId: acc.clientId } });
+  await notifyAdmin({ kind: "devis", title: `Demande via l'assistant : ${d.name}`, body: d.message.slice(0, 140), link: `/admin/demandes/${lead.id}` });
   let transcript = "";
   if (d.conversationId) {
     const conv = await db.chatConversation.findUnique({ where: { id: d.conversationId } });

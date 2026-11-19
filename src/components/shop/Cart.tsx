@@ -44,6 +44,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return cur ? p.map((x) => (x.slug === l.slug ? { ...x, ...l, qty: q } : x)) : [...p, { ...l, qty: Math.max(1, q) }];
     });
     setOpen(true);
+    // client connecté : l'administration est prévenue (sans effet pour un visiteur sans compte)
+    fetch("/api/compte/cart-event", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title: l.title, qty }), keepalive: true }).catch(() => {});
   }, []);
   const setQty = useCallback((slug: string, qty: number) => setLines((p) => p.map((x) => (x.slug === slug ? { ...x, qty: Math.max(1, Math.min(maxQty(x.stock), qty)) } : x))), []);
   const remove = useCallback((slug: string) => setLines((p) => p.filter((x) => x.slug !== slug)), []);

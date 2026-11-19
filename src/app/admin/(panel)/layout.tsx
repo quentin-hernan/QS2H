@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { logoutAction } from "../actions";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NoticeBell } from "@/components/NoticeBell";
 
 export const metadata: Metadata = { title: { default: "Administration", template: "%s — administration" }, robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       <aside className="border-b p-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:overflow-y-auto lg:border-b-0 lg:border-r" style={{ borderColor: "rgb(242 239 233 / .12)" }}>
         <div className="flex items-center justify-between lg:block">
           <Link href="/admin" aria-label="Tableau de bord"><Image src="/logo-light.png" alt="QS2H" width={720} height={227} sizes="160px" className="admin-logo-d h-10 w-auto lg:mb-8" /><Image src="/logo.png" alt="QS2H" width={720} height={227} sizes="160px" className="admin-logo-l h-10 w-auto lg:mb-8" /></Link>
-          <Link href="/" target="_blank" className="muted text-sm underline lg:hidden">Voir le site ↗</Link>
+          <div className="flex items-center gap-3 lg:mb-6"><NoticeBell endpoint="/api/admin/notices" label="Notifications" /><Link href="/" target="_blank" className="muted text-sm underline lg:hidden">Voir le site ↗</Link></div>
         </div>
         <AdminNav owner={s.role === "owner"} newLeads={newLeads} newOrders={newOrders} />
         <div className="mt-6 border-t pt-5 text-sm lg:mt-auto" style={{ borderColor: "rgb(242 239 233 / .12)" }}>

@@ -5,6 +5,7 @@ import { audit, requireSession } from "@/lib/auth";
 import { esc, layout, sendMail } from "@/lib/email";
 import { parseJson, SITE_URL } from "@/lib/utils";
 import { ORDER_STATUSES, clientSteps, type OrderHistory, type OrderLine } from "@/lib/shop";
+import { notifyClient } from "@/lib/notify";
 
 type Result = { ok: boolean; error?: string; message?: string };
 
@@ -53,6 +54,7 @@ export async function updateOrder(id: string, input: { status: string; carrier?:
   revalidateTag("content");
 
   let message = "Commande mise à jour.";
+  if (changed) await notifyClient(o.clientId, { kind: "commande", title: `Commande ${o.number} : ${(clientSteps(o.delivery).find((x) => x.key === input.status)?.label ?? input.status).toLowerCase()}`, body: input.status === "expédiée" && tracking ? `Suivi : ${carrier} ${tracking}`.trim() : "", link: "/compte/commandes" });
   if (changed && input.notify !== false && SUBJECT[input.status]) {
     const step = clientSteps(o.delivery).find((x) => x.key === input.status)?.label ?? input.status;
     const track = input.status === "expédiée" && (carrier || tracking) ? `<p style="line-height:1.6">Transporteur : <strong>${esc(carrier || "—")}</strong>${tracking ? ` · Suivi : <strong>${esc(tracking)}</strong>` : ""}</p>` : "";

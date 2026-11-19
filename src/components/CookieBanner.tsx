@@ -60,6 +60,7 @@ export function CookieBanner({ plausibleDomain }: { plausibleDomain: string }) {
     } catch {}
     setConsent(c);
     setShow(false);
+    if (analytics) window.dispatchEvent(new Event("qs2h:consent-given")); // la mesure interne compte la page en cours
   }
 
   return (
