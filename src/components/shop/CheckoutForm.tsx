@@ -35,11 +35,11 @@ const validate = (v: Vals, delivery: "livraison" | "retrait", consent: boolean, 
  * Champs obligatoires contrôlés dans le navigateur (puis revérifiés côté serveur), saisies filtrées (code postal et téléphone : chiffres),
  * villes proposées d'après le code postal (geo.api.gouv.fr) et adresses suggérées (api-adresse.data.gouv.fr).
  */
-export function CheckoutForm() {
+export function CheckoutForm({ account }: { account: { name: string; email: string; company: string } }) {
   const { lines, total, clear } = useCart();
   const router = useRouter();
   const [delivery, setDelivery] = useState<"livraison" | "retrait">("livraison");
-  const [v, setV] = useState<Vals>({ name: "", email: "", phone: "", company: "", address: "", zip: "", city: "", note: "" });
+  const [v, setV] = useState<Vals>({ name: account.name, email: account.email, phone: "", company: account.company, address: "", zip: "", city: "", note: "" });
   const [consent, setConsent] = useState(false);
   const [cgv, setCgv] = useState(false);
   const [errs, setErrs] = useState<Record<string, string>>({});
@@ -132,7 +132,7 @@ export function CheckoutForm() {
         {top && <p role="alert" className="err rounded-xl border p-4">{top}</p>}
         <fieldset className="grid gap-5 sm:grid-cols-2"><legend className="mb-4 text-h3 font-medium">Vos coordonnées</legend>
           <F id="name" label="Nom et prénom *" error={errs.name}><input id="name" name="name" autoComplete="name" className="field" required aria-required="true" value={v.name} onChange={(e) => set("name", e.target.value)} {...bad("name")} /></F>
-          <F id="email" label="Email *" error={errs.email}><input id="email" name="email" type="email" inputMode="email" autoComplete="email" className="field" required aria-required="true" value={v.email} onChange={(e) => set("email", e.target.value)} {...bad("email")} /></F>
+          <F id="email" label="Email (de votre compte) *" error={errs.email}><input id="email" name="email" type="email" inputMode="email" autoComplete="email" className="field" required aria-required="true" readOnly value={v.email} {...bad("email")} /></F>
           <F id="phone" label="Téléphone" error={errs.phone}><input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={20} placeholder="06 12 34 56 78" className="field" value={v.phone} onChange={(e) => set("phone", e.target.value.replace(/[^0-9+ .()-]/g, ""))} {...bad("phone")} /></F>
           <F id="company" label="Entreprise"><input id="company" name="company" autoComplete="organization" className="field" value={v.company} onChange={(e) => set("company", e.target.value)} /></F>
         </fieldset>

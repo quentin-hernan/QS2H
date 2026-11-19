@@ -27,7 +27,7 @@ export function CartPage() {
       </ul>
       <aside className="shop-summary lg:col-span-4">
         <div className="flex items-baseline justify-between"><span className="muted">Total TTC</span><span className="text-2xl font-semibold">{money(total)}</span></div>
-        <p className="muted mt-2 text-[0.85rem]">Livraison ou retrait chiffrés à la confirmation. Aucun paiement en ligne.</p>
+        <p className="muted mt-2 text-[0.85rem]">Livraison ou retrait chiffrés à la confirmation. Aucun paiement en ligne. Un compte client est nécessaire pour commander : vous suivez ensuite votre commande dans votre espace.</p>
         <Link href="/boutique/commande" className="btn btn-primary btn-fill mt-5 w-full"><span>Commander</span></Link>
         <Link href="/boutique" className="btn btn-ghost mt-2 w-full">Continuer mes achats</Link>
       </aside>

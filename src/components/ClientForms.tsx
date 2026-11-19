@@ -21,11 +21,12 @@ const Check = ({ name, children, required }: { name: string; children: React.Rea
   <label className="flex cursor-pointer items-start gap-3 text-[0.95rem]"><input type="checkbox" name={name} required={required} className="mt-1 h-5 w-5 shrink-0 accent-[rgb(42,85,135)]" /><span>{children}</span></label>
 );
 
-export function RegisterForm() {
+export function RegisterForm({ next }: { next?: string }) {
   const [s, act, pending] = useActionState(registerAction, undefined);
   if (s?.ok) return <Msg s={s} />;
   return (
     <form action={act} className="space-y-5" noValidate={false}>
+      {next && <input type="hidden" name="next" value={next} />}
       <Msg s={s} />
       <div className="grid gap-5 sm:grid-cols-2"><F id="firstName" label="Prénom" autoComplete="given-name" /><F id="lastName" label="Nom" autoComplete="family-name" /></div>
       <F id="email" label="Email professionnel" type="email" autoComplete="email" />
@@ -44,16 +45,17 @@ export function RegisterForm() {
   );
 }
 
-export function LoginForm({ reset }: { reset?: boolean }) {
+export function LoginForm({ reset, next }: { reset?: boolean; next?: string }) {
   const [s, act, pending] = useActionState(loginClient, undefined);
   return (
     <form action={act} className="space-y-5">
+      {next && <input type="hidden" name="next" value={next} />}
       {reset && <p role="status" className="acc acc-border border p-3">Mot de passe modifié. Vous pouvez vous connecter.</p>}
       <Msg s={s} />
       <F id="email" label="Email" type="email" autoComplete="email" />
       <F id="password" label="Mot de passe" type="password" autoComplete="current-password" />
       <Btn pending={pending}>Me connecter</Btn>
-      <p className="text-[0.92rem]"><Link href="/compte/mot-de-passe-oublie" className="link-u">Mot de passe oublié ?</Link> · <Link href="/compte/inscription" className="link-u">Créer un compte</Link></p>
+      <p className="text-[0.92rem]"><Link href="/compte/mot-de-passe-oublie" className="link-u">Mot de passe oublié ?</Link> · <Link href={next ? `/compte/inscription?next=${encodeURIComponent(next)}` : "/compte/inscription"} className="link-u">Créer un compte</Link></p>
     </form>
   );
 }

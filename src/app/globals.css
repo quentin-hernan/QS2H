@@ -284,3 +284,23 @@ html:not(.sx-editing) [data-ov-hidden] { display: none !important; }
 #sx-bar .sx-bar-tag { padding: 0 8px; color: #A9AEB5; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.66rem; }
 .team-tools { display: none; }
 .sx-editing .team-tools { display: block; }
+
+/* Suivi de commande (espace client) : bande d'étapes façon marketplace */
+.es-track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; list-style: none; padding: 0; margin: 0; }
+.es-track li { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; }
+.es-track li::before { content: ""; position: absolute; top: 15px; left: -50%; width: 100%; height: 3px; background: rgb(28 28 28 / 0.12); }
+.es-track li:first-child::before { display: none; }
+.es-track li.is-done::before, .es-track li.is-now::before { background: rgb(var(--accent)); }
+.es-track-dot { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid rgb(28 28 28 / 0.18); font-size: 0.8rem; font-weight: 700; color: #5A5F66; }
+.es-track li.is-done .es-track-dot { background: rgb(var(--accent)); border-color: rgb(var(--accent)); color: #fff; }
+.es-track li.is-now .es-track-dot { border-color: rgb(var(--accent)); color: rgb(var(--accent)); box-shadow: 0 0 0 5px rgb(var(--accent) / 0.16); }
+.es-track-label { font-size: 0.82rem; font-weight: 600; line-height: 1.25; }
+.es-track-date { font-size: 0.74rem; color: #5A5F66; min-height: 1em; }
+.es-track li:not(.is-done):not(.is-now) .es-track-label { color: #5A5F66; font-weight: 500; }
+.es-cancel { padding: 10px 14px; border-radius: 12px; background: rgb(200 60 50 / 0.1); color: #B3261E; font-weight: 600; }
+@media (max-width: 560px) { .es-track-label { font-size: 0.7rem; } .es-track-date { display: none; } .es-track-dot { width: 28px; height: 28px; } .es-track li::before { top: 13px; } }
+html[data-theme="dark"] .es-track li::before { background: rgb(248 248 247 / 0.16); }
+html[data-theme="dark"] .es-track li.is-done::before, html[data-theme="dark"] .es-track li.is-now::before { background: rgb(var(--accent-hi, var(--accent))); }
+html[data-theme="dark"] .es-track-dot { background: #1F1F1F; border-color: rgb(248 248 247 / 0.25); color: #A9AEB5; }
+html[data-theme="dark"] .es-track-date, html[data-theme="dark"] .es-track li:not(.is-done):not(.is-now) .es-track-label { color: #A9AEB5; }
+html[data-theme="dark"] .es-cancel { background: rgb(255 138 128 / 0.12); color: #ff8a80; }

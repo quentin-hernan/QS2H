@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { createClientSession, truncatedIp, userAgent } from "@/lib/client-auth";
 import { SITE_URL } from "@/lib/utils";
+import { safeNext } from "@/lib/shop";
 
 const fail = (why = "google") => NextResponse.redirect(`${SITE_URL}/compte/connexion?erreur=${why}`);
 
@@ -36,8 +37,9 @@ export async function GET(req: NextRequest) {
     await db.clientLogin.create({ data: { clientId: c.id, email, ipTruncated: await truncatedIp(), agent: await userAgent(), success: true } });
     await db.client.update({ where: { id: c.id }, data: { lastLoginAt: new Date(), inactivityWarnedAt: null } });
     await createClientSession(c.id, c.sessionVersion);
-    const res = NextResponse.redirect(`${SITE_URL}/compte`);
+    const res = NextResponse.redirect(`${SITE_URL}${safeNext(req.cookies.get("qs2h_gnext")?.value) || "/compte"}`);
     res.cookies.delete("qs2h_gstate");
+    res.cookies.delete("qs2h_gnext");
     return res;
   } catch (e) {
     console.error("[google]", e);

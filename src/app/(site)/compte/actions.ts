@@ -1,5 +1,6 @@
 "use server";
 import { redirect } from "next/navigation";
+import { safeNext } from "@/lib/shop";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -63,7 +64,7 @@ export async function registerAction(_: S, fd: FormData): Promise<S> {
   if (d.newsletter === "on") await sendNewsletterConfirmation(client.id, d.email, d.firstName);
   // accès immédiat à l'espace client : l'adresse email sera confirmée plus tard (rappel affiché dans l'espace)
   await createClientSession(client.id, client.sessionVersion);
-  redirect("/compte");
+  redirect(safeNext(fd.get("next")) || "/compte");
 }
 
 /** Renvoie le lien de confirmation de l'adresse email (depuis l'espace client). */
@@ -100,7 +101,7 @@ export async function loginClient(_: S, fd: FormData): Promise<S> {
   await db.clientLogin.create({ data: { clientId: c.id, email, ipTruncated: await truncatedIp(), agent: await userAgent(), success: true } });
   await db.client.update({ where: { id: c.id }, data: { lastLoginAt: new Date(), inactivityWarnedAt: null, ...(needsRehash(c.passwordHash) ? { passwordHash: await hashPassword(password) } : {}) } });
   await createClientSession(c.id, c.sessionVersion);
-  redirect("/compte");
+  redirect(safeNext(fd.get("next")) || "/compte");
 }
 
 export async function logoutClient() {

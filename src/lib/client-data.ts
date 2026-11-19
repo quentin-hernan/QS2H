@@ -12,6 +12,7 @@ export async function eraseClient(id: string) {
     if (d.kind === "facture") await db.clientDocument.update({ where: { id: d.id }, data: { clientId: null, projectId: null, retainedUntil: retain, title: `${d.title} (client supprimé)` } });
     else { await db.clientDocument.delete({ where: { id: d.id } }); await removePrivate(d.file); }
   }
+  await db.shopOrder.updateMany({ where: { clientId: id }, data: { clientId: null } }); // les commandes sont conservées (comptabilité), dissociées du compte
   await db.lead.deleteMany({ where: { OR: [{ clientId: id }, { email: c.email }] } });
   await db.client.delete({ where: { id } });
 }

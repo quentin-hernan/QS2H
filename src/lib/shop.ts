@@ -15,4 +15,19 @@ export const discount = (price: number, compare: number) => (compare > price && 
 /** Article tel que le panier le conserve (le prix est revérifié côté serveur à la commande). */
 export type CartLine = { slug: string; title: string; price: number; image: string; qty: number; stock: number };
 export type OrderLine = { slug: string; title: string; price: number; qty: number };
-export const ORDER_STATUSES = ["nouvelle", "confirmée", "expédiée", "terminée", "annulée"] as const;
+export const ORDER_STATUSES = ["nouvelle", "confirmée", "préparation", "expédiée", "terminée", "annulée"] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+/** Étiquettes côté administration. */
+export const ADMIN_STATUS: Record<string, string> = { nouvelle: "À traiter", confirmée: "Confirmée", préparation: "En préparation", expédiée: "Expédiée", terminée: "Terminée", annulée: "Annulée" };
+/** Étapes du suivi affiché au client (comme sur une marketplace). Le retrait remplace « expédiée » par « prête à retirer ». */
+export const clientSteps = (delivery: string) => [
+  { key: "nouvelle", label: "Commande reçue" },
+  { key: "confirmée", label: "Confirmée" },
+  { key: "préparation", label: "En préparation" },
+  { key: "expédiée", label: delivery === "retrait" ? "Prête à retirer" : "Expédiée" },
+  { key: "terminée", label: delivery === "retrait" ? "Retirée" : "Livrée" },
+];
+export const stepIndex = (status: string) => ORDER_STATUSES.indexOf(status as OrderStatus); // nouvelle=0 … terminée=4, annulée=5
+export type OrderHistory = { status: string; at: string }[];
+/** Redirection après connexion : uniquement un chemin interne du site. */
+export const safeNext = (n: unknown) => (typeof n === "string" && /^\/(?!\/)[a-zA-Z0-9\-_/?=&%.]*$/.test(n) && n.length < 200 ? n : "");

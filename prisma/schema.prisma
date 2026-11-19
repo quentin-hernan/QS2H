@@ -436,7 +436,7 @@ model ShopItem {
 model ShopOrder {
   id        String   @id @default(cuid())
   number    String   @unique
-  status    String   @default("nouvelle") // nouvelle, confirmée, expédiée, terminée, annulée
+  status    String   @default("nouvelle") // nouvelle (à traiter), confirmée, préparation, expédiée, terminée, annulée
   name      String
   email     String
   phone     String   @default("")
@@ -449,5 +449,13 @@ model ShopOrder {
   items     String   @default("[]") // JSON {slug,title,price,qty}[] (prix figés au moment de la commande)
   total     Float    @default(0)
   cgvVersion Int     @default(0) // version des CGV boutique acceptée à la commande
+  clientId  String?  // compte client ayant passé la commande (obligatoire à la commande)
+  carrier   String   @default("") // transporteur
+  tracking  String   @default("") // numéro de suivi
+  adminNote String   @default("") // note interne (jamais visible du client)
+  history   String   @default("[]") // JSON {status, at}[] : horodatage de chaque étape (affiché au client)
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([clientId])
 }

@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
   if (!s) redirect("/admin/login");
-  const newLeads = await db.lead.count({ where: { status: "nouveau" } });
+  const [newLeads, newOrders] = await Promise.all([db.lead.count({ where: { status: "nouveau" } }), db.shopOrder.count({ where: { status: "nouvelle" } })]);
   return (
     <div className="dark-section min-h-screen lg:grid lg:grid-cols-[272px_1fr]">
       <aside className="border-b p-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:overflow-y-auto lg:border-b-0 lg:border-r" style={{ borderColor: "rgb(242 239 233 / .12)" }}>
@@ -21,7 +21,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           <Link href="/admin" aria-label="Tableau de bord"><Image src="/logo-light.png" alt="QS2H" width={720} height={227} sizes="160px" className="h-10 w-auto lg:mb-8" /></Link>
           <Link href="/" target="_blank" className="muted text-sm underline lg:hidden">Voir le site ↗</Link>
         </div>
-        <AdminNav owner={s.role === "owner"} newLeads={newLeads} />
+        <AdminNav owner={s.role === "owner"} newLeads={newLeads} newOrders={newOrders} />
         <div className="mt-6 border-t pt-5 text-sm lg:mt-auto" style={{ borderColor: "rgb(242 239 233 / .12)" }}>
           <p className="font-medium">{s.name}</p><p className="muted">{s.email} · {s.role === "owner" ? "Propriétaire" : "Éditeur"}</p>
           <div className="mt-3 flex items-center gap-4"><Link href="/" target="_blank" className="muted hidden underline lg:inline">Voir le site ↗</Link>

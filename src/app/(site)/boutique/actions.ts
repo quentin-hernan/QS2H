@@ -9,6 +9,7 @@ import { getSettings } from "@/lib/content";
 import { money, type OrderLine } from "@/lib/shop";
 import { SITE_URL } from "@/lib/utils";
 import { legalVersionNumber } from "@/lib/legal-db";
+import { getClient } from "@/lib/client-auth";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Indiquez votre nom.").max(120),
@@ -30,6 +31,9 @@ export type OrderResult = { ok: true; number: string } | { ok: false; error: str
 
 /** Commande sans paiement en ligne : les prix et le stock sont revérifiés ici, jamais repris du navigateur. */
 export async function placeOrder(input: OrderInput): Promise<OrderResult> {
+  // un compte client est obligatoire : la commande est rattachée au compte et suivie dans l'espace client
+  const client = await getClient();
+  if (!client) return { ok: false, error: "Connectez-vous ou créez un compte pour passer commande." };
   const h = await headers();
   const ip = (h.get("x-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || "local").trim();
   // les formulaires incomplets ne comptent pas dans la limite : seules les vraies commandes sont limitées
@@ -39,7 +43,7 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
     for (const i of p.error.issues) fields[String(i.path[0])] ??= i.message;
     return { ok: false, error: "Certains champs sont à corriger.", fields };
   }
-  const d = p.data;
+  const d = { ...p.data, email: client.email };
   if (d.website) return { ok: true, number: "—" };
   if (d.delivery === "livraison") {
     const fields: Record<string, string> = {};
@@ -65,7 +69,7 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
   const number = `QS-${now.toISOString().slice(2, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
   await db.$transaction([
-    db.shopOrder.create({ data: { number, name: d.name, email: d.email, phone: d.phone, company: d.company, delivery: d.delivery, address: d.address, zip: d.zip, city: d.city, note: d.note, items: JSON.stringify(lines), total, cgvVersion } }),
+    db.shopOrder.create({ data: { number, name: d.name, email: d.email, phone: d.phone, company: d.company, delivery: d.delivery, address: d.address, zip: d.zip, city: d.city, note: d.note, items: JSON.stringify(lines), total, cgvVersion, clientId: client.id, history: JSON.stringify([{ status: "nouvelle", at: now.toISOString() }]) } }),
     ...lines.map((l) => {
       const it = items.find((x) => x.slug === l.slug)!;
       return it.stock > 0 ? db.shopItem.update({ where: { id: it.id }, data: { stock: { decrement: l.qty } } }) : db.shopItem.findUnique({ where: { id: it.id } });
@@ -78,7 +82,7 @@ export async function placeOrder(input: OrderInput): Promise<OrderResult> {
   const where = d.delivery === "retrait" ? "Retrait sur place" : `${esc(d.address)}, ${esc(d.zip)} ${esc(d.city)}`;
   await Promise.allSettled([
     sendMail({ to: process.env.MAIL_TO || s.company.email, replyTo: d.email, subject: `Nouvelle commande ${number} — ${money(total)}`, html: layout(`Commande ${number}`, `<p><strong>${esc(d.name)}</strong>${d.company ? ` (${esc(d.company)})` : ""}<br>${esc(d.email)} ${esc(d.phone)}</p><p>${where}</p>${table}${d.note ? `<p style="white-space:pre-wrap">${esc(d.note)}</p>` : ""}<p style="font-size:13px">${SITE_URL}/admin/commandes</p>`) }),
-    sendMail({ to: d.email, subject: `Votre commande ${number} chez QS2H`, html: layout("Merci pour votre commande", `<p style="line-height:1.6">Bonjour ${esc(d.name)},</p><p style="line-height:1.6">Nous avons bien reçu votre commande <strong>${number}</strong>. Nous la vérifions et revenons vers vous rapidement avec la confirmation et la facture. Aucun paiement n'a été demandé à ce stade.</p>${table}<p style="line-height:1.6">${where}</p><p style="line-height:1.6">L'équipe QS2H</p>`) }),
+    sendMail({ to: d.email, subject: `Votre commande ${number} chez QS2H`, html: layout("Merci pour votre commande", `<p style="line-height:1.6">Bonjour ${esc(d.name)},</p><p style="line-height:1.6">Nous avons bien reçu votre commande <strong>${number}</strong>. Vous pouvez la suivre à tout moment dans votre espace client : ${SITE_URL}/compte/commandes. Nous la vérifions et revenons vers vous rapidement avec la confirmation et la facture. Aucun paiement n'a été demandé à ce stade.</p>${table}<p style="line-height:1.6">${where}</p><p style="line-height:1.6">L'équipe QS2H</p>`) }),
   ]);
   return { ok: true, number };
 }
