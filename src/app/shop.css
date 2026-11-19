@@ -92,3 +92,7 @@ html[data-theme="dark"] .stock-ok { color: #8fd2a8; } html[data-theme="dark"] .s
 /* Le tiroir du panier est dans la coque du site (thème) : on garde sa glissière malgré la transition de fond des sections */
 .site-shell .cart-drawer.cart-drawer { transition: transform 0.55s cubic-bezier(.2,.8,.2,1), background-color 0.4s, color 0.4s; }
 @media (prefers-reduced-motion: reduce) { .site-shell .cart-drawer.cart-drawer { transition: none; } }
+
+/* Fiche article : visuel plus mesuré (image entière, sans recadrage) */
+.shop-media.shop-gal { aspect-ratio: 4 / 3; max-height: 440px; }
+.shop-gal .shop-img { object-fit: contain; padding: 4%; }

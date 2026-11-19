@@ -132,11 +132,11 @@ export function CtaBand({ title, text }: { title: string; text: string }) {
   );
 }
 
-export function PageHero({ eyebrow, title, lead, children, image = "", art, after }: { eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode; image?: string; art?: React.ReactNode; after?: React.ReactNode }) {
+export function PageHero({ eyebrow, title, lead, children, image = "", art, after, tight = false }: { tight?: boolean; eyebrow: string; title: React.ReactNode; lead?: string; children?: React.ReactNode; image?: string; art?: React.ReactNode; after?: React.ReactNode }) {
   const video = /\.(mp4|webm|mov|ogv)(\?|$)/i.test(image);
   const side = !!image || !!art;
   return (
-    <section className="dark-section relative pb-20 pt-40 md:pb-28 md:pt-52" aria-label={typeof title === "string" ? title : eyebrow}>
+    <section className={`dark-section relative pt-40 md:pt-52 ${tight ? "pb-8 md:pb-10" : "pb-20 md:pb-28"}`} aria-label={typeof title === "string" ? title : eyebrow}>
       <FrameDraw className={`container ${side ? "grid items-center gap-12 lg:grid-cols-12" : ""}`}>
         <div className={side ? "lg:col-span-7" : ""}>
           {children}

@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ShopGrid } from "@/components/shop/ShopCard";
 import { WordReveal } from "@/components/Motion";
+import { CartRoll } from "@/components/Scenes";
 import { getShopItems } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
@@ -19,7 +20,7 @@ export default async function Boutique() {
         <div className="container">
           <Breadcrumbs items={[{ name: "Boutique", path: "/boutique" }]} />
           <div className="mt-6 grid items-end gap-8 md:grid-cols-12">
-            <h1 id="shop-h" className="text-h1 font-medium md:col-span-7"><WordReveal text="La boutique QS2H." auto step={90} /></h1>
+            <div className="md:col-span-7"><h1 id="shop-h" className="text-h1 font-medium"><WordReveal text="La boutique QS2H." auto step={90} /></h1><CartRoll /></div>
             <p className="muted text-[1.05rem] leading-relaxed md:col-span-5">Matériel, logiciels et solutions clés en main, choisis et installés par nos soins. Commandez en ligne : nous confirmons la disponibilité et vous envoyons la facture, sans paiement à l&apos;avance.</p>
           </div>
           <ul className="shop-perks">

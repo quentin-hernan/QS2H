@@ -22,9 +22,8 @@ export default async function Rdv() {
           <h1 className="text-h1 font-medium">Choisissez <span className="serif-it">votre créneau.</span></h1>
           <p className="muted mt-7 max-w-md text-[1.1rem] leading-relaxed">Un échange gratuit et sans engagement pour parler de votre projet. Les horaires sont en heure de Paris. Votre créneau est réservé aussitôt ; nous le validons rapidement et vous recevez la confirmation avec un fichier agenda, puis un rappel la veille.</p>
           <p className="muted mt-6 text-sm">Horaires de l&apos;agence : {s.company.hours}</p>
-          <div className="mt-12 hidden max-w-sm lg:block"><RdvScene /></div>
         </div>
-        <div className="min-w-0 lg:col-span-8"><BookingForm kinds={KINDS.map((k) => ({ id: k.id, label: k.label, minutes: k.minutes, text: k.text }))} /></div>
+        <div className="min-w-0 lg:col-span-8"><BookingForm art={<RdvScene />} kinds={KINDS.map((k) => ({ id: k.id, label: k.label, minutes: k.minutes, text: k.text }))} /></div>
       </div>
     </section>
   );

@@ -155,3 +155,49 @@
   .bs-pub, .rs-slot, .rs-ok { animation: none; opacity: 1; }
   .fs-a, .fs-plus::after, .rs-grid i { transition: none; }
 }
+
+/* Services / Réalisations : points de progression sous le portable */
+.svs-dots { display: flex; justify-content: center; gap: 6px; margin-top: 18px; }
+.svs-dots i { width: 6px; height: 6px; border-radius: 999px; background: currentColor; opacity: 0.25; transition: width 0.5s var(--ease), opacity 0.5s var(--ease), background-color 0.5s; }
+.svs-dots i.is-on { width: 22px; opacity: 1; background: rgb(var(--accent-hi, var(--accent))); }
+
+/* Boutique : chariot qui traverse sous le titre */
+.cr { position: relative; height: 52px; margin-top: 18px; max-width: 520px; }
+.cr-track { position: absolute; left: 0; right: 0; bottom: 3px; height: 1px; background: currentColor; opacity: 0.2; }
+.cr-cart { position: absolute; bottom: 0; left: 0; color: rgb(var(--accent-hi, var(--accent))); animation: crRoll 1.8s cubic-bezier(.25,.75,.25,1) 0.3s both; }
+.cr-body { stroke: currentColor; stroke-width: 3; }
+.cr-wheel { stroke: currentColor; stroke-width: 2.5; transform-box: fill-box; transform-origin: center; animation: crSpin 1.8s cubic-bezier(.25,.75,.25,1) 0.3s both; }
+.cr-box { fill: currentColor; opacity: 0; transform: translateY(-26px); animation: crDrop 0.55s cubic-bezier(.3,1.5,.5,1) 2.1s forwards; }
+@keyframes crRoll { from { transform: translateX(-12px); opacity: 0; } 12% { opacity: 1; } to { transform: translateX(min(456px, calc(100vw - 120px))); opacity: 1; } }
+@keyframes crSpin { from { transform: rotate(0); } to { transform: rotate(720deg); } }
+@keyframes crDrop { to { opacity: 0.85; transform: none; } }
+
+/* Tarifs : devis et bandes bleues */
+.ps { gap: 9px; }
+.ps .sc-row:first-child { justify-content: space-between; }
+.ps-line { justify-content: space-between; }
+.ps-stamp { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border: 1.5px solid rgb(var(--accent)); color: rgb(var(--accent)); transform: rotate(-6deg) scale(1.6); opacity: 0; animation: psStamp 0.45s cubic-bezier(.3,1.4,.5,1) 1.9s forwards; }
+@keyframes psStamp { to { transform: rotate(-6deg) scale(1); opacity: 1; } }
+.ps-band { display: block; height: 14px; width: 100%; margin-top: 4px; background: rgb(var(--accent)); transform: scaleX(0); transform-origin: left; animation: psBand 0.9s cubic-bezier(.2,.8,.2,1) forwards; }
+.ps-band2 { width: 62%; align-self: flex-end; height: 10px; opacity: 0.55; transform-origin: right; }
+@keyframes psBand { to { transform: scaleX(1); } }
+
+/* Réalisations : trois métiers, trois mises en page */
+.ts { display: flex; flex-direction: column; gap: 8px; padding: 6% 7%; }
+.ts-nav { display: flex; align-items: center; justify-content: space-between; }
+.ts-nav i { width: 22%; height: 8px; background: rgb(28 28 28 / 0.75); }
+.ts-nav span { display: flex; gap: 5px; } .ts-nav b { width: 18px; height: 5px; background: rgb(28 28 28 / 0.25); }
+.ts-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; flex: 1; }
+.ts-h { display: flex; flex-direction: column; gap: 6px; }
+.ts-pic { align-self: stretch; animation: scIn 0.6s var(--ease) 0.2s both; }
+.ts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ts-card { height: 22px; background: rgb(28 28 28 / 0.1); }
+.ts-a .ts-pic { background: linear-gradient(135deg, rgb(var(--accent) / 0.35), rgb(var(--accent) / 0.12)); border-radius: 50% 6px 6px 50%; }
+.ts-b .ts-hero { grid-template-columns: 1.2fr 1fr; } .ts-b .ts-pic { background: repeating-linear-gradient(90deg, rgb(139 94 52 / 0.35) 0 10px, rgb(139 94 52 / 0.22) 10px 20px); }
+.ts-c .ts-hero { grid-template-columns: 1fr; } .ts-c .ts-pic { order: -1; min-height: 34px; background: radial-gradient(circle at 30% 50%, rgb(176 96 0 / 0.4) 0 18px, transparent 19px), rgb(28 28 28 / 0.08); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-cart, .cr-wheel { animation: none; } .cr-cart { transform: translateX(min(456px, calc(100vw - 120px))); } .cr-box { animation: none; opacity: 0.85; transform: none; }
+  .ps-stamp, .ps-band { animation: none; opacity: 1; transform: none; } .ps-stamp { transform: rotate(-6deg); }
+  .svs-dots i { transition: none; }
+}

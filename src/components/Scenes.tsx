@@ -252,3 +252,73 @@ export function AboutScene({ city = "La Rochelle" }: { city?: string }) {
     </Laptop>
   );
 }
+
+/** Page Services : l'écran du portable passe d'un service à l'autre (vitrine, sur mesure, refonte, boutique, SEO, maintenance). */
+export function ServicesScene() {
+  const slugs = ["site-vitrine", "site-sur-mesure", "refonte-de-site", "e-commerce", "referencement-seo", "maintenance-hebergement"];
+  const names = ["Site vitrine", "Sur mesure", "Refonte", "Boutique en ligne", "Référencement", "Maintenance"];
+  const i = useCycle(slugs.length, 3200);
+  return (
+    <div>
+      <Laptop label={`Aperçu du service : ${names[i]}`}><div key={slugs[i]} className="sc-wrap"><ServiceScreen slug={slugs[i]} /></div></Laptop>
+      <div className="svs-dots" aria-hidden="true">{slugs.map((s, n) => (<i key={s} className={n === i ? "is-on" : ""} />))}</div>
+      <p className="muted mt-3 text-center text-[0.8rem] uppercase tracking-[0.18em]" aria-live="polite">{names[i]}</p>
+    </div>
+  );
+}
+
+/** Boutique : un chariot traverse la ligne sous le titre, de gauche à droite, et un colis s'y pose. */
+export function CartRoll() {
+  return (
+    <div className="cr" aria-hidden="true">
+      <span className="cr-track" />
+      <span className="cr-cart">
+        <svg viewBox="0 0 64 48" width="64" height="48" fill="none" strokeLinecap="round" strokeLinejoin="round">
+          <rect className="cr-box" x="22" y="6" width="18" height="14" rx="2" />
+          <path className="cr-body" d="M2 6h8l6 24h36l6-18H14" />
+          <g className="cr-wheel"><circle cx="22" cy="40" r="5" /><path d="M22 36v8M18 40h8" /></g>
+          <g className="cr-wheel"><circle cx="46" cy="40" r="5" /><path d="M46 36v8M42 40h8" /></g>
+        </svg>
+      </span>
+    </div>
+  );
+}
+
+/** Tarifs : un devis dont les deux montants (formule et total) se tracent en bandes bleues, puis « Prix fixe » se pose. */
+export function PriceScene() {
+  const k = useCycle(1000, 8000);
+  return (
+    <Laptop label="Un devis au prix fixe">
+      <div key={k} className="sc ps">
+        <div className="sc-row"><p className="sc-t">Devis</p><span className="ps-stamp">Prix fixe</span></div>
+        {[70, 55, 62].map((w, i) => (<div key={i} className="sc-row ps-line"><Bar w={`${w}%`} h={6} d={150 + i * 180} /><Bar w="16%" h={6} d={250 + i * 180} /></div>))}
+        <span className="ps-band" style={{ animationDelay: "900ms" }} />
+        <span className="ps-band ps-band2" style={{ animationDelay: "1300ms" }} />
+      </div>
+    </Laptop>
+  );
+}
+
+/** Réalisations : l'écran montre trois sites de métiers différents (auto-école, menuiserie, restaurant), chacun avec sa mise en page. */
+export function TradesScene() {
+  const trades = [
+    { name: "Auto-école", layout: "a" },
+    { name: "Menuiserie", layout: "b" },
+    { name: "Restaurant", layout: "c" },
+  ];
+  const i = useCycle(trades.length, 3400);
+  const t = trades[i];
+  return (
+    <div>
+      <Laptop label={`Exemple de site : ${t.name}`}>
+        <div key={t.name} className={`sc-wrap ts ts-${t.layout}`}>
+          <div className="ts-nav"><i /><span><b /><b /><b /></span></div>
+          <div className="ts-hero"><span className="ts-h"><Bar w="80%" h={9} c="acc" /><Bar w="60%" h={6} d={150} /><Bar w="38%" h={14} c="acc" d={300} /></span><span className="ts-pic" /></div>
+          <div className="ts-row">{[0, 1, 2].map((n) => (<span key={n} className="ts-card sc-in" style={{ animationDelay: `${450 + n * 140}ms` }} />))}</div>
+        </div>
+      </Laptop>
+      <div className="svs-dots" aria-hidden="true">{trades.map((x, n) => (<i key={x.name} className={n === i ? "is-on" : ""} />))}</div>
+      <p className="muted mt-3 text-center text-[0.8rem] uppercase tracking-[0.18em]" aria-live="polite">{t.name}</p>
+    </div>
+  );
+}

@@ -6,10 +6,10 @@ import { AddToCart, QtyInput } from "./Cart";
 /** Galerie de la fiche article : grande image + vignettes. */
 export function Gallery({ images, title }: { images: string[]; title: string }) {
   const [i, setI] = useState(0);
-  if (!images.length) return <div className="shop-media !aspect-square"><span className="shop-ph text-[6rem]" aria-hidden="true">{title.slice(0, 1)}</span></div>;
+  if (!images.length) return <div className="shop-media shop-gal"><span className="shop-ph text-[6rem]" aria-hidden="true">{title.slice(0, 1)}</span></div>;
   return (
     <div>
-      <div className="shop-media !aspect-square">
+      <div className="shop-media shop-gal">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={images[i]} src={images[i]} alt={`${title}, vue ${i + 1}`} className="shop-img swap" />
       </div>

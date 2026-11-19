@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMe } from "@/lib/use-me";
 
 type Kind = { id: string; label: string; minutes: number; text: string };
@@ -10,7 +10,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const longDate = (iso: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(iso + "T12:00:00Z"));
 
 /** Réservation en 3 étapes : type, jour et heure, coordonnées. Les créneaux viennent de /api/rdv (disponibilités de l'admin). */
-export function BookingForm({ kinds }: { kinds: Kind[] }) {
+export function BookingForm({ kinds, art }: { kinds: Kind[]; art?: ReactNode }) {
   const [kind, setKind] = useState<Kind>(kinds[0]);
   const [dates, setDates] = useState<string[] | null>(null);
   const [date, setDate] = useState("");
@@ -100,7 +100,7 @@ export function BookingForm({ kinds }: { kinds: Kind[] }) {
               </div>
             </div>
             <div aria-live="polite">
-              {!date ? <p className="muted">Choisissez un jour dans le calendrier.</p> : slots === null ? <p className="muted">Chargement…</p> : slots.length === 0 ? <p className="muted">Plus de créneau ce jour-là.</p> : (
+              {!date ? <div><p className="muted">Choisissez un jour dans le calendrier.</p>{art && <div className="mt-6 hidden max-w-[360px] md:block">{art}</div>}</div> : slots === null ? <p className="muted">Chargement…</p> : slots.length === 0 ? <p className="muted">Plus de créneau ce jour-là.</p> : (
                 <>
                   <p className="mb-3 capitalize">{longDate(date)}</p>
                   <div className="flex flex-wrap gap-2">

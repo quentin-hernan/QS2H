@@ -42,7 +42,7 @@ export function NoticeBell({ endpoint, label = "Notifications" }: { endpoint: st
       setUnread((u) => { if (j.unread > u) setBump((b) => b + 1); return j.unread; });
       if (seen.current) {
         const fresh = j.items.filter((n) => !seen.current!.has(n.id) && !n.readAt).slice(0, 3);
-        if (fresh.length) setToasts((t) => [...fresh, ...t].slice(0, 3));
+        if (fresh.length) { setToasts((t) => [...fresh, ...t].slice(0, 3)); window.dispatchEvent(new Event("qs2h:notice")); }
       }
       seen.current = new Set(j.items.map((n) => n.id));
     } catch { /* réseau */ }

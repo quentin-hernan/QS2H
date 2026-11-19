@@ -130,8 +130,8 @@ export function AnalyticsBoard() {
     fetch(`/api/admin/analytics?days=${d}`, { cache: "no-store" }).then((r) => r.json()).then((j) => { if (j.ok) { setData(j.data); setErr(""); } else setErr("Statistiques indisponibles."); }).catch(() => setErr("Statistiques indisponibles.")).finally(() => setLoading(false));
   }, []);
   useEffect(() => { load(days); }, [days, load]);
-  // temps réel : rafraîchi toutes les 30 secondes
-  useEffect(() => { const t = setInterval(() => load(days), 30000); return () => clearInterval(t); }, [days, load]);
+  // temps réel : rafraîchi toutes les 15 secondes (onglet visible), sans recharger la page
+  useEffect(() => { const t = setInterval(() => { if (!document.hidden) load(days); }, 15000); return () => clearInterval(t); }, [days, load]);
 
   const k = data?.kpis, p = data?.prev;
   const pmax = useMemo(() => Math.max(1, ...(data?.realtime.perMinute ?? [0])), [data]);

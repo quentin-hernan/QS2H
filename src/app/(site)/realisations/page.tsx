@@ -1,4 +1,5 @@
 import { PageHero, CtaBand } from "@/components/Blocks";
+import { TradesScene } from "@/components/Scenes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { RealisationsView } from "@/components/RealisationsView";
 import { getProjects, getServices } from "@/lib/content";
@@ -15,10 +16,10 @@ export default async function Realisations() {
   const sectors = [...new Set(projects.map((p) => p.sector))];
   return (
     <>
-      <PageHero eyebrow="Réalisations" title={<>Des sites pensés pour <span className="serif-it">chaque métier.</span></>} lead="Artisan, restaurant, cabinet, boutique : chaque projet part de l'activité du client, pas d'un modèle.">
+      <PageHero art={<TradesScene />} tight eyebrow="Réalisations" title={<>Des sites pensés pour <span className="serif-it">chaque métier.</span></>} lead="Artisan, restaurant, cabinet, boutique : chaque projet part de l'activité du client, pas d'un modèle.">
         <Breadcrumbs items={[{ name: "Réalisations", path: "/realisations" }]} />
       </PageHero>
-      <section className="light-section py-16 md:py-24" aria-label="Explorer les projets">
+      <section className="light-section pb-16 pt-6 md:pb-24 md:pt-8" aria-label="Explorer les projets">
         <div className="container">
           <RealisationsView
             desk={projects.map((p) => ({ slug: p.slug, title: p.title, client: p.client, sector: p.sector, year: p.year, summary: p.summary, cover: p.cover, url: p.url, isExample: p.isExample, duration: p.duration, beforeImage: p.beforeImage, planes: p.planes, meta: p.meta }))}

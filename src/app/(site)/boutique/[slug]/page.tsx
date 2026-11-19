@@ -34,8 +34,8 @@ export default async function ShopItemPage({ params }: P) {
         <div className="container">
           <Breadcrumbs items={[{ name: "Boutique", path: "/boutique" }, { name: p.title, path: `/boutique/${p.slug}` }]} />
           <div className="mt-8 grid gap-10 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-7"><Gallery images={imgs} title={p.title} /></div>
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-6"><Gallery images={imgs} title={p.title} /></div>
+            <div className="lg:col-span-6">
               <div className="lg:sticky lg:top-28">
                 <p className="muted text-[0.8rem] uppercase tracking-[0.14em]">{[p.brand, p.category].filter(Boolean).join(" · ")}</p>
                 <h1 className="mt-3 text-h2 font-medium">{p.title}</h1>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlanDevices } from "@/components/Scenes";
+import { PlanDevices, PriceScene } from "@/components/Scenes";
 import { PageHero, CtaBand } from "@/components/Blocks";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Reveal } from "@/components/Reveal";
@@ -22,11 +22,11 @@ export default async function Tarifs() {
   return (
     <>
       <JsonLd data={faqJsonLd(f)} />
-      <PageHero image={tp.heroImage || ""} eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
+      <PageHero image={tp.heroImage || ""} art={<PriceScene />} tight eyebrow="Tarifs" title={<>Un prix fixe, <span className="serif-it">écrit d&apos;avance.</span></>} lead="Trois formules pour la plupart des projets. Le devis est gratuit, sous 24 heures ouvrées, et le prix ne change pas en cours de route.">
         <Breadcrumbs items={[{ name: "Tarifs", path: "/tarifs" }]} />
       </PageHero>
 
-      <section className="light-section py-20 md:py-28">
+      <section className="light-section pb-20 pt-10 md:pb-28 md:pt-12">
         <div className="container">
           <PlanDevices names={plans.map((p) => p.name)} />
           <div className="plans grid gap-5 lg:grid-cols-3">
