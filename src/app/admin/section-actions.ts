@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { audit, requireSession } from "@/lib/auth";
 import { cleanStyle, isEmptyStyle, type StyleMap } from "@/lib/section-style";
 import { parseJson } from "@/lib/utils";
+import { cleanPageOverrides, isEmptyOv, type OverridesMap, type PageOverrides } from "@/lib/overrides";
 
 type Result = { ok: boolean; error?: string };
 const KEY = "sectionStyles";
@@ -47,7 +48,7 @@ export async function resetSectionStyle(path: string, index: string): Promise<Re
 export async function saveSlot(id: string, url: string): Promise<Result> {
   const s = await requireSession();
   if (!/^[a-zA-Z0-9\-_]{1,80}$/.test(id)) return { ok: false, error: "Emplacement invalide." };
-  if (url && !/^(\/|https:\/\/)/.test(url)) return { ok: false, error: "Adresse d'image invalide." };
+  if (url && url !== "none" && !/^(\/|https:\/\/)/.test(url)) return { ok: false, error: "Adresse d'image invalide." };
   const row = await db.setting.findUnique({ where: { key: "slots" } });
   const map = parseJson<Record<string, string>>(row?.value, {});
   if (url) map[id] = url.slice(0, 500); else delete map[id];
@@ -59,31 +60,29 @@ export async function saveSlot(id: string, url: string): Promise<Result> {
 }
 
 /* ------------------------------------------------------------------ Textes et images modifiés directement sur la page */
-type OvEntry = { o: string; v: string };
-type PageOv = { t?: Record<string, OvEntry>; m?: Record<string, OvEntry> };
 const OV_KEY = "overrides";
-async function loadOv() { return parseJson<Record<string, PageOv>>((await db.setting.findUnique({ where: { key: OV_KEY } }))?.value, {}); }
-async function persistOv(map: Record<string, PageOv>, who: string, path: string) {
+async function loadOv() { return parseJson<OverridesMap>((await db.setting.findUnique({ where: { key: OV_KEY } }))?.value, {}); }
+async function persistOv(map: OverridesMap, who: string, path: string) {
   await db.setting.upsert({ where: { key: OV_KEY }, create: { key: OV_KEY, value: JSON.stringify(map) }, update: { value: JSON.stringify(map) } });
-  await audit(who, "modification directe d'un texte ou d'une image", "overrides", path);
+  await audit(who, "modification directe des textes et images d'une page", "overrides", path);
   revalidateTag("content");
   revalidatePath("/", "layout");
 }
 
-export async function saveOverride(path: string, kind: "t" | "m", index: number, orig: string, value: string): Promise<Result> {
+/** Enregistre toutes les modifications directes d'une page (éditeur visuel ou admin : même donnée). */
+export async function savePageOverrides(path: string, page: unknown): Promise<Result> {
   const s = await requireSession();
-  if (!validPath(path) || (kind !== "t" && kind !== "m") || !Number.isInteger(index) || index < 0 || index > 5000) return { ok: false, error: "Élément invalide." };
-  const o = String(orig).slice(0, 2000), v = String(value).slice(0, 2000);
-  if (kind === "t" && !/\p{L}/u.test(v)) return { ok: false, error: "Le texte ne peut pas être vide." };
-  if (kind === "m" && v && !/^(\/|https:\/\/)/.test(v)) return { ok: false, error: "Adresse d'image invalide." };
+  if (!validPath(path)) return { ok: false, error: "Page invalide." };
+  const clean = cleanPageOverrides(page);
   const map = await loadOv();
-  const page = (map[path] = map[path] ?? {});
-  const bucket = (page[kind] = page[kind] ?? {});
-  if (!v || v === o) delete bucket[String(index)]; else bucket[String(index)] = { o, v };
-  if (!Object.keys(bucket).length) delete page[kind];
-  if (!page.t && !page.m) delete map[path];
+  if (isEmptyOv(clean)) delete map[path]; else map[path] = clean;
   await persistOv(map, s.email, path);
   return { ok: true };
+}
+
+export async function getPageOverrides(path: string): Promise<PageOverrides> {
+  await requireSession();
+  return (await loadOv())[path] ?? {};
 }
 
 export async function resetOverrides(path: string): Promise<Result> {

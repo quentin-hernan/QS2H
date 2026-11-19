@@ -13,6 +13,9 @@ import { buildMetadata, creativeWorkJsonLd } from "@/lib/seo";
 
 type P = { params: Promise<{ slug: string }> };
 
+// rendu à chaque visite : les modifications de l'admin apparaissent tout de suite
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   return (await getProjects()).map((p) => ({ slug: p.slug }));
 }

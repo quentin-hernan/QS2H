@@ -6,6 +6,9 @@ import { CtaBand } from "@/components/Blocks";
 import { getProduct, getProducts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
+// rendu à chaque visite : les modifications de l'admin apparaissent tout de suite
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   return (await getProducts()).map((p) => ({ slug: p.slug }));
 }

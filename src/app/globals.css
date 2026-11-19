@@ -269,3 +269,16 @@ h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *, h4 * { font-style: normal !important; 
 .sx-editing [data-ov]:hover { outline: 1.5px dashed rgb(127 169 217 / 0.95); outline-offset: 3px; cursor: text; }
 .sx-editing [data-ov="m"]:hover { cursor: pointer; }
 .sx-typing { outline: 2px solid #7FA9D9 !important; outline-offset: 4px; background: rgb(127 169 217 / 0.12); cursor: text; }
+
+/* Édition directe : éléments supprimés, zones ajoutées, élément choisi, barre d'outils */
+html:not(.sx-editing) [data-ov-hidden] { display: none !important; }
+.sx-editing [data-ov-hidden] { opacity: 0.28; outline: 1.5px dashed #d9534f; outline-offset: 3px; }
+.ov-media { display: block; max-width: 100%; height: auto; margin: 1.25rem 0; border-radius: 16px; }
+.ov-text { white-space: pre-wrap; }
+.sx-editing [data-ov="g"] { outline: 1.5px dashed rgb(127 169 217 / 0.6); outline-offset: 3px; }
+.sx-picked { outline: 2px solid #2A5587 !important; outline-offset: 4px; }
+#sx-bar { position: fixed; z-index: 95; display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px; border-radius: 12px; background: #1C1C1C; color: #F8F8F7; box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.5); font: 500 0.78rem/1 var(--font-sans), sans-serif; max-width: calc(100vw - 16px); }
+#sx-bar button { padding: 8px 10px; border-radius: 8px; color: inherit; background: transparent; }
+#sx-bar button:hover { background: rgb(248 248 247 / 0.12); }
+#sx-bar .sx-bar-del { color: #ff8a80; }
+#sx-bar .sx-bar-tag { padding: 0 8px; color: #A9AEB5; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.66rem; }

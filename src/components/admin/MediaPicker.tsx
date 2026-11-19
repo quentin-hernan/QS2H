@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 export type MediaItem = { id: string; url: string; alt: string; width: number; height: number; kind?: string };
 
 /** Sélecteur de média : bibliothèque + import (texte alternatif obligatoire). Utilise <dialog> (focus piégé nativement). */
-export function MediaPicker({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (m: MediaItem) => void }) {
+export function MediaPicker({ open, onClose, onPick, onRemove, removeLabel = "Retirer l'image" }: { open: boolean; onClose: () => void; onPick: (m: MediaItem) => void; onRemove?: () => void; removeLabel?: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [items, setItems] = useState<MediaItem[]>([]);
   const [tab, setTab] = useState<"lib" | "up">("lib");
@@ -38,7 +38,7 @@ export function MediaPicker({ open, onClose, onPick }: { open: boolean; onClose:
           <div className="flex gap-2" role="tablist">
             {(["lib", "up"] as const).map((t) => (<button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm ${tab === t ? "bg-ivory text-ink-900" : "hover:bg-white/10"}`}>{t === "lib" ? "Bibliothèque" : "Importer un fichier"}</button>))}
           </div>
-          <button type="button" onClick={onClose} className="rounded-full px-3 py-1.5 text-sm hover:bg-white/10" aria-label="Fermer">✕</button>
+          <span className="flex items-center gap-2">{onRemove && <button type="button" onClick={onRemove} className="err rounded-full border px-4 py-1.5 text-sm" style={{ borderColor: "currentColor" }}>{removeLabel}</button>}<button type="button" onClick={onClose} className="rounded-full px-3 py-1.5 text-sm hover:bg-white/10" aria-label="Fermer">✕</button></span>
         </div>
         {tab === "lib" ? (
           items.length === 0 ? <p className="muted py-10 text-center">Aucun média. Importez-en un.</p> : (

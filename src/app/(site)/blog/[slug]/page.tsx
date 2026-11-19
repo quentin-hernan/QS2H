@@ -14,6 +14,9 @@ import { cleanHtml } from "@/lib/sanitize";
 
 type P = { params: Promise<{ slug: string }> };
 
+// rendu à chaque visite : les modifications de l'admin apparaissent tout de suite
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   return (await getPosts()).map((p) => ({ slug: p.slug }));
 }

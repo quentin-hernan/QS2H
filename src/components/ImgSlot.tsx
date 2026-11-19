@@ -19,7 +19,9 @@ export function ImgSlot({ id, src = "", alt = "", className = "", children, ghos
   const router = useRouter();
   const [local, setLocal] = useState<string | null>(null);
   const [pick, setPick] = useState(false);
-  const url = local ?? slots[id] ?? src;
+  // local === "" : image retirée à l'instant (on n'affiche plus l'image par défaut non plus)
+  const raw = local !== null ? local : (slots[id] ?? src);
+  const url = raw === "none" ? "" : raw; // « none » : image retirée volontairement (l'image par défaut ne revient pas)
   const editing = () => document.documentElement.classList.contains("sx-editing");
   const open = (e: React.SyntheticEvent) => { if (!editing()) return; e.preventDefault(); e.stopPropagation(); setPick(true); };
   if (!url && !children && !ghost) return null;
@@ -37,6 +39,7 @@ export function ImgSlot({ id, src = "", alt = "", className = "", children, ghos
           open
           onClose={() => setPick(false)}
           onPick={async (m) => { setPick(false); setLocal(m.url); await saveSlot(id, m.url); router.refresh(); }}
+          onRemove={url ? async () => { setPick(false); setLocal("none"); await saveSlot(id, "none"); router.refresh(); } : undefined}
         />
       )}
     </>

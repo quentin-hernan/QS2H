@@ -15,6 +15,9 @@ import { euro } from "@/lib/utils";
 
 type P = { params: Promise<{ slug: string }> };
 
+// rendu à chaque visite : les modifications de l'admin apparaissent tout de suite
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
   return (await getServices()).map((s) => ({ slug: s.slug }));
 }
